@@ -9,7 +9,7 @@ from .dict_pomes import (
     dict_get_keys, dict_from_object, dict_from_form, dict_from_list, dict_replace_value, dict_pop_value
 )
 from .email_pomes import (
-    EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SERVER, email_send,
+    EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SERVER, email_send
 )
 from .encoding_pomes import (
     encode_ascii_hex, decode_ascii_hex
@@ -28,10 +28,16 @@ from .json_pomes import (
 )
 from .list_pomes import (
     list_compare, list_flatten, list_unflatten,
-    list_find_coupled, list_elem_starting_with, list_transform,
+    list_find_coupled, list_elem_starting_with, list_transform
 )
 from .str_pomes import (
     str_between, str_split_on_mark, str_find_whitespace
+)
+from .validation_pomes import (
+    VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
+    validate_value, validate_bool, validate_int, validate_float, validate_str,
+    validate_date, validate_datetime, validate_ints, validate_strs,
+    validation_format_error, validation_format_errors
 )
 from .xml_pomes import (
     xml_to_dict, xml_normalize_keys
@@ -61,11 +67,16 @@ __all__ = [
     # list_pomes
     list_compare, list_flatten, list_unflatten,
     list_find_coupled, list_elem_starting_with, list_transform,
+    # validation_pomes
+    VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
+    validate_value, validate_bool, validate_int, validate_float, validate_str,
+    validate_date, validate_datetime, validate_ints, validate_strs,
+    validation_format_error, validation_format_errors,
     # str_pomes
     str_between, str_split_on_mark, str_find_whitespace,
     # xml_pomes
     xml_to_dict, xml_normalize_keys
 ]
 
-__version__ = "0.1.1"
-__version_info__ = (0, 1, 1)
+__version__ = "0.1.2"
+__version_info__ = (0, 1, 2)
