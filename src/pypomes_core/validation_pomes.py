@@ -283,10 +283,10 @@ def validate_strs(errors: list[str], scheme: dict, attr: str,
     return result
 
 
-def validation_format_error(err_msg: str, *args) -> str:
+def validate_format_error(error_id: int, err_msgs: dict, *args) -> str:
 
     # inicializa a variável de retorno
-    result: str = err_msg
+    result: str = VALIDATION_MSG_PREFIX + str(error_id) + ": " + err_msgs.get(error_id)
 
     if result is not None:
         # aplica os argumentos fornecidos
@@ -304,7 +304,7 @@ def validation_format_error(err_msg: str, *args) -> str:
 
 
 # formata itens na lista de erros: <codigo> <descricao> [@<atributo>]
-def validation_format_errors(errors: list[str]) -> list[dict]:
+def validate_format_errors(errors: list[str]) -> list[dict]:
 
     # import needed modulo
     from .str_pomes import str_find_whitespace
@@ -329,55 +329,57 @@ def validation_format_errors(errors: list[str]) -> list[dict]:
             desc: str = error
         else:
             # sim
-            out_error: dict = {"atributo": error[pos + 1:]}
+            term: str = "attribute" if VALIDATION_MSG_LANGUAGE == "en" else "atributo"
+            out_error: dict = {term: error[pos + 1:]}
             desc = error[:pos - 1]
 
         # o texto contem o código ?
         if desc.startswith(VALIDATION_MSG_PREFIX):
             # sim
-            out_error["codigo"] = desc[0:7]
+            term: str = "code" if VALIDATION_MSG_LANGUAGE == "en" else "codigo"
+            out_error[term] = desc[0:7]
             desc = desc[9:]
 
-        out_error["descricao"] = desc
+        term: str = "description" if VALIDATION_MSG_LANGUAGE == "en" else "descricao"
+        out_error[term] = desc
         result.append(out_error)
 
     return result
 
 
-__ERR_MSGS_EN: Final[dict] = {
-    10: "Value must be provided",
-    11: "Invalid value {}",
-    12: "Invalid value {}: length shorter than {}",
-    13: "Invalid value {}: length longer than {}",
-    14: "Invalid value {}: length must be {}",
-    15: "Invalid value {}: must be {}",
-    16: "Invalid value {}: must be one of {}",
-    17: "Invalid value {}: must be in the range {}",
-    18: "Invalid value {}: must be type {}",
-    19: "Invalid value {}: date is later than the current date"
-}
+def __format_error(err_id: int, *args) -> str:
 
-__ERR_MSGS_PT: Final[dict] = {
-    10: "Valor deve ser fornecido",
-    11: "Valor {} inválido",
-    12: "Valor {} inválido: comprimento menor que {}",
-    13: "Valor {} inválido: comprimento maior que {}",
-    14: "Valor {} inválido: comprimento deve ser {}",
-    15: "Valor {} inválido: deve ser {}",
-    16: "Valor {} inválido: deve ser um de {}",
-    17: "Valor {} inválido: deve estar no intervalo {}",
-    18: "Valor {} inválido: deve ser do tipo {}",
-    19: "Valor {} inválido: data posterior à data atual"
-}
+    err_msgs_en: Final[dict] = {
+        10: "Value must be provided",
+        11: "Invalid value {}",
+        12: "Invalid value {}: length shorter than {}",
+        13: "Invalid value {}: length longer than {}",
+        14: "Invalid value {}: length must be {}",
+        15: "Invalid value {}: must be {}",
+        16: "Invalid value {}: must be one of {}",
+        17: "Invalid value {}: must be in the range {}",
+        18: "Invalid value {}: must be type {}",
+        19: "Invalid value {}: date is later than the current date"
+    }
 
+    err_msgs_pt: Final[dict] = {
+        10: "Valor deve ser fornecido",
+        11: "Valor {} inválido",
+        12: "Valor {} inválido: comprimento menor que {}",
+        13: "Valor {} inválido: comprimento maior que {}",
+        14: "Valor {} inválido: comprimento deve ser {}",
+        15: "Valor {} inválido: deve ser {}",
+        16: "Valor {} inválido: deve ser um de {}",
+        17: "Valor {} inválido: deve estar no intervalo {}",
+        18: "Valor {} inválido: deve ser do tipo {}",
+        19: "Valor {} inválido: data posterior à data atual"
+    }
 
-def __format_error(error_id: int, *args) -> str:
-
-    err_msg: str | None = None
+    err_msgs: dict | None = None
     match VALIDATION_MSG_LANGUAGE:
         case "en":
-            err_msg = __ERR_MSGS_EN.get(error_id)
+            err_msgs = err_msgs_en
         case "pt":
-            err_msg = __ERR_MSGS_PT.get(error_id)
+            err_msgs = err_msgs_pt
 
-    return validation_format_error(err_msg, args)
+    return validate_format_error(err_id, err_msgs, args)
