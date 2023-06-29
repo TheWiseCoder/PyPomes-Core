@@ -23,6 +23,12 @@ from .exception_pomes import (
 from .file_pomes import (
     file_from_request
 )
+from .http_pomes import (
+    MIMETYPE_BINARY, MIMETYPE_CSS, MIMETYPE_CSV, MIMETYPE_HTML, MIMETYPE_JAVASCRIPT,
+    MIMETYPE_JSON, MIMETYPE_MULTIPART, MIMETYPE_PDF, MIMETYPE_PKCS7, MIMETYPE_SOAP,
+    MIMETYPE_TEXT, MIMETYPE_URLENCODED, MIMETYPE_XML, MIMETYPE_ZIP,
+    http_status
+)
 from .json_pomes import (
     jsonify_dict, jsonify_iterable
 )
@@ -62,6 +68,11 @@ __all__ = [
     exc_format,
     # file_pomes
     file_from_request,
+    # http_pomes
+    MIMETYPE_BINARY, MIMETYPE_CSS, MIMETYPE_CSV, MIMETYPE_HTML, MIMETYPE_JAVASCRIPT,
+    MIMETYPE_JSON, MIMETYPE_MULTIPART, MIMETYPE_PDF, MIMETYPE_PKCS7, MIMETYPE_SOAP,
+    MIMETYPE_TEXT, MIMETYPE_URLENCODED, MIMETYPE_XML, MIMETYPE_ZIP,
+    http_status,
     # json_pomes
     jsonify_dict, jsonify_iterable,
     # list_pomes
@@ -78,5 +89,5 @@ __all__ = [
     xml_to_dict, xml_normalize_keys
 ]
 
-__version__ = "0.1.3"
-__version_info__ = (0, 1, 3)
+__version__ = "0.1.4"
+__version_info__ = (0, 1, 4)
