@@ -27,14 +27,19 @@ from .http_pomes import (
     MIMETYPE_BINARY, MIMETYPE_CSS, MIMETYPE_CSV, MIMETYPE_HTML, MIMETYPE_JAVASCRIPT,
     MIMETYPE_JSON, MIMETYPE_MULTIPART, MIMETYPE_PDF, MIMETYPE_PKCS7, MIMETYPE_SOAP,
     MIMETYPE_TEXT, MIMETYPE_URLENCODED, MIMETYPE_XML, MIMETYPE_ZIP,
-    http_status_name, http_status_description, htpp_json_from_get, htpp_json_from_post
+    http_status_name, http_status_description, http_json_from_get, http_json_from_post
 )
 from .json_pomes import (
-    jsonify_dict, jsonify_iterable
+    json_normalize_dict, json_normalize_iterable, json_from_request
 )
 from .list_pomes import (
     list_compare, list_flatten, list_unflatten,
     list_find_coupled, list_elem_starting_with, list_transform
+)
+from .logging_pomes import (
+    LOGGING_ID, LOGGING_LEVEL, LOGGING_FORMAT, LOGGING_STYLE,
+    LOGGING_FILE_PATH, LOGGING_FILE_MODE, PYPOMES_LOGGER,
+    logging_log_msgs, logging_get_entries
 )
 from .str_pomes import (
     str_between, str_split_on_mark, str_find_whitespace
@@ -72,12 +77,16 @@ __all__ = [
     MIMETYPE_BINARY, MIMETYPE_CSS, MIMETYPE_CSV, MIMETYPE_HTML, MIMETYPE_JAVASCRIPT,
     MIMETYPE_JSON, MIMETYPE_MULTIPART, MIMETYPE_PDF, MIMETYPE_PKCS7, MIMETYPE_SOAP,
     MIMETYPE_TEXT, MIMETYPE_URLENCODED, MIMETYPE_XML, MIMETYPE_ZIP,
-    http_status_name, http_status_description, htpp_json_from_get, htpp_json_from_post,
+    http_status_name, http_status_description, http_json_from_get, http_json_from_post,
     # json_pomes
-    jsonify_dict, jsonify_iterable,
+    json_normalize_dict, json_normalize_iterable, json_from_request,
     # list_pomes
     list_compare, list_flatten, list_unflatten,
     list_find_coupled, list_elem_starting_with, list_transform,
+    # logging_pomes
+    LOGGING_ID, LOGGING_LEVEL, LOGGING_FORMAT, LOGGING_STYLE,
+    LOGGING_FILE_PATH, LOGGING_FILE_MODE, PYPOMES_LOGGER,
+    logging_log_msgs, logging_get_entries,
     # validation_pomes
     VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
     validate_value, validate_bool, validate_int, validate_float, validate_str,
@@ -89,5 +98,5 @@ __all__ = [
     XML_FILE_HEADER, xml_to_dict, xml_normalize_keys
 ]
 
-__version__ = "0.1.5"
-__version_info__ = (0, 1, 5)
+__version__ = "0.1.8"
+__version_info__ = (0, 1, 8)

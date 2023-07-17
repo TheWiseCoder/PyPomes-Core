@@ -1,7 +1,7 @@
+import sys
 from email.message import EmailMessage
 from smtplib import SMTP
 from typing import Final
-import sys
 from .env_pomes import APP_PREFIX, env_get_str, env_get_int
 
 EMAIL_ACCOUNT: Final[str] = env_get_str(f"{APP_PREFIX}_EMAIL_ACCOUNT")

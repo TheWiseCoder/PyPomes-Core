@@ -1,6 +1,6 @@
-from flask import Request
 import inspect
 import types
+from flask import Request
 
 
 def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:

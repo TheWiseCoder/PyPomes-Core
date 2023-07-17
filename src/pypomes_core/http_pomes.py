@@ -1,8 +1,7 @@
-
-from typing import Final
 import logging
 import requests
 import sys
+from typing import Final
 
 from .exception_pomes import exc_format
 
@@ -205,8 +204,8 @@ def http_status_description(status_code: int) -> str:
     return result
 
 
-def htpp_json_from_get(errors: list[str], url: str, headers: dict = None,
-                       req_params: dict = None, logger: logging.Logger = None) -> dict:
+def http_json_from_get(errors: list[str], url: str, headers: dict = None,
+                       params: dict = None, logger: logging.Logger = None) -> dict:
 
     if logger is not None:
         logger.info(f"Invoking GET: '{url}'")
@@ -217,7 +216,7 @@ def htpp_json_from_get(errors: list[str], url: str, headers: dict = None,
     try:
         response: requests.Response = requests.get(url=url,
                                                    headers=headers,
-                                                   params=req_params)
+                                                   params=params)
         if logger is not None:
             logger.info(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
         result = response.json()
@@ -230,8 +229,8 @@ def htpp_json_from_get(errors: list[str], url: str, headers: dict = None,
     return result
 
 
-def htpp_json_from_post(errors: list[str], url: str, headers: dict = None, req_params: dict = None,
-                        req_data: dict = None, req_json: dict = None, logger: logging.Logger = None) -> dict:
+def http_json_from_post(errors: list[str], url: str, headers: dict = None, params: dict = None,
+                        data: dict = None, json: dict = None, logger: logging.Logger = None) -> dict:
 
     if logger is not None:
         logger.info(f"Invoking POST: '{url}'")
@@ -242,9 +241,9 @@ def htpp_json_from_post(errors: list[str], url: str, headers: dict = None, req_p
     try:
         response: requests.Response = requests.post(url=url,
                                                     headers=headers,
-                                                    data=req_data,
-                                                    json=req_json,
-                                                    params=req_params)
+                                                    data=data,
+                                                    json=json,
+                                                    params=params)
         if logger is not None:
             logger.info(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
         result = response.json()
