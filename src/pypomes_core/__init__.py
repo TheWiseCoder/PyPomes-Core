@@ -27,7 +27,7 @@ from .http_pomes import (
     MIMETYPE_BINARY, MIMETYPE_CSS, MIMETYPE_CSV, MIMETYPE_HTML, MIMETYPE_JAVASCRIPT,
     MIMETYPE_JSON, MIMETYPE_MULTIPART, MIMETYPE_PDF, MIMETYPE_PKCS7, MIMETYPE_SOAP,
     MIMETYPE_TEXT, MIMETYPE_URLENCODED, MIMETYPE_XML, MIMETYPE_ZIP,
-    http_status
+    http_status_name, http_status_description, htpp_json_from_get, htpp_json_from_post
 )
 from .json_pomes import (
     jsonify_dict, jsonify_iterable
@@ -46,7 +46,7 @@ from .validation_pomes import (
     validate_format_error, validate_format_errors
 )
 from .xml_pomes import (
-    xml_to_dict, xml_normalize_keys
+    XML_FILE_HEADER, xml_to_dict, xml_normalize_keys
 )
 
 __all__ = [
@@ -72,7 +72,7 @@ __all__ = [
     MIMETYPE_BINARY, MIMETYPE_CSS, MIMETYPE_CSV, MIMETYPE_HTML, MIMETYPE_JAVASCRIPT,
     MIMETYPE_JSON, MIMETYPE_MULTIPART, MIMETYPE_PDF, MIMETYPE_PKCS7, MIMETYPE_SOAP,
     MIMETYPE_TEXT, MIMETYPE_URLENCODED, MIMETYPE_XML, MIMETYPE_ZIP,
-    http_status,
+    http_status_name, http_status_description, htpp_json_from_get, htpp_json_from_post,
     # json_pomes
     jsonify_dict, jsonify_iterable,
     # list_pomes
@@ -86,8 +86,8 @@ __all__ = [
     # str_pomes
     str_between, str_split_on_mark, str_find_whitespace,
     # xml_pomes
-    xml_to_dict, xml_normalize_keys
+    XML_FILE_HEADER, xml_to_dict, xml_normalize_keys
 ]
 
-__version__ = "0.1.4"
-__version_info__ = (0, 1, 4)
+__version__ = "0.1.5"
+__version_info__ = (0, 1, 5)

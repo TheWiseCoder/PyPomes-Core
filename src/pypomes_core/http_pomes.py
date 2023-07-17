@@ -1,4 +1,10 @@
+
 from typing import Final
+import logging
+import requests
+import sys
+
+from .exception_pomes import exc_format
 
 # https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status
 
@@ -18,7 +24,7 @@ MIMETYPE_XML: Final[str] = "application/xml"
 MIMETYPE_ZIP: Final[str] = "application/zip"
 
 
-# TODO (adddescription)
+# TODO (add description)
 __HTTP_STATUS: Final[dict] = {
   200: {
     "name": "OK",
@@ -183,9 +189,69 @@ __HTTP_STATUS: Final[dict] = {
 }
 
 
-def http_status(status_code: int) -> str:
+def http_status_name(status_code: int) -> str:
 
-    item: dict = __HTTP_STATUS.get(status_code, {"name": None})
-    result = f"HTTP status code {status_code}, {item.get('name')}"
+    item: dict = __HTTP_STATUS.get(status_code, {"name": "Unknown status code"})
+    result = f"HTTP status code {status_code}: {item.get('name')}"
                                                              
+    return result
+
+
+def http_status_description(status_code: int) -> str:
+
+    item: dict = __HTTP_STATUS.get(status_code, {"description": "Unknown status code"})
+    result = f"HTTP status code {status_code}: {item.get('description')}"
+
+    return result
+
+
+def htpp_json_from_get(errors: list[str], url: str, headers: dict = None,
+                       req_params: dict = None, logger: logging.Logger = None) -> dict:
+
+    if logger is not None:
+        logger.info(f"Invoking GET: '{url}'")
+
+    # initialize return variable
+    result: dict | None = None
+
+    try:
+        response: requests.Response = requests.get(url=url,
+                                                   headers=headers,
+                                                   params=req_params)
+        if logger is not None:
+            logger.info(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
+        result = response.json()
+    except Exception as e:
+        msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
+        if logger is not None:
+            logger.info(msg)
+        errors.append(msg)
+
+    return result
+
+
+def htpp_json_from_post(errors: list[str], url: str, headers: dict = None, req_params: dict = None,
+                        req_data: dict = None, req_json: dict = None, logger: logging.Logger = None) -> dict:
+
+    if logger is not None:
+        logger.info(f"Invoking POST: '{url}'")
+
+    # initialize return variable
+    result: dict | None = None
+
+    try:
+        response: requests.Response = requests.post(url=url,
+                                                    headers=headers,
+                                                    data=req_data,
+                                                    json=req_json,
+                                                    params=req_params)
+        if logger is not None:
+            logger.info(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
+        result = response.json()
+    except Exception as e:
+        msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
+        if logger is not None:
+            logger.info(msg)
+        errors.append(msg)
+
     return result

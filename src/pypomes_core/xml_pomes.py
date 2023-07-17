@@ -1,4 +1,7 @@
+from typing import Final
 from xmltodict3 import XmlTextToDict
+
+XML_FILE_HEADER: Final[str] = '<?xml version="1.0" encoding="UTF-8" ?>'
 
 
 def xml_normalize_keys(source: dict) -> dict:
