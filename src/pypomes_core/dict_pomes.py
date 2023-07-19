@@ -1,6 +1,5 @@
 import inspect
 import types
-from flask import Request
 
 
 def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
@@ -534,24 +533,6 @@ def dict_from_object(source: object) -> dict:
             else:
                 # não, prossiga linearmente
                 result[name] = value
-
-    return result
-
-
-def dict_from_form(request: Request) -> dict:
-    """
-    Constrói e retorna um *dict* com os parâmetros encontrados no form existente em *request*.
-
-    :param request: the HTTP request
-    :return: dicionários contendo os parâmetros encontrados.
-    """
-
-    # inicializa variável de retorno
-    result: dict = {}
-
-    # percorre os parâmetros do form
-    for key, value in request.form.items():
-        result[key] = value
 
     return result
 

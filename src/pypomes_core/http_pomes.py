@@ -1,7 +1,9 @@
 import logging
 import requests
 import sys
+from flask import Request
 from typing import Final
+from werkzeug.exceptions import BadRequest
 
 from .exception_pomes import exc_format
 
@@ -204,13 +206,53 @@ def http_status_description(status_code: int) -> str:
     return result
 
 
+def http_json_from_form(request: Request) -> dict:
+    """
+    Constrói e retorna um *dict* com os parâmetros encontrados no form existente em *request*.
+
+    :param request: the HTTP request
+    :return: dicionários contendo os parâmetros encontrados.
+    """
+
+    # initialize the return variable
+    result: dict = {}
+
+    # traverse the form parameters
+    for key, value in request.form.items():
+        result[key] = value
+
+    return result
+
+
+def http_json_from_request(request: Request) -> dict:
+    """
+    Obtain the *JSON* holding the *request*'s input parameters.
+
+    :param request: the Request object
+    :return: dict containing the input parameters (empty, if no input data exist)
+    """
+    # initialize the return variable
+    result: dict = {}
+
+    # retrieve the input JSON
+    try:
+        result: dict = request.get_json()
+    except BadRequest:
+        resp: str = request.get_data(as_text=True)
+        # does the request contain input data ?
+        if len(resp) > 0:
+            # yes, possibly mal-fomed JSON
+            raise
+    return result
+
+
 def http_json_from_get(errors: list[str], url: str, headers: dict = None,
                        params: dict = None, logger: logging.Logger = None) -> dict:
 
     if logger is not None:
         logger.info(f"Invoking GET: '{url}'")
 
-    # initialize return variable
+    # initialize the return variable
     result: dict | None = None
 
     try:
@@ -235,7 +277,7 @@ def http_json_from_post(errors: list[str], url: str, headers: dict = None, param
     if logger is not None:
         logger.info(f"Invoking POST: '{url}'")
 
-    # initialize return variable
+    # initialize the return variable
     result: dict | None = None
 
     try:

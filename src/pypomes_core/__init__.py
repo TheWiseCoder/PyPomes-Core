@@ -6,7 +6,7 @@ from .datetime_pomes import (
 from .dict_pomes import (
     dict_has_key_chain, dict_get_value, dict_set_value, dict_reduce,
     dict_listify, dict_transform, dict_merge, dict_coalesce, dict_get_key,
-    dict_get_keys, dict_from_object, dict_from_form, dict_from_list, dict_replace_value, dict_pop_value
+    dict_get_keys, dict_from_object, dict_from_list, dict_replace_value, dict_pop_value
 )
 from .email_pomes import (
     EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SERVER, email_send
@@ -27,10 +27,11 @@ from .http_pomes import (
     MIMETYPE_BINARY, MIMETYPE_CSS, MIMETYPE_CSV, MIMETYPE_HTML, MIMETYPE_JAVASCRIPT,
     MIMETYPE_JSON, MIMETYPE_MULTIPART, MIMETYPE_PDF, MIMETYPE_PKCS7, MIMETYPE_SOAP,
     MIMETYPE_TEXT, MIMETYPE_URLENCODED, MIMETYPE_XML, MIMETYPE_ZIP,
-    http_status_name, http_status_description, http_json_from_get, http_json_from_post
+    http_status_name, http_status_description,
+    http_json_from_form, http_json_from_request, http_json_from_get, http_json_from_post
 )
 from .json_pomes import (
-    json_normalize_dict, json_normalize_iterable, json_from_request
+    json_normalize_dict, json_normalize_iterable
 )
 from .list_pomes import (
     list_compare, list_flatten, list_unflatten,
@@ -62,7 +63,7 @@ __all__ = [
     # dict_pomes
     dict_has_key_chain, dict_get_value, dict_set_value, dict_reduce,
     dict_listify, dict_transform, dict_merge, dict_coalesce, dict_get_key,
-    dict_get_keys, dict_from_object, dict_from_form, dict_from_list, dict_replace_value, dict_pop_value,
+    dict_get_keys, dict_from_object, dict_from_list, dict_replace_value, dict_pop_value,
     # email_pomes
     EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SERVER, email_send,
     # encoding_pomes
@@ -77,9 +78,10 @@ __all__ = [
     MIMETYPE_BINARY, MIMETYPE_CSS, MIMETYPE_CSV, MIMETYPE_HTML, MIMETYPE_JAVASCRIPT,
     MIMETYPE_JSON, MIMETYPE_MULTIPART, MIMETYPE_PDF, MIMETYPE_PKCS7, MIMETYPE_SOAP,
     MIMETYPE_TEXT, MIMETYPE_URLENCODED, MIMETYPE_XML, MIMETYPE_ZIP,
-    http_status_name, http_status_description, http_json_from_get, http_json_from_post,
+    http_status_name, http_status_description,
+    http_json_from_form, http_json_from_request, http_json_from_get, http_json_from_post,
     # json_pomes
-    json_normalize_dict, json_normalize_iterable, json_from_request,
+    json_normalize_dict, json_normalize_iterable,
     # list_pomes
     list_compare, list_flatten, list_unflatten,
     list_find_coupled, list_elem_starting_with, list_transform,
@@ -98,5 +100,5 @@ __all__ = [
     XML_FILE_HEADER, xml_to_dict, xml_normalize_keys
 ]
 
-__version__ = "0.1.8"
-__version_info__ = (0, 1, 8)
+__version__ = "0.2.0"
+__version_info__ = (0, 2, 0)
