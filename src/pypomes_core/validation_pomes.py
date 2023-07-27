@@ -7,59 +7,79 @@ VALIDATION_MSG_LANGUAGE: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_
 VALIDATION_MSG_PREFIX: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_PREFIX", APP_PREFIX)
 
 
-# valida o valor do atributo de acordo com lista e restrições de comprimento
-def validate_value(value: str | int | float, min_val: int = None,
+def validate_value(val: str | int | float, min_val: int = None,
                    max_val: int = None, default: bool | list[any] = None) -> str:
+    """
+    Validate *val* according to type, range, or membership in values list, as specified.
 
-    # inicializa variável de retorno
+    :param val: the value to be validated
+    :param min_val: if val is a string, specifies its minimum length; otherwise, specifies its minimum value
+    :param max_val:  if val is a string, specifies its maximum length; otherwise, specifies its maximum value
+    :param default: if boolean, requires val to be specified; if list, requires val to be in it
+    :return: None if val passes validation; otherwise, the corresponding error message
+    """
+    # initialize the return variable
     result: str | None = None
-    # 'value' pode ser None, e None pode estar em 'default'
+
+    # 'val' can be None, and None can be in 'default'
     if isinstance(default, list):
-        if value not in default:
-            if value is None:
+        if val not in default:
+            if val is None:
                 result = __format_error(10)
             else:
                 length: int = len(default)
                 if length == 1:
-                    result = __format_error(15, value, default[0])
+                    result = __format_error(15, val, default[0])
                 else:
                     # o último elemento da lista é None ?
                     if default[-1] is None:
                         # sim, omita-o da mensagem
                         length -= 1
-                    result = __format_error(16, value, [default[:length]])
-    elif value is None:
+                    result = __format_error(16, val, [default[:length]])
+    elif val is None:
         if isinstance(default, bool) and default:
             result = __format_error(10)
-    elif isinstance(value, str):
-        length: int = len(value)
+    elif isinstance(val, str):
+        length: int = len(val)
         if min_val is not None and max_val == min_val and length != min_val:
-            result = __format_error(14, value, min_val)
+            result = __format_error(14, val, min_val)
         elif max_val is not None and max_val < length:
-            result = __format_error(13, value, max_val)
+            result = __format_error(13, val, max_val)
         elif min_val is not None and length < min_val:
-            result = __format_error(12, value, min_val)
-    elif (min_val is not None and value < min_val) or \
-         (max_val is not None and value > max_val):
-        result = __format_error(17, value, [min_val, max_val])
+            result = __format_error(12, val, min_val)
+    elif (min_val is not None and val < min_val) or \
+         (max_val is not None and val > max_val):
+        result = __format_error(17, val, [min_val, max_val])
 
     return result
 
 
-# obtem e valida booleano - valor retornado pode ser None
 def validate_bool(errors: list[str], scheme: dict, attr: str,
-                  default: bool = None, mandatory: bool = False, parse_string: bool = False) -> bool:
+                  default: bool = None, mandatory: bool = False) -> bool:
+    """
+    Validate the boolean value associated with *attr* in *scheme*.
+    If provided, this value must be a *bool*, or the string *t*, *true*, *f*, or *false*.
 
+    :param errors: incidental error messages
+    :param scheme: dictionary containing the value to be validated
+    :param attr: the name of the attribute whose value is being validated
+    :param default: default value, if not found
+    :param mandatory: specifies whether the value must be provided
+    :return:
+    """
+    # initialize the return variable
     result: bool | None = None
+
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
     try:
-        if parse_string:
-            result = json.loads(scheme[suffix].lower())
-        else:
-            result = scheme[suffix]
-
+        result = scheme[suffix]
+        if isinstance(result, str):
+            if result.lower() in ["t", "true"]:
+                result = True
+            elif result.lower() in ["f", "false"]:
+                result = False
         if not isinstance(result, bool):
             stat = __format_error(18, result, "bool")
     except (KeyError, TypeError):
@@ -74,28 +94,47 @@ def validate_bool(errors: list[str], scheme: dict, attr: str,
     return result
 
 
-# obtem e valida inteiro - valor retornado pode ser None
 def validate_int(errors: list[str], scheme: dict, attr: str,
-                 min_value: int = None, max_value: int = None,
+                 min_val: int = None, max_val: int = None,
                  default: bool | int | list[int] = None) -> int:
+    """
+    Validate the *int* value associated with *attr* in *scheme*.
+    If provided, this value must be a *int*, or a valid string representation of a *int*.
 
+    :param errors: incidental error messages
+    :param scheme: dictionary containing the value to be validated
+    :param attr: the attribute associated with the value to be validated
+    :param min_val: the minimum value accepted
+    :param max_val:  the maximum value accepted
+    :param default: if int, specifies the default value;
+                    if bool, requires the value to be specified;
+                    if list, requires the value to be in it
+    :return: the validated value, or None if validation failed
+    """
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
 
-    # obtem e valida o valor
+    # retrieve the value
     result: int | None = scheme.get(suffix)
+
+    # validate it
+    if result is None:
+        result = default
+    elif isinstance(result, str):
+        try:
+            result = int(result)
+        except ValueError:
+            result = None
+            stat = __format_error(18, result, "int")
+
+    # bool is subtype of int
     if result is not None and \
-       (not isinstance(result, int) or isinstance(result, bool)):
+            (isinstance(result, bool) or not isinstance(result, int)):
         stat = __format_error(18, result, "int")
-    # bool é subtipo de int
-    elif isinstance(default, int) and not isinstance(default, bool):
-        if result is None:
-            result = default
-        else:
-            stat = validate_value(result, min_value, max_value)
-    else:
-        stat = validate_value(result, min_value, max_value, default)
+
+    if stat is None:
+        stat = validate_value(result, min_val, max_val, default)
 
     if stat is not None:
         errors.append(f"{stat} @{attr}")
@@ -103,38 +142,53 @@ def validate_int(errors: list[str], scheme: dict, attr: str,
     return result
 
 
-# obtem e valida decimal - valor retornado pode ser None
 def validate_float(errors: list[str], scheme: dict, attr: str,
-                   min_value: float = None, max_value: float = None,
-                   default: bool | float | list[float | int] = None) -> float:
+                   min_val: float = None, max_val: float = None,
+                   default: bool | int | float | list[float | int] = None) -> float:
+    """
+    Validate the *float* value associated with *attr* in *scheme*.
+    If provided, this value must be a *float*, or a valid string representation of a *float*.
 
+    :param errors: incidental error messages
+    :param scheme: dictionary containing the value to be validated
+    :param attr: the attribute associated with the value to be validated
+    :param min_val: the minimum value accepted
+    :param max_val:  the maximum value accepted
+    :param default: if float, specifies the default value;
+                    if bool, requires the value to be specified;
+                    if list, requires the value to be in it
+    :return: the validated value, or None if validation failed
+    """
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
 
-    # obtem e valida o valor
+    # retrieve the value
     result: float | None = scheme.get(suffix)
-    if result is not None and not isinstance(result, int) and not isinstance(result, float):
-        stat = __format_error(18, result, "float")
-    else:
-        # bool é subtipo de int
-        if isinstance(result, int) and not isinstance(result, bool):
+
+    # validate it
+    if result is None:
+        result = default
+    elif isinstance(result, str) or isinstance(result, int):
+        try:
             result = float(result)
-        if isinstance(default, float):
-            if result is None:
-                result = default
-            else:
-                stat = validate_value(result, min_value, max_value)
-        else:
-            stat = validate_value(result, min_value, max_value, default)
+        except ValueError:
+            result = None
+            stat = __format_error(18, result, "int")
+
+    if result is not None and not isinstance(result, float):
+        stat = __format_error(18, result, "float")
+
+    if stat is None:
+        stat = validate_value(result, min_val, max_val, default)
 
     if stat is not None:
+        result = None
         errors.append(f"{stat} @{attr}")
 
     return result
 
 
-# obtem e valida string - valor retornado pode ser None
 def validate_str(errors: list[str], scheme: dict, attr: str,
                  min_length: int = None, max_length: int = None,
                  default: bool | str | list[str] = None) -> str:
@@ -161,7 +215,6 @@ def validate_str(errors: list[str], scheme: dict, attr: str,
     return result
 
 
-# obtem e valida data - valor retornado pode ser None
 def validate_date(errors: list[str], scheme: dict, attr: str,
                   default: bool | date = None, day_first: bool = True) -> date:
 
@@ -191,7 +244,6 @@ def validate_date(errors: list[str], scheme: dict, attr: str,
     return result
 
 
-# obtem e valida data - valor retornado pode ser None
 def validate_datetime(errors: list[str], scheme: dict, attr: str,
                       default: bool | datetime = None, day_first: bool = True) -> datetime:
 
@@ -221,7 +273,6 @@ def validate_datetime(errors: list[str], scheme: dict, attr: str,
     return result
 
 
-# obtem e valida lista de inteiros - valor retornado pode ser None ou lista vazia
 def validate_ints(errors: list[str], scheme: dict, attr: str,
                   min_size: int = None, max_size: int = None, mandatory: bool = False) -> list[int]:
 
@@ -252,7 +303,6 @@ def validate_ints(errors: list[str], scheme: dict, attr: str,
     return result
 
 
-# obtem e valida lista de strings - valor retornado pode ser None ou uma lista vazia
 def validate_strs(errors: list[str], scheme: dict, attr: str,
                   min_size: int, max_size: int, mandatory: bool = False) -> list[str]:
 
@@ -285,11 +335,11 @@ def validate_strs(errors: list[str], scheme: dict, attr: str,
 
 def validate_format_error(error_id: int, err_msgs: dict, *args) -> str:
 
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: str = VALIDATION_MSG_PREFIX + str(error_id) + ": " + err_msgs.get(error_id)
 
     if result is not None:
-        # aplica os argumentos fornecidos
+        # apply the provided  arguments
         for arg in args:
             if arg is None:
                 result = result.replace(" {}", "", 1)
@@ -306,39 +356,40 @@ def validate_format_error(error_id: int, err_msgs: dict, *args) -> str:
 # formata itens na lista de erros: <codigo> <descricao> [@<atributo>]
 def validate_format_errors(errors: list[str]) -> list[dict]:
 
-    # import needed modulo
+    # import needed module
     from .str_pomes import str_find_whitespace
 
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: list[dict] = []
 
-    # extrai código, descrição e atributo do texto
+    # extract error code, description, and attribute from text
     for error in errors:
         # localiza o último indicador do atributo
         pos = error.rfind("@")
 
-        # existe whitespace no nome do atributo ?
+        # is there a whitespace in the attribute ?
         if pos > 0 and str_find_whitespace(error[pos:]) > 0:
-            # sim, desconsidere-o
+            # yes, disregard it
             pos = -1
 
-        # o texto contem o atributo ?
+        # does the text contain the attribute ?
         if pos == -1:
-            # não
+            # no
             out_error: dict = {}
             desc: str = error
         else:
-            # sim
+            # yes
             term: str = "attribute" if VALIDATION_MSG_LANGUAGE == "en" else "atributo"
             out_error: dict = {term: error[pos + 1:]}
             desc = error[:pos - 1]
 
-        # o texto contem o código ?
+        # does the text contain an error code ?
         if desc.startswith(VALIDATION_MSG_PREFIX):
-            # sim
+            # yes
             term: str = "code" if VALIDATION_MSG_LANGUAGE == "en" else "codigo"
-            out_error[term] = desc[0:7]
-            desc = desc[9:]
+            pos: int = desc.find(":")
+            out_error[term] = desc[0:pos]
+            desc = desc[pos+1:]
 
         term: str = "description" if VALIDATION_MSG_LANGUAGE == "en" else "descricao"
         out_error[term] = desc
