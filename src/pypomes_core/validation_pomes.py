@@ -1,4 +1,3 @@
-import json
 from datetime import date, datetime
 from typing import Final
 from .env_pomes import APP_PREFIX, env_get_str
@@ -58,6 +57,7 @@ def validate_bool(errors: list[str], scheme: dict, attr: str,
                   default: bool = None, mandatory: bool = False) -> bool:
     """
     Validate the boolean value associated with *attr* in *scheme*.
+
     If provided, this value must be a *bool*, or the string *t*, *true*, *f*, or *false*.
 
     :param errors: incidental error messages
@@ -99,6 +99,7 @@ def validate_int(errors: list[str], scheme: dict, attr: str,
                  default: bool | int | list[int] = None) -> int:
     """
     Validate the *int* value associated with *attr* in *scheme*.
+
     If provided, this value must be a *int*, or a valid string representation of a *int*.
 
     :param errors: incidental error messages
@@ -147,6 +148,7 @@ def validate_float(errors: list[str], scheme: dict, attr: str,
                    default: bool | int | float | list[float | int] = None) -> float:
     """
     Validate the *float* value associated with *attr* in *scheme*.
+
     If provided, this value must be a *float*, or a valid string representation of a *float*.
 
     :param errors: incidental error messages
@@ -192,7 +194,21 @@ def validate_float(errors: list[str], scheme: dict, attr: str,
 def validate_str(errors: list[str], scheme: dict, attr: str,
                  min_length: int = None, max_length: int = None,
                  default: bool | str | list[str] = None) -> str:
+    """
+    Validate the *str* value associated with *attr* in *scheme*.
 
+    If provided, this value must be a *str*.
+
+    :param errors: incidental error messages
+    :param scheme: dictionary containing the value to be validated
+    :param attr: the attribute associated with the value to be validated
+    :param min_length: the minimum length accepted
+    :param max_length:  the maximum length accepted
+    :param default: if str, specifies the default value;
+                    if bool, requires the value to be specified;
+                    if list, requires the value to be in it
+    :return: the validated value, or None if validation failed
+    """
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
@@ -217,7 +233,19 @@ def validate_str(errors: list[str], scheme: dict, attr: str,
 
 def validate_date(errors: list[str], scheme: dict, attr: str,
                   default: bool | date = None, day_first: bool = True) -> date:
+    """
+    Validate the *date* value associated with *attr* in *scheme*.
 
+    If provided, this value must be a *date*, or a valid string representation of a *date*.
+
+    :param errors: incidental error messages
+    :param scheme: dictionary containing the value to be validated
+    :param attr: the attribute associated with the value to be validated
+    :param day_first: indicates that the day precedes the month in the string representing the date
+    :param default: if date, specifies the default value;
+                    if bool, requires the value to be specified
+    :return: the validated value, or None if validation failed
+    """
     # import needed module
     from .datetime_pomes import date_parse
 
@@ -246,7 +274,19 @@ def validate_date(errors: list[str], scheme: dict, attr: str,
 
 def validate_datetime(errors: list[str], scheme: dict, attr: str,
                       default: bool | datetime = None, day_first: bool = True) -> datetime:
+    """
+    Validate the *datetime* value associated with *attr* in *scheme*.
 
+    If provided, this value must be a *date*, or a valid string representation of a *date*.
+
+    :param errors: incidental error messages
+    :param scheme: dictionary containing the value to be validated
+    :param attr: the attribute associated with the value to be validated
+    :param day_first: indicates that the day precedes the month in the string representing the date
+    :param default: if datetime, specifies the default value;
+                    if bool, requires the value to be specified
+    :return: the validated value, or None if validation failed
+    """
     # import needed module
     from .datetime_pomes import datetime_parse
 
@@ -274,8 +314,20 @@ def validate_datetime(errors: list[str], scheme: dict, attr: str,
 
 
 def validate_ints(errors: list[str], scheme: dict, attr: str,
-                  min_size: int = None, max_size: int = None, mandatory: bool = False) -> list[int]:
+                  min_val: int = None, max_val: int = None, mandatory: bool = False) -> list[int]:
+    """
+    Validate the list of *int* values associated with *attr* in *scheme*.
 
+    If provided, this list must contain *ints*, or valid string representations of *ints*.
+
+    :param errors: incidental error messages
+    :param scheme: dictionary containing the list of values to be validated
+    :param attr: the attribute associated with the list of values to be validated
+    :param min_val: the minimum value accepted
+    :param max_val:  the maximum value accepted
+    :param mandatory: whether the list of values must be provided
+    :return: the list of validated values, or None if validation failed
+    """
     result: list[any] | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
@@ -289,7 +341,7 @@ def validate_ints(errors: list[str], scheme: dict, attr: str,
                 for inx, value in enumerate(values):
                     result.append(value)
                     if isinstance(value, int):
-                        stat: str = validate_value(value, min_size, max_size)
+                        stat: str = validate_value(value, min_val, max_val)
                     else:
                         stat: str = __format_error(18, value, "int")
                     if stat is not None:
@@ -304,8 +356,20 @@ def validate_ints(errors: list[str], scheme: dict, attr: str,
 
 
 def validate_strs(errors: list[str], scheme: dict, attr: str,
-                  min_size: int, max_size: int, mandatory: bool = False) -> list[str]:
+                  min_length: int, max_length: int, mandatory: bool = False) -> list[str]:
+    """
+    Validate the list of *str* values associated with *attr* in *scheme*.
 
+    If provided, this list must contain *strs*.
+
+    :param errors: incidental error messages
+    :param scheme: dictionary containing the list of values to be validated
+    :param attr: the attribute associated with the list of values to be validated
+    :param min_length: the minimum length accepted
+    :param max_length:  the maximum length accepted
+    :param mandatory: whether the list of values must be provided
+    :return: the list of validated values, or None if validation failed
+    """
     result: list[any] | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
@@ -319,7 +383,7 @@ def validate_strs(errors: list[str], scheme: dict, attr: str,
                 for inx, value in enumerate(values):
                     result.append(value)
                     if isinstance(value, str):
-                        stat: str = validate_value(value, min_size, max_size)
+                        stat: str = validate_value(value, min_length, max_length)
                     else:
                         stat: str = __format_error(18, value, "str")
                     if stat is not None:
@@ -334,7 +398,17 @@ def validate_strs(errors: list[str], scheme: dict, attr: str,
 
 
 def validate_format_error(error_id: int, err_msgs: dict, *args) -> str:
+    """
+    Format and return the error message identified by *err_id* in *err_msgs*.
 
+    The message is built from the message element in *err_msgs* identified by *err_id*.
+    The occurrences of '{}' in the element are sequentially replaced by the given *args*.
+
+    :param error_id: the identification of the message element
+    :param err_msgs: the message elements
+    :param args: optional arguments to format the error message with
+    :return: the formatted error message
+    """
     # initialize the return variable
     result: str = VALIDATION_MSG_PREFIX + str(error_id) + ": " + err_msgs.get(error_id)
 
@@ -348,14 +422,21 @@ def validate_format_error(error_id: int, err_msgs: dict, *args) -> str:
             elif isinstance(arg, str) and arg.find(" ") > 0:
                 result = result.replace("{}", arg, 1)
             else:
-                result = result.replace("{}", f"'{str(arg)}'", 1)
+                result = result.replace("{}", f"'{arg}'", 1)
 
     return result
 
 
 # formata itens na lista de erros: <codigo> <descricao> [@<atributo>]
 def validate_format_errors(errors: list[str]) -> list[dict]:
+    """
+    Build and return a *dict* to be used as the value representing a list of errors.
 
+    This list is tipically used in a returning *JSON* string.
+
+    :param errors: the errors to build the list with
+    :return: the list built
+    """
     # import needed module
     from .str_pomes import str_find_whitespace
 
@@ -399,7 +480,17 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
 
 
 def __format_error(err_id: int, *args) -> str:
+    """
+    Format and return the error message identified by *err_id*.
 
+    The message is built from the message element in the error list herein, identified by *err_id*.
+    The occurrences of '{}' in the element are sequentially replaced by the given *args*.
+
+    :param error_id: the identification of the message element
+    :param err_msgs: the message elements
+    :param args: optional arguments to format the error message with
+    :return: the formatted error message
+    """
     err_msgs_en: Final[dict] = {
         10: "Value must be provided",
         11: "Invalid value {}",

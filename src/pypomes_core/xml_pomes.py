@@ -7,6 +7,7 @@ XML_FILE_HEADER: Final[str] = '<?xml version="1.0" encoding="UTF-8" ?>'
 def xml_normalize_keys(source: dict) -> dict:
     """
     Clona o *source*, removenda os *namespaces* e os prefixos *'@'* e *'#'* nos nomes de suas chaves.
+
     A ordem das chaves é mantida.
 
     :param source: o dict de referência
@@ -49,8 +50,10 @@ def xml_normalize_keys(source: dict) -> dict:
 
 def xml_to_dict(file_data: bytes | str) -> dict:
     """
-    Converte XML em um dict sem namespaces e sem chaves com prefixos "@" e "#". O XML de entrada deve estar em
-    *file_data* (tipo *bytes*), ou em arquivo do sistema com o caminho especificado por *file_data* (tipo *str*).
+    Convert the XML into a *dict*, by removing namespaces, and keys prefixed with "@" e "#".
+
+    O XML de entrada deve estar em *file_data* (tipo *bytes*),
+    ou em arquivo do sistema com o caminho especificado por *file_data* (tipo *str*).
 
     :param file_data: XML a ser convertido
     :return: dict normalizado

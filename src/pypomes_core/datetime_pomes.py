@@ -14,6 +14,7 @@ DATETIME_FORMAT_INV: Final[str] = "%Y-%m-%d %H:%M:%S"
 def date_reformat(dt_str: str, to_format: str, **kwargs: any) -> str:
     """
     Convert the date in *dt_str* to the format especified in *to_format*.
+
     The argument *dt_str* must represent a valid date, with or without time-of-day information.
     The argument *to_format* must be a valid format for *date* ou *datetime*.
 
@@ -33,6 +34,7 @@ def date_reformat(dt_str: str, to_format: str, **kwargs: any) -> str:
 def date_parse(dt_str: str, **kwargs: any) -> date:
     """
     Obtain and return the *date* object corresponding to *dt_str*.
+
     Return *None* se *dt_str* does not contain a valid date.
 
     :param dt_str: The date, in a supported format.
@@ -48,7 +50,8 @@ def date_parse(dt_str: str, **kwargs: any) -> date:
 
 def datetime_parse(dt_str: str, **kwargs: any) -> datetime:
     """
-   Obtain and return the *datetime* object corresponding to *dt_str*.
+    Obtain and return the *datetime* object corresponding to *dt_str*.
+
    Return *None* se *dt_str* does not contain a valid date.
 
     :param dt_str: The date, in a supported format.

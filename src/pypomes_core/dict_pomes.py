@@ -4,13 +4,14 @@ import types
 
 def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
     """
-    Indicate the existence of an element in *source* pointed to by the nested keys chain
-    *[keys[0]: ... :keys[n]*. The path up to he last key in the chain must point to an existing element.
+    Indicate the existence of an element in *source* pointed to by the nested keys chain *[keys[0]: ... :keys[n]*.
+
+    The path up to he last key in the chain must point to an existing element.
     A given key may indicate the element's position within a *list*, using the format *<key>[<pos>]*.
 
-    :param source: The reference dict.
-    :param key_chain: The nested keys chain.
-    :return: Whether the element exists.
+    :param source: the reference dict
+    :param key_chain: the nested keys chain
+    :return: whether the element exists
     """
     # initialize the return variable
     result: bool = False
@@ -53,6 +54,7 @@ def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
 def dict_get_value(source: dict, key_chain: list[str]) -> any:
     """
     Obtain the value of the element in *source* pointed to by the nested keys chain *[keys[0]: ... :keys[n]*.
+
     The path up to the last key in the chain must point to an existing element.
     A given key may indicate the element's position within a *list*, using the format *<key>[<pos>]*.
     Return *None* if the sought after value is not found.
@@ -60,38 +62,38 @@ def dict_get_value(source: dict, key_chain: list[str]) -> any:
     since that element might exist therein with the value *None*. To determine whether this is the case,
     use the operation *dict_has_value*.
 
-    :param source: o dict de referência
-    :param key_chain: a cadeia de chaves
-    :return: o valor obtido
+    :param source: the reference dict
+    :param key_chain: the key chain
+    :return: the value obtained
     """
-    # inicializa a variável de retorno
+    # inicializa
     result: any = source
 
-    # percorre as chaves da cadeia
+    # traverse the keys in the chain
     for key in key_chain:
 
-        # é possível prosseguir ?
+        # is it possible to proceed ?
         if not isinstance(result, dict):
-            # não, encerre a operação
+            # no, terminate the operation
             result = None
             break
 
-        # a chave denota um elemento de lista ?
+        # dos the key refer to an elemenent in a list ?
         if key[-1] == "]":
-            # sim, recupere-o
+            # yes, retrieve it
             pos: int = key.find("[")
             inx: int = int(key[pos+1:-1])
             result = result.get(key[:pos])
 
-            # é possível prosseguir ?
+            # is it possible to proceed ?
             if isinstance(result, list) and len(result) > inx:
-                # sim, prossiga
+                # yes, proceed
                 result = result[inx]
             else:
-                # não, aborte a operação
+                # no, abort the operation
                 result = None
         else:
-            # não, recupere o elemento 'key' do dicionário
+            # no, retrieve the element corresponding to 'key' in the dictionary
             result = result.get(key)
 
     return result
@@ -99,69 +101,71 @@ def dict_get_value(source: dict, key_chain: list[str]) -> any:
 
 def dict_set_value(target: dict, key_chain: list[str], value: any):
     """
-    Atribui ao elemento de *source*, apontado pela cadeia de chaves aninhadas *[keys[0]: ... :keys[n]*,
-    o valor *value*. Caso o elemento final não exista, será criado com o valor especificado.
-    Os elementos intermediários, caso não existam, serão criados com o valor de um *dict* vazio.
+    Assign to an element of *source* the value *value*.
 
-    Uma chave pode indicar a posição do elemento dentro de uma lista, utilizando para tanto
-    o formato *<key>[<pos>]*, e nesse caso, o elemento deve existir.
+    The element in question is appointed to by the key chain *[keys[0]: ... :keys[n]*.
+    If the element does not exist, it is created with the specified value.
+    Any non-existing intermediate elements are created with the value of an empty *dict*.
+    A key might indicate the position of the element within a list, using the format *<key>[<pos>]*.
+    In such a case, that element must exist.
 
-    :param target: o dict de referência
-    :param key_chain: a cadeia de chaves
-    :param value: o valor a ser atribuído ao elemento
+    :param target: the reference dict
+    :param key_chain: the key chain
+    :param value: the value to be assigned
     """
     dict_item: any = target
-    # percorre a cadeia até a penúltima chave
+    # traverse the chain, up to end including its penultimate element
     for key in key_chain[:-1]:
 
-        # é possível prosseguir ?
+        # is it possible to proceed ?
         if not isinstance(dict_item, dict):
-            # não, aborte a operação
+            # no, abort the operation
             break
 
-        # a chave denota um elemento de lista ?
+        # does 'key' refer to a list element ?
         if key[-1] == "]":
-            # sim, recupere-o
+            # yes, retrieve it
             pos: int = key.find("[")
             inx: int = int(key[pos+1:-1])
             dict_item = dict_item.get(key[:pos])
-            # é possível prosseguir ?
+            # is it possible to proceed ?
             if isinstance(dict_item, list) and len(dict_item) > inx:
-                # sim, prossiga
+                # yes, proceed
                 dict_item = dict_item[inx]
             else:
-                # não aborte a operação
+                # no, abort the operation
                 dict_item = None
         else:
-            # não, dict_item tem a chave como elemento ?
+            # no, does 'dict_item' have 'key' as one of its elements ?
             if key not in dict_item:
-                # não, atribua a dict_item a chave com valor de um dicionário vazio
+                # não, assign to 'dict_item' the element 'key' with an empty dict as value
                 dict_item[key] = {}
             dict_item = dict_item.get(key)
 
-    # existe chave e dict_item é um dicionário ?
+    # does a key exist and is 'dict_item'a dict ?
     if len(key_chain) > 0 and isinstance(dict_item, dict):
-        # sim, prossiga
+        # yes, proceed
         key: str = key_chain[-1]
-        # a chave denota um elemento de lista ?
+        # does 'key' refer to a list element ?
         if key[-1] == "]":
-            # sim, recupere-o
+            # yes, retrieve it
             pos: int = key.find("[")
             inx: int = int(key[pos+1:-1])
             dict_item = dict_item.get(key[:pos])
-            # a atribuição é possível ?
+            # is the assignment possible ?
             if isinstance(dict_item, list) and len(dict_item) > inx:
-                # sim, faça-a
+                # yes, do it
                 dict_item[inx] = value
         else:
-            # não, faça a atribuição ao elemento 'key' do dicionário
+            # no, assign 'value' to the element 'key' in the dictionary
             dict_item[key] = value
 
 
 def dict_pop_value(target: dict, key_chain: list[str]) -> any:
     """
-    Remove e retorna o valor do elemento de *source* apontado pela cadeia de chaves aninhadas
-    *[keys[0]: ... :keys[n]*. O caminho até a última chave deve apontar para elementos existentes.
+    Remove e retorna o valor do elemento de *source* apontado pela cadeia de chaves *[keys[0]: ... :keys[n]*.
+
+    O caminho até a última chave deve apontar para elementos existentes.
     Uma chave pode indicar a posição do elemento dentro de uma lista, utilizando para tanto
     o formato *<key>[<pos>]*. Retorna *None* se o valor procurado não for encontrado.
 
@@ -217,49 +221,50 @@ def dict_pop_value(target: dict, key_chain: list[str]) -> any:
 
 def dict_replace_value(target: dict, old_value: any, new_value: any):
     """
-    Substitui em *target* todas as ocorrências de *old_value* por *new_value*.
+    Replace in *target* all occurrences of *old_value* with *new_value*.
 
-    :param target: o dict de referência
-    :param old_value: o valor a ser substituído
-    :param new_value: o novo valor
+    :param target: the reference dict
+    :param old_value: the value to be replaced
+    :param new_value: the new value
     """
     def list_replace_value(items: list[any], old_val: any, new_val: any):
-        # percorre a lista
+        # traverse the list
         for item in items:
 
-            # o item é um dicionário ?
+            # is 'item' a dict ?
             if isinstance(item, dict):
-                # sim, processe-o recursivamente
+                # yes, process it recursively
                 dict_replace_value(item, old_val, new_val)
 
-            # o item é uma lista ?
+            # is 'item' a list ?
             elif isinstance(item, list):
-                # sim, processe-o recursivamente
+                # yes, process it recursively
                 list_replace_value(item, old_val, new_val)
 
-    # percorre o dicionário
+    # traverse the dict
     for curr_key, curr_value in target.items():
 
-        # o valor atual é o valor buscado ?
+        # is 'curr_value' the value to be replaced ?
         if curr_value == old_value:
-            # sim, substitua-o
+            # yes, replace it
             target[curr_key] = new_value
 
-        # o valor atual é um dicionário ?
+        # is 'curr_value' a dict ?
         elif isinstance(curr_value, dict):
-            # sim, processe-o recursivamente
+            # yes, process it recursively
             dict_replace_value(curr_value, old_value, new_value)
 
-        # o valor atual é uma lista ?
+        # is 'curr_value' a list ?
         elif isinstance(curr_value, list):
-            # sim, processe-o recursivamente
+            # yes, process it recursively
             list_replace_value(curr_value, old_value, new_value)
 
 
 def dict_get_key(source: dict, value: any) -> any:
     """
-    Retorna a chave em *source*, associada à primeira ocorrência de *value* encontrada,
-    ou *None*, se nenhuma chave for encontrada. Apenas os atributos no primeiro nível
+    Retorna a chave em *source*, associada à primeira ocorrência de *value* encontrada.
+
+    Retorna *None*, se nenhuma chave for encontrada. Apenas os atributos no primeiro nível
     em *source* são inspecionados.
 
     :param source: dicionário a ser pesquisado
@@ -277,8 +282,9 @@ def dict_get_key(source: dict, value: any) -> any:
 
 def dict_get_keys(source: dict, value: any) -> list[str]:
     """
-    Restorna lista com todas as chaves ne primeiro nível em *source*, associadas a *value*,
-    ou *[]* se nenhuma chave for encontrada.
+    Restorna lista com todas as chaves ne primeiro nível em *source*, associadas a *value*.
+
+    Retorna *[]* se nenhuma chave for encontrada.
 
     :param source: dicionário a ser pesquisado
     :param value: valor de referência
@@ -289,14 +295,15 @@ def dict_get_keys(source: dict, value: any) -> list[str]:
 
 def dict_merge(target: dict, source: dict):
     """
-    Percorre os elementos de *source* para atualizar *target*, obedecendo aos seguintes os critérios:
+    Percorre os elementos de *source* para atualizar *target*, obedecendo um conjunto de critérios.
 
-    - acrescentar o elemento a *target*, se não existir
-    - se o elemento existir em *target*:
+    Os critérios a sere mseguidos são:
+      - acrescentar o elemento a *target*, se não existir
+      - se o elemento existir em *target*:
 
-      -   processar recursivamente os dois elementos, se ambos forem do tipo *dict*
-      -   acrescentar os itens faltantes, se ambos forem do tipo *list*
-      -   substituir o elemento em *target* se for de outro tipo, ou se os tipos forem diferentes entre si
+        - processar recursivamente os dois elementos, se ambos forem do tipo *dict*
+        - acrescentar os itens faltantes, se ambos forem do tipo *list*
+        - substituir o elemento em *target* se for de outro tipo, ou se os tipos forem diferentes entre si
 
     :param target: o dicionário a ser atualizado
     :param source: o dicionário com os novos elementos
@@ -330,8 +337,9 @@ def dict_merge(target: dict, source: dict):
 
 def dict_coalesce(target: dict, key_chain: list[str]):
     """
-    Coalesce o elemento do tipo *list* em *target* no nível *n*, apontado pela cadeia de
-    chaves aninhadas *[keys[0]: ... :keys[n]*, com a lista no nível imediatamente anterior,
+    Coalesce o elemento do tipo *list* em *target* no nível *n*, com a lista no nível imediatamente anterior.
+
+    Esse elemento é apontado pela cadeia de chaves aninhadas *[keys[0]: ... :keys[n]*, e é processado
     como uma sequência de multiplos elementos. Para tanto, as duas últimas chaves da cadeia
     *key_chain* devem estar associadas a valores do tipo *list*.
 
@@ -426,9 +434,10 @@ def dict_coalesce(target: dict, key_chain: list[str]):
 
 def dict_reduce(target: dict, key_chain: list[str]):
     """
-    Realoca os elementos de *target* no nível *n*, apontados pela cadeia de chaves aninhadas
-    *[keys[0]: ... :keys[n]*, para o nível imediatamente acima, e remove o elemento no nivel *n*
-    ao final.
+    Realoca os elementos de *target* no nível *n*, para o nível imediatamente acima.
+
+    Esses elementos são apontados pela cadeia de chaves aninhadas *[keys[0]: ... :keys[n]*.
+    O elemento no nivel *n* é removido, ao final.
 
     :param target: o dicionário a ser reduzido
     :param key_chain: a cadeia de chaves
@@ -474,8 +483,9 @@ def dict_reduce(target: dict, key_chain: list[str]):
 
 def dict_from_list(source: list[dict], key_chain: list[str], value: any) -> dict:
     """
-    Localiza em *source*, e retorna, o elemento do tipo *dict* contendo a cadeia de chaves
-    *key_chain* com o valor *value*. Retorna *None* se esse *dict* não for encontrado.
+    Localiza em *source*, e retorna, o elemento do tipo *dict* com o valor *value* na cadeia de chaves *key_chain*.
+
+    Retorna *None* se esse *dict* não for encontrado.
 
     :param source: a lista a ser inspecionada
     :param key_chain: a cadeia de chaves usada na busca
@@ -496,8 +506,9 @@ def dict_from_list(source: list[dict], key_chain: list[str], value: any) -> dict
 
 def dict_from_object(source: object) -> dict:
     """
-    Percorre *source* e cria um *dict* com seus atributos contendo valores não nulos. *source* pode ser
-    qualquer objeto, especialmente aqueles que tenham sido decorados com *@dataclass*.
+    Percorre *source* e cria um *dict* com seus atributos contendo valores não nulos.
+
+    *source* pode ser qualquer objeto, especialmente aqueles que tenham sido decorados com *@dataclass*.
 
     :param source: o objeto de referência
     :return: dicionário com estrutura equivalente ao objeto de referência
@@ -540,7 +551,9 @@ def dict_from_object(source: object) -> dict:
 def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
                    prefix_from: str = None, prefix_to: str = None) -> dict:
     """
-    Constrói um novo *dict*, atribuindo a cada elemento indicado pelo segundo elemento de uma
+    Constrói um novo *dict*, segundo as regras seguintes.
+
+    Esse dicionário é construído atribuindo-se a cada elemento indicado pelo segundo elemento de uma
     tupla contendo uma cadeia de chaves aninhadas em *from_to_keys*, o valor do elemento
     de *source* indicado pelo primeiro elemento da tupla, também contendo uma cadeia de chaves
     aninhadas, respectivamente para todos os elementos mapeados em *from_to_keys*.
@@ -600,8 +613,9 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
 
 def dict_listify(target: dict, key_chain: list[str]):
     """
-    Insere o valor do item de *target* apontado pela cadeia de chaves aninhadas
-    *[keys[0]: ... :keys[n]* em uma lista, se esse valor já não for uma lista.
+    Insere o valor do item de *target* apontado pela cadeia de chaves *[keys[0]: ... :keys[n]* em uma lista.
+
+    Essa inserção ocorrerá apenas se esse valor já não for uma lista.
     Todas as listas eventualmente encontradas no percurso até a penúltima chava
     da cadeia serão recursivamente processadas.
 

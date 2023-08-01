@@ -1,6 +1,7 @@
 def str_split_on_mark(source: str, mark: str) -> list[str]:
     """
     Extrai, de *source*, os segmentos de texto separados por *mark*, e os retorna em uma lista.
+
     Os segmentos retornados não contem o separador.
 
     :param source: o texto de referência
@@ -27,8 +28,9 @@ def str_split_on_mark(source: str, mark: str) -> list[str]:
 
 def str_between(source: str, from_str: str, to_str: str) -> str:
     """
-    Extrai e retorna a *substring* em *source* localizada entre os delimitadores
-    *from_st* e *to_str*, ou *None* se essa extração não for possível.
+    Extrai e retorna a *substring* em *source* localizada entre os delimitadores *from_st* e *to_str*.
+
+    Retorna *None* se essa extração não for possível.
 
     :param source: a string a ser pesquisada
     :param from_str: o delimitador inicial
@@ -51,6 +53,7 @@ def str_between(source: str, from_str: str, to_str: str) -> str:
 def str_find_whitespace(source: str) -> int:
     """
     Localiza e retorna a posição da primeira ocorrência de *whitespace* em *source*.
+
     Retorna *-1* se nenhum *whitespace* for encontrado.
 
     :param source: a string a ser pesquisada

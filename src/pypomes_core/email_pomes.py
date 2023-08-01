@@ -11,26 +11,33 @@ EMAIL_SERVER: Final[str] = env_get_str(f"{APP_PREFIX}_EMAIL_SERVER")
 
 
 def email_send(errors: list[str], user_email: str, subject: str, content: str):
+    """
+    Send email, to *user_email", with *subject* as the email subject, and *content* as the email message.
 
+    :param errors: incidental error messages
+    :param user_email: the address to send the email to
+    :param subject: the email subject
+    :param content: the email message
+    """
     # import needed function
     from .exception_pomes import exc_format
 
-    # connstrói o email
+    # build the email object
     email_msg = EmailMessage()
     email_msg.set_content(content)
     email_msg["Subject"] = subject
     email_msg["From"] = EMAIL_ACCOUNT
     email_msg["To"] = user_email
 
-    # instancia o email server
+    # instanciate the email server
     server = SMTP(host=EMAIL_SERVER, port=EMAIL_PORT)
     server.starttls()
     server.login(user=EMAIL_ACCOUNT, password=EMAIL_PWD)
 
-    # envia a mensagem
+    # send the message
     try:
         server.send_message(email_msg)
         server.quit()
     except Exception as e:
-        # a operação resultou em exceção
-        errors.append(f"Erro no envio de email: {exc_format(e, sys.exc_info())}")
+        # the operatin raised an exception
+        errors.append(f"Error sending the email: {exc_format(e, sys.exc_info())}")

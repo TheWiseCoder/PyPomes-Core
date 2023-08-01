@@ -41,7 +41,8 @@ LOGGING_FORMAT: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_FORMAT",
 LOGGING_STYLE: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_STYLE", "{")
 
 LOGGING_FILE_PATH: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_FILE_PATH",
-                                            os.path.join(tempfile.gettempdir(), f"{APP_PREFIX}.log"))
+                                            os.path.join(tempfile.gettempdir(),
+                                                         f"{APP_PREFIX}.log"))
 LOGGING_FILE_MODE: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_FILE_MODE", "a")
 
 # define and configure the logger
@@ -68,8 +69,9 @@ def logging_get_entries(errors: list[str],
                         log_from: str = None, log_to: str = None,
                         file_path: str = LOGGING_FILE_PATH) -> BytesIO:
     """
-    Extract and return all entries in *PYPOMES_LOGGER*'s logging file,
-    meeting the criteria specified by *log_level* and by the inclusive interval *[log_from, log_to]*.
+    Extract and return all entries in *PYPOMES_LOGGER*'s logging file.
+
+    The extraction meets the criteria specified by *log_level* and by the inclusive interval *[log_from, log_to]*.
 
     :param errors: errors eventually generated during execution
     :param log_level: the logging level (defaults to all levels)
@@ -109,7 +111,7 @@ def logging_get_entries(errors: list[str],
     if len(errors) == 0:
         # no, proceed
         result = BytesIO()
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             line: str = f.readline()
             while line:
                 items: list[str] = line.split(maxsplit=3)
@@ -126,11 +128,13 @@ def logging_get_entries(errors: list[str],
 
 
 def logging_log_msgs(msgs: list[str], output_dev: TextIO = None,
-                     log_level: Literal["debug", "info", "warning", "error", "critical"] = "error",
+                     log_level: Literal["debug", "info", "warning",
+                                        "error", "critical"] = "error",
                      logger: logging.Logger = PYPOMES_LOGGER):
     """
-    Write all messages in *msgs* to *PYPOMES_LOGGER*'s logging file, and to *output_dev*
-    (tipically, *sys.stdout* ou *sys.stderr*).
+    Write all messages in *msgs* to *PYPOMES_LOGGER*'s logging file, and to *output_dev*.
+
+    The output device is tipically *sys.stdout* ou *sys.stderr*.
 
     :param msgs: the messages list
     :param output_dev: output device where the message is to be printed (None for no device printing)

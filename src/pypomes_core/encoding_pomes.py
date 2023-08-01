@@ -1,8 +1,10 @@
 def encode_ascii_hex(source: bytes) -> bytes:
-    """
-    Codifica o conteúdo binário em texto, com caracteres para bytes no intervalo ASCII,
+    r"""
+    Codifica o conteúdo binário em texto.
+
+    Essa codificação é feita com caracteres para bytes no intervalo ASCII,
     com a representação *backslash-escaped* para os caracteres especiais LF, HT, CR, VT, FF e BS,
-    e com a representação *\\\\xNN* para os demais (onde *N* é um dígito hexadecimal [0-9] e [a-f]).
+    e com a representação *\\xNN* para os demais (onde *N* é um dígito hexadecimal [0-9] e [a-f]).
 
     :param source: o conteúdo binário a ser codificado
     :return: o conteúdo texto codificado
@@ -45,10 +47,12 @@ def encode_ascii_hex(source: bytes) -> bytes:
 
 
 def decode_ascii_hex(source: bytes) -> bytes:
-    """
-    Decodifica em binário o conteúdo texto codificado com caracteres para bytes no intervalo ASCII,
+    r"""
+    Decodifica em binário o conteúdo texto.
+
+    Essa decodificação é feita para texto codificado com caracteres para bytes no intervalo ASCII,
     com a representação *backslash-escaped* para os caracteres especiais LF, HT, CR, VT, FF e BS,
-    e com a representação *\\\\xNN* para os demais (onde *N* é um dígito hexadecimal [0-9] e [a-f]).
+    e com a representação *\\xNN* para os demais (onde *N* é um dígito hexadecimal [0-9] e [a-f]).
 
     :param source: o conteúdo texto a ser decodificado
     :return: o conteúdo binário decodificado

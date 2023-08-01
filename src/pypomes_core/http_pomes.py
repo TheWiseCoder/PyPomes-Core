@@ -191,7 +191,12 @@ __HTTP_STATUS: Final[dict] = {
 
 
 def http_status_name(status_code: int) -> str:
+    """
+    Return the name of the status message identified to by *status_code*.
 
+    :param status_code: the code of the status
+    :return: the corresponding name given to the status
+    """
     item: dict = __HTTP_STATUS.get(status_code, {"name": "Unknown status code"})
     result = f"HTTP status code {status_code}: {item.get('name')}"
                                                              
@@ -199,7 +204,12 @@ def http_status_name(status_code: int) -> str:
 
 
 def http_status_description(status_code: int) -> str:
+    """
+    Return the description of the status message identified to by *status_code*.
 
+    :param status_code: the code of the status
+    :return: the corresponding status description
+    """
     item: dict = __HTTP_STATUS.get(status_code, {"description": "Unknown status code"})
     result = f"HTTP status code {status_code}: {item.get('description')}"
 
@@ -208,12 +218,11 @@ def http_status_description(status_code: int) -> str:
 
 def http_json_from_form(request: Request) -> dict:
     """
-    Constrói e retorna um *dict* com os parâmetros encontrados no form existente em *request*.
+    Build and return a *dict* containing the *key-value* pairs of the form parameters found in *request*.
 
     :param request: the HTTP request
-    :return: dicionários contendo os parâmetros encontrados.
+    :return: dict containing the form parameters found
     """
-
     # initialize the return variable
     result: dict = {}
 
@@ -248,7 +257,19 @@ def http_json_from_request(request: Request) -> dict:
 
 def http_json_from_get(errors: list[str], url: str, headers: dict = None,
                        params: dict = None, logger: logging.Logger = None) -> dict:
+    """
+    Retrieve a *JSON* string by issuing a *GET* request to the given *url*.
 
+    The contents of the *JSON* string are returned as a *dict* .
+    The request might contain *headers* and *parameters*.
+
+    :param errors: incidental error messages
+    :param url: the destination URL
+    :param headers: optional headers
+    :param params: optional parameters
+    :param logger: optional logger to log the operation with
+    :return: the contents of the JSON string
+    """
     if logger is not None:
         logger.info(f"Invoking GET: '{url}'")
 
@@ -273,7 +294,21 @@ def http_json_from_get(errors: list[str], url: str, headers: dict = None,
 
 def http_json_from_post(errors: list[str], url: str, headers: dict = None, params: dict = None,
                         data: dict = None, json: dict = None, logger: logging.Logger = None) -> dict:
+    """
+    Retrieve a *JSON* string by issuing a *POST* request to the given *url*.
 
+    The contents of the *JSON* string are returned as a *dict* .
+    The request might contain *headers* and *parameters*.
+
+    :param errors: incidental error messages
+    :param url: the destination URL
+    :param headers: optional headers
+    :param params: optional parameters
+    :param data: optionaL data to send in the body of the request
+    :param json: optional JSON to send in the body of the request
+    :param logger: optional logger to log the operation with
+    :return: the contents of the JSON string
+    """
     if logger is not None:
         logger.info(f"Invoking POST: '{url}'")
 

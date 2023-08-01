@@ -1,28 +1,28 @@
 from types import TracebackType
-from typing import Type
 import os
 import traceback
 
 
-def exc_format(exc: Exception, exc_info: tuple[Type[BaseException], BaseException, TracebackType]) -> str:
+def exc_format(exc: Exception,
+               exc_info: tuple[type[BaseException], BaseException, TracebackType]) -> str:
     """
-    Formata a mensagem de erro decorrente da exceção levantada em tempo de execução, no formato:
+    Format the error message resulting from the exception raised in execution time.
 
-    <python_module>, <line_number>: <exc_class> - <exc_text>
+    The format to use: <python_module>, <line_number>: <exc_class> - <exc_text>
 
-    :param exc: a exceção levantada
-    :param exc_info: informações associadas à exceção
-    :return: a mensagem de erro formatada
+    :param exc: the exception raised
+    :param exc_info: information associated with the exception
+    :return: the formatted message
     """
     tback: TracebackType = exc_info[2]
     cls: str = str(exc.__class__)
 
-    # obtem o ponto de execução que provocou a exceção (última posição na pilha)
+    # retrieve the execution point where the exception was raised (bottom of the stack)
     tlast: traceback = tback
     while tlast.tb_next is not None:
         tlast = tlast.tb_next
 
-    # obtem nome do módulo e linha do código (origem da exceção)
+    # retrieve the module name and the line number within the module
     try:
         fname: str = os.path.split(tlast.tb_frame.f_code.co_filename)[1]
     except Exception:

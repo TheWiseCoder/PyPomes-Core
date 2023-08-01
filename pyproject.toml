@@ -20,10 +20,11 @@ classifiers = [
 ]
 dependencies = [
     "Flask>=2.3.2",
-    "pip>=23.1.2",
+    "pip>=23.2.1",
     "python-dateutil>=2.8.2",
+    "requests>=2.31.0",
     "setuptools>=68.0.0",
-    "wheel>=0.40.0",
+    "wheel>=0.41.0",
     "xmltodict3>=0.0.4"
 ]
 

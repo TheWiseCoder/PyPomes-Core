@@ -3,14 +3,24 @@ from werkzeug.datastructures import FileStorage
 
 
 def file_from_request(request: Request, file_name: str = None, file_seq: int = 0) -> bytes:
+    """
+    Retrieve and return the contents of the file returned in the response to a request.
 
-    # inicializa a variável de retorno
+    The file may be referred to by its name (*file_name*), or if no name is specified,
+    by its sequence number (*file_seq*).
+
+    :param request: the request
+    :param file_name: optional name for the file
+    :param file_seq:  sequence number for the file, defaults to the first file
+    :return: the contents retrieved from the file
+    """
+    # inicialize the return variable
     result: bytes | None = None
 
     count: int = len(request.files)
-    # algum arquivo foi encontrado ?
+    # has a file been found ?
     if count > 0:
-        # sim, obtenha o arquivo
+        # yes, retrieve it
         file: FileStorage | None = None
         if isinstance(file_name, str):
             file = request.files.get(file_name)
