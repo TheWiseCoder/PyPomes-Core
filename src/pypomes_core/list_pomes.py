@@ -43,9 +43,7 @@ def list_flatten(source: list[str]) -> str:
     result: str = ""
     for item in source:
         result += "." + item
-    result = result[1:]
-
-    return result
+    return result[1:]
 
 
 def list_unflatten(source: str) -> list[str]:

@@ -75,9 +75,7 @@ def decode_ascii_hex(source: bytes) -> bytes:
                 # HAZARD: chars intermediários necessários - int(byte) quebra para byte > b"\x09"
                 upper_char: str = source[pos2+2:pos2+3].decode()
                 lower_char: str = source[pos2+3:pos2+4].decode()
-                # print(upper_char, lower_char)
                 int_val: int = 16 * int(upper_char, base=16) + int(lower_char, base=16)
-                # int_val = int.from_bytes(source[pos2+2:pos2+4], "big")
                 byte_val = bytes([int_val])
                 shift = 4
             case b"n":

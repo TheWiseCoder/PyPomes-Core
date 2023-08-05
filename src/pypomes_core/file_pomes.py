@@ -1,5 +1,8 @@
 from flask import Request
-from werkzeug.datastructures import FileStorage
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from werkzeug.datastructures import FileStorage
 
 
 def file_from_request(request: Request, file_name: str = None, file_seq: int = 0) -> bytes:

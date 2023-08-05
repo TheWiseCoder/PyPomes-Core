@@ -1,5 +1,8 @@
 import inspect
-import types
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import types
 
 
 def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
@@ -85,6 +88,8 @@ def dict_get_value(source: dict, key_chain: list[str]) -> any:
             inx: int = int(key[pos+1:-1])
             result = result.get(key[:pos])
 
+            result = result[inx] if isinstance(result, list) and len(result) > inx else None
+
             # is it possible to proceed ?
             if isinstance(result, list) and len(result) > inx:
                 # yes, proceed
@@ -99,7 +104,7 @@ def dict_get_value(source: dict, key_chain: list[str]) -> any:
     return result
 
 
-def dict_set_value(target: dict, key_chain: list[str], value: any):
+def dict_set_value(target: dict, key_chain: list[str], value: any) -> None:
     """
     Assign to an element of *source* the value *value*.
 
@@ -219,7 +224,7 @@ def dict_pop_value(target: dict, key_chain: list[str]) -> any:
     return result
 
 
-def dict_replace_value(target: dict, old_value: any, new_value: any):
+def dict_replace_value(target: dict, old_value: any, new_value: any) -> None:
     """
     Replace in *target* all occurrences of *old_value* with *new_value*.
 
@@ -227,7 +232,7 @@ def dict_replace_value(target: dict, old_value: any, new_value: any):
     :param old_value: the value to be replaced
     :param new_value: the new value
     """
-    def list_replace_value(items: list[any], old_val: any, new_val: any):
+    def list_replace_value(items: list[any], old_val: any, new_val: any) -> None:
         # traverse the list
         for item in items:
 
@@ -293,7 +298,7 @@ def dict_get_keys(source: dict, value: any) -> list[str]:
     return [key for key, val in source.items() if val == value]
 
 
-def dict_merge(target: dict, source: dict):
+def dict_merge(target: dict, source: dict) -> None:
     """
     Percorre os elementos de *source* para atualizar *target*, obedecendo um conjunto de critérios.
 
@@ -335,7 +340,7 @@ def dict_merge(target: dict, source: dict):
             target[skey] = svalue
 
 
-def dict_coalesce(target: dict, key_chain: list[str]):
+def dict_coalesce(target: dict, key_chain: list[str]) -> None:
     """
     Coalesce o elemento do tipo *list* em *target* no nível *n*, com a lista no nível imediatamente anterior.
 
@@ -371,9 +376,9 @@ def dict_coalesce(target: dict, key_chain: list[str]):
                 # termina a operação
                 curr_dict = None
                 break
-            else:
-                # não, prossiga com o valor associado a key
-                curr_dict = curr_dict.get(key)
+
+            # prossiga com o valor associado a key
+            curr_dict = curr_dict.get(key)
 
         # curr_dict é um dicionário contendo a penúltima chave ?
         if isinstance(curr_dict, dict) and \
@@ -432,7 +437,7 @@ def dict_coalesce(target: dict, key_chain: list[str]):
             curr_dict[key_chain[-2]] = penultimate_list
 
 
-def dict_reduce(target: dict, key_chain: list[str]):
+def dict_reduce(target: dict, key_chain: list[str]) -> None:
     """
     Realoca os elementos de *target* no nível *n*, para o nível imediatamente acima.
 
@@ -467,9 +472,9 @@ def dict_reduce(target: dict, key_chain: list[str]):
                 # termine a operação
                 curr_dict = None
                 break
-            else:
-                # não, prossiga com o valor associado a key
-                curr_dict = curr_dict.get(key)
+
+            # prossiga com o valor associado a key
+            curr_dict = curr_dict.get(key)
 
         last_key: str = key_chain[-1]
         # curr_dict contem um dicionário associado a last_key ?
@@ -611,7 +616,7 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
     return result
 
 
-def dict_listify(target: dict, key_chain: list[str]):
+def dict_listify(target: dict, key_chain: list[str]) -> None:
     """
     Insere o valor do item de *target* apontado pela cadeia de chaves *[keys[0]: ... :keys[n]* em uma lista.
 
@@ -622,7 +627,7 @@ def dict_listify(target: dict, key_chain: list[str]):
     :param target: dicionário a ser modificado
     :param key_chain: cadeia de chaves aninhadas apontando para o item em questão
     """
-    def items_listify(in_targets: list, in_keys: list[str]):
+    def items_listify(in_targets: list, in_keys: list[str]) -> None:
 
         # percorra os itens da lista
         for in_target in in_targets:

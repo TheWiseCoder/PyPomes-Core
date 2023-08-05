@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from typing import Final
+from .datetime_pomes import TIMEZONE_LOCAL
 from .env_pomes import APP_PREFIX, env_get_str
 
 VALIDATION_MSG_LANGUAGE: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_LANGUAGE", "pt")
@@ -171,7 +172,7 @@ def validate_float(errors: list[str], scheme: dict, attr: str,
     # validate it
     if result is None:
         result = default
-    elif isinstance(result, str) or isinstance(result, int):
+    elif isinstance(result, str | int):
         try:
             result = float(result)
         except ValueError:
@@ -258,7 +259,7 @@ def validate_date(errors: list[str], scheme: dict, attr: str,
         result = date_parse(date_str, dayfirst=day_first)
         if result is None:
             stat = __format_error(11, date_str)
-        elif result > datetime.now().date():
+        elif result > datetime.now(TIMEZONE_LOCAL).date():
             stat = __format_error(19, date_str)
     except KeyError:
         if isinstance(default, bool) and default:
@@ -299,7 +300,7 @@ def validate_datetime(errors: list[str], scheme: dict, attr: str,
         result = datetime_parse(date_str, dayfirst=day_first)
         if result is None:
             stat = __format_error(21, date_str)
-        elif result > datetime.now():
+        elif result > datetime.now(TIMEZONE_LOCAL):
             stat = __format_error(18, date_str)
     except KeyError:
         if isinstance(default, bool) and default:
@@ -335,9 +336,7 @@ def validate_ints(errors: list[str], scheme: dict, attr: str,
         values: list[any] = scheme[suffix]
         if isinstance(values, list):
             result = []
-            if len(values) == 0:
-                raise KeyError
-            else:
+            if len(values) > 0:
                 for inx, value in enumerate(values):
                     result.append(value)
                     if isinstance(value, int):
@@ -346,6 +345,8 @@ def validate_ints(errors: list[str], scheme: dict, attr: str,
                         stat: str = __format_error(18, value, "int")
                     if stat is not None:
                         errors.append(f"{stat} @{attr}[{inx+1}]")
+            elif mandatory:
+                errors.append(__format_error(10, f"@{attr}"))
         else:
             errors.append(__format_error(18, result, "list", f"@{attr}"))
     except (KeyError, TypeError):
@@ -377,9 +378,7 @@ def validate_strs(errors: list[str], scheme: dict, attr: str,
         values: list[any] = scheme[suffix]
         if isinstance(values, list):
             result = []
-            if len(values) == 0:
-                raise KeyError
-            else:
+            if len(values) > 0:
                 for inx, value in enumerate(values):
                     result.append(value)
                     if isinstance(value, str):
@@ -388,6 +387,8 @@ def validate_strs(errors: list[str], scheme: dict, attr: str,
                         stat: str = __format_error(18, value, "str")
                     if stat is not None:
                         errors.append(f"{stat} @{attr}[{inx+1}]")
+            elif mandatory:
+                errors.append(__format_error(11, f"@{attr}"))
         else:
             errors.append(__format_error(18, result, "list", f"@{attr}"))
     except (KeyError, TypeError):

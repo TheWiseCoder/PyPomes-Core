@@ -2,7 +2,7 @@ import base64
 from collections.abc import Iterable
 
 
-def json_normalize_dict(source: dict):
+def json_normalize_dict(source: dict) -> None:
     """
     Turn the values in *source* into values that can be serialized to JSON, avoiding *TypeError*.
 
@@ -17,7 +17,7 @@ def json_normalize_dict(source: dict):
     for key, value in source.items():
         if isinstance(value, dict):
             json_normalize_dict(value)
-        elif isinstance(value, bytes) or isinstance(value, bytearray):
+        elif isinstance(value, bytes | bytearray):
             source[key] = base64.b64encode(value).decode()
         elif isinstance(value, Iterable) and not isinstance(value, str):
             source[key] = json_normalize_iterable(value)
@@ -41,7 +41,7 @@ def json_normalize_iterable(source: Iterable) -> list[any]:
         if isinstance(value, dict):
             json_normalize_dict(value)
             result.append(value)
-        elif isinstance(value, bytes) or isinstance(value, bytearray):
+        elif isinstance(value, bytes | bytearray):
             result.append(base64.b64encode(value).decode())
         elif isinstance(value, Iterable) and not isinstance(value, str):
             result.append(json_normalize_iterable(value))

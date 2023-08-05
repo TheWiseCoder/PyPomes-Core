@@ -1,12 +1,15 @@
 import logging
-import os
 import tempfile
-from datetime import datetime
 from dateutil import parser
 from io import BytesIO
+from pathlib import Path
 from typing import Final, Literal, TextIO
 from .datetime_pomes import DATETIME_FORMAT_INV
-from .env_pomes import APP_PREFIX, env_get_str
+from .env_pomes import APP_PREFIX, env_get_str, env_get_path
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 def __get_logging_level(level: Literal["debug", "info", "warning", "error", "critical"]) -> int:
@@ -40,9 +43,8 @@ LOGGING_FORMAT: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_FORMAT",
                                          "{module:20.20} {funcName:20.20} {lineno:3d} {message}")
 LOGGING_STYLE: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_STYLE", "{")
 
-LOGGING_FILE_PATH: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_FILE_PATH",
-                                            os.path.join(tempfile.gettempdir(),
-                                                         f"{APP_PREFIX}.log"))
+LOGGING_FILE_PATH: Final[Path] = env_get_path(f"{APP_PREFIX}_LOGGING_FILE_PATH",
+                                              Path(tempfile.gettempdir()) / f"{APP_PREFIX}.log")
 LOGGING_FILE_MODE: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_FILE_MODE", "a")
 
 # define and configure the logger
@@ -67,7 +69,7 @@ for _handler in logging.root.handlers:
 def logging_get_entries(errors: list[str],
                         log_level:  Literal["debug", "info", "warning", "error", "critical"] = None,
                         log_from: str = None, log_to: str = None,
-                        file_path: str = LOGGING_FILE_PATH) -> BytesIO:
+                        file_path: Path = LOGGING_FILE_PATH) -> BytesIO:
     """
     Extract and return all entries in *PYPOMES_LOGGER*'s logging file.
 
@@ -103,7 +105,7 @@ def logging_get_entries(errors: list[str],
             errors.append(f"Value '{to_stamp}' of 'to' attribute invalid")
 
     # does the log file exist ?
-    if not os.path.exists(file_path):
+    if not Path.exists(file_path):
         # no, report the error
         errors.append(f"File '{file_path}' not found")
 
@@ -111,7 +113,7 @@ def logging_get_entries(errors: list[str],
     if len(errors) == 0:
         # no, proceed
         result = BytesIO()
-        with open(file_path) as f:
+        with Path.open(file_path) as f:
             line: str = f.readline()
             while line:
                 items: list[str] = line.split(maxsplit=3)
@@ -128,9 +130,8 @@ def logging_get_entries(errors: list[str],
 
 
 def logging_log_msgs(msgs: list[str], output_dev: TextIO = None,
-                     log_level: Literal["debug", "info", "warning",
-                                        "error", "critical"] = "error",
-                     logger: logging.Logger = PYPOMES_LOGGER):
+                     log_level: Literal["debug", "info", "warning", "error", "critical"] = "error",
+                     logger: logging.Logger = PYPOMES_LOGGER) -> None:
     """
     Write all messages in *msgs* to *PYPOMES_LOGGER*'s logging file, and to *output_dev*.
 

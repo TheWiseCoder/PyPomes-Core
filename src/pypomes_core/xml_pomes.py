@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Final
 from xmltodict3 import XmlTextToDict
 
@@ -64,7 +65,7 @@ def xml_to_dict(file_data: bytes | str) -> dict:
         file_bytes: bytes = file_data
     else:  # elif isinstance(file_date, str):
         # não, obtenha-o do arquivo
-        with open(file_data, "rb") as f:
+        with Path.open(Path(file_data), "rb") as f:
             file_bytes: bytes = f.read()
 
     # converte o XML em dict
@@ -73,6 +74,4 @@ def xml_to_dict(file_data: bytes | str) -> dict:
     result: dict = xml_data.get_dict()
 
     # normaliza o dict, removendo namespaces e prefixos "@" e "#" nos nomes das chaves
-    result = xml_normalize_keys(result)
-
-    return result
+    return xml_normalize_keys(result)

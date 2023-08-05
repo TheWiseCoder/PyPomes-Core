@@ -1,6 +1,9 @@
 from types import TracebackType
 import os
-import traceback
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import traceback
 
 
 def exc_format(exc: Exception,

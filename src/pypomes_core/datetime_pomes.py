@@ -1,6 +1,9 @@
+import pytz
 from datetime import date, datetime
 from dateutil import parser
 from typing import Final
+
+from .env_pomes import APP_PREFIX, env_get_str
 
 # some useful date/datetime formats
 DATE_FORMAT_STD: Final[str] = "%m/%d/%Y"
@@ -9,6 +12,9 @@ DATE_FORMAT_INV: Final[str] = "%Y-%m-%d"
 DATETIME_FORMAT_STD: Final[str] = "%m/%d/%Y %H:%M:%S"
 DATETIME_FORMAT_COMPACT: Final[str] = "%Y%m%d%H%M%S"
 DATETIME_FORMAT_INV: Final[str] = "%Y-%m-%d %H:%M:%S"
+
+TIMEZONE_LOCAL: pytz.BaseTzInfo = pytz.timezone(env_get_str(f"{APP_PREFIX}_TIMEZONE_LOCAL", "America/Sao_Paulo"))
+TIMEZONE_UTC: pytz.BaseTzInfo = pytz.UTC
 
 
 def date_reformat(dt_str: str, to_format: str, **kwargs: any) -> str:

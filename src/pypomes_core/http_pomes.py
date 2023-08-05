@@ -5,9 +5,15 @@ from flask import Request
 from typing import Final
 from werkzeug.exceptions import BadRequest
 
+from .env_pomes import APP_PREFIX, env_get_int
 from .exception_pomes import exc_format
 
 # https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status
+
+HTTP_DELETE_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_DELETE_TIMEOUT", 10)
+HTTP_GET_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_GET_TIMEOUT", 10)
+HTTP_POST_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_POST_TIMEOUT", 10)
+HTTP_PUT_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_PUT_TIMEOUT", 10)
 
 MIMETYPE_BINARY: Final[str] = "application/octet-stream"
 MIMETYPE_CSS: Final[str] = "text/css"
@@ -198,9 +204,7 @@ def http_status_name(status_code: int) -> str:
     :return: the corresponding name given to the status
     """
     item: dict = __HTTP_STATUS.get(status_code, {"name": "Unknown status code"})
-    result = f"HTTP status code {status_code}: {item.get('name')}"
-                                                             
-    return result
+    return f"HTTP status code {status_code}: {item.get('name')}"
 
 
 def http_status_description(status_code: int) -> str:
@@ -211,9 +215,7 @@ def http_status_description(status_code: int) -> str:
     :return: the corresponding status description
     """
     item: dict = __HTTP_STATUS.get(status_code, {"description": "Unknown status code"})
-    result = f"HTTP status code {status_code}: {item.get('description')}"
-
-    return result
+    return f"HTTP status code {status_code}: {item.get('description')}"
 
 
 def http_json_from_form(request: Request) -> dict:
@@ -252,11 +254,13 @@ def http_json_from_request(request: Request) -> dict:
         if len(resp) > 0:
             # yes, possibly mal-fomed JSON
             raise
+
     return result
 
 
 def http_json_from_get(errors: list[str], url: str, headers: dict = None,
-                       params: dict = None, logger: logging.Logger = None) -> dict:
+                       params: dict = None, timeout: int = HTTP_GET_TIMEOUT,
+                       logger: logging.Logger = None) -> dict:
     """
     Retrieve a *JSON* string by issuing a *GET* request to the given *url*.
 
@@ -267,6 +271,7 @@ def http_json_from_get(errors: list[str], url: str, headers: dict = None,
     :param url: the destination URL
     :param headers: optional headers
     :param params: optional parameters
+    :param timeout: timeout, in seconds (defaults to HTTP_GET_TIMEOUT - use None to omit)
     :param logger: optional logger to log the operation with
     :return: the contents of the JSON string
     """
@@ -279,7 +284,8 @@ def http_json_from_get(errors: list[str], url: str, headers: dict = None,
     try:
         response: requests.Response = requests.get(url=url,
                                                    headers=headers,
-                                                   params=params)
+                                                   params=params,
+                                                   timeout=timeout)
         if logger is not None:
             logger.info(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
         result = response.json()
@@ -293,7 +299,8 @@ def http_json_from_get(errors: list[str], url: str, headers: dict = None,
 
 
 def http_json_from_post(errors: list[str], url: str, headers: dict = None, params: dict = None,
-                        data: dict = None, json: dict = None, logger: logging.Logger = None) -> dict:
+                        data: dict = None, json: dict = None, timeout: int = HTTP_GET_TIMEOUT,
+                        logger: logging.Logger = None) -> dict:
     """
     Retrieve a *JSON* string by issuing a *POST* request to the given *url*.
 
@@ -306,6 +313,7 @@ def http_json_from_post(errors: list[str], url: str, headers: dict = None, param
     :param params: optional parameters
     :param data: optionaL data to send in the body of the request
     :param json: optional JSON to send in the body of the request
+    :param timeout: timeout, in seconds (defaults to HTTP_GET_TIMEOUT - use None to omit)
     :param logger: optional logger to log the operation with
     :return: the contents of the JSON string
     """
@@ -320,7 +328,8 @@ def http_json_from_post(errors: list[str], url: str, headers: dict = None, param
                                                     headers=headers,
                                                     data=data,
                                                     json=json,
-                                                    params=params)
+                                                    params=params,
+                                                    timeout=timeout)
         if logger is not None:
             logger.info(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
         result = response.json()
