@@ -1,7 +1,7 @@
 # environment
 cache-dir = "~/.cache/ruff"
 force-exclude = true
-required-version = "0.0.280"
+required-version = "0.0.282"
 target-version = "py310"
 respect-gitignore = true
 task-tags = ["TODO", "FIXME", "HACK"]
@@ -81,6 +81,7 @@ ignore = [
     "PTH118",   # os.{module}.join() should be replaced by Path with / operator
     "D212",     # multi-line docstring summary to start at the second line
     "RUF013",   # implicit Optional in type annotations when the default parameter value is None
+    "S301",     # 'pickle' and modules that wrap it can be unsafe when used to deserialize untrusted data
     "S608",     # possible SQL injection vector through string-based query construction
     "SIM108",   # use ternary operator instead of if-else-block
 ]
@@ -100,9 +101,8 @@ docstring-quotes = "double"
 inline-quotes = "double"
 multiline-quotes = "double"
 
-
 [mccabe]
-max-complexity = 20      # upper limit for McCabe code complexity
+max-complexity = 20         # upper limit for McCabe code complexity
 
 [pycodestyle]
 max-doc-length = 120
@@ -111,3 +111,4 @@ max-doc-length = 120
 max-args = 10
 max-branches = 32
 max-returns = 1
+max-statements = 60
