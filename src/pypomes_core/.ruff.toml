@@ -77,6 +77,7 @@ ignore = [
     "D204",     # 1 blank line required after class docstring
     "D210",     # whitespaces surrounding docstring text
     "G004",     # logging statement uses f-string
+    "PGH004",   # use specific rule codes when using noqa
     "PLR2004",  # magic value used in comparison, consider replacing it with a constant variable
     "PTH118",   # os.{module}.join() should be replaced by Path with / operator
     "D212",     # multi-line docstring summary to start at the second line
