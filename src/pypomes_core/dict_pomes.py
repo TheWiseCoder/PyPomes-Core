@@ -7,13 +7,13 @@ if TYPE_CHECKING:
 
 def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
     """
-    Indicate the existence of an element in *source* pointed to by the nested keys chain *[keys[0]: ... :keys[n]*.
+    Indicate the existence of an element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
     The path up to he last key in the chain must point to an existing element.
     A given key may indicate the element's position within a *list*, using the format *<key>[<pos>]*.
 
     :param source: the reference dict
-    :param key_chain: the nested keys chain
+    :param key_chain: the nested key chain
     :return: whether the element exists
     """
     # initialize the return variable
@@ -56,7 +56,7 @@ def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
 
 def dict_get_value(source: dict, key_chain: list[str]) -> any:
     """
-    Obtain the value of the element in *source* pointed to by the nested keys chain *[keys[0]: ... :keys[n]*.
+    Obtain the value of the element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
     The path up to the last key in the chain must point to an existing element.
     A given key may indicate the element's position within a *list*, using the format *<key>[<pos>]*.
@@ -69,7 +69,7 @@ def dict_get_value(source: dict, key_chain: list[str]) -> any:
     :param key_chain: the key chain
     :return: the value obtained
     """
-    # inicializa
+    # initialize the return variable
     result: any = source
 
     # traverse the keys in the chain
@@ -108,7 +108,7 @@ def dict_set_value(target: dict, key_chain: list[str], value: any) -> None:
     """
     Assign to an element of *source* the value *value*.
 
-    The element in question is appointed to by the key chain *[keys[0]: ... :keys[n]*.
+    The element in question is pointed to by the key chain *[keys[0]: ... :keys[n]*.
     If the element does not exist, it is created with the specified value.
     Any non-existing intermediate elements are created with the value of an empty *dict*.
     A key might indicate the position of the element within a list, using the format *<key>[<pos>]*.
@@ -168,57 +168,56 @@ def dict_set_value(target: dict, key_chain: list[str], value: any) -> None:
 
 def dict_pop_value(target: dict, key_chain: list[str]) -> any:
     """
-    Remove e retorna o valor do elemento de *source* apontado pela cadeia de chaves *[keys[0]: ... :keys[n]*.
+    Obtain the value of the element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
-    O caminho até a última chave deve apontar para elementos existentes.
-    Uma chave pode indicar a posição do elemento dentro de uma lista, utilizando para tanto
-    o formato *<key>[<pos>]*. Retorna *None* se o valor procurado não for encontrado.
+    The path up to the last key in the chain must point to an existing element.
+    A given key may indicate the element's position within a *list*, using the format *<key>[<pos>]*.
+    Return *None* if the sought after value is not found.
+    Note that returning *None* might not be indicative of the absence of the element in *source*,
+    since that element might exist therein with the value *None*. To determine whether this is the case,
+    use the operation *dict_has_value*.
 
-    Note que o retorno do valor *None* pode não ser indicativo da ausência do elemento em *source*, quando
-    da invocaçxão dessa operação, uma vez que esse elemento pode ter existido com o próprio valor *None*.
-    Para certificar-se disso, use antes a operação *dict_has_value*.
-
-    :param target: o dict de referência
-    :param key_chain: a cadeia de chaves
-    :return: o valor removido
+    :param target: the reference dict
+    :param key_chain: the key chain
+    :return: the value removed
     """
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: any = None
 
-    # obtem o elemento pai do elemento denotado pela última chave da cadeia
+    # obtain the element pointed to by the las key in the chain
     parent: dict | None = None
 
-    # a cadeia de chaves contem 1 único elemento ?
+    # does the key chain contain just 1 element ?
     if len(key_chain) == 1:
-        # sim, utilize o dict fornecido
+        # yes, use the provided dict
         parent = target
 
-    # a cadeia de chaves contem mais de 1 elemento ?
+    # does the key chain contain more than 1 element ?
     elif len(key_chain) > 1:
-        # sim, obtenha o elemento pai da última chave da cadeia
+        # yes, retrieve the parent element of the last key in the chain
         parent = dict_get_value(target, key_chain[:-1])
 
-    # o elemento pai é um dicionário ?
+    # is the parent element a dict ?
     if isinstance(parent, dict):
-        # sim, prossiga
+        # yes, proceed
         key: str = key_chain[-1]
 
-        # a última chave da cadeia denota um elemento de lista ?
+        # does the last key un the chain refer to a list element ?
         if key[-1] == "]":
-            # sim, recupere a lista em questão
+            # sim, retrieve the list
             pos: int = key.find("[")
             inx: int = int(key[pos+1:-1])
             key = key[:pos]
             child: any = parent.get(key)
 
-            #  o elemento da última chave da cadeia é uma lista com mais de 'inx' elementos ?
+            # is the element pointed to by the last key in the chain a list with more than 'inx' elements ?
             if isinstance(child, list) and len(child) > inx:
-                # sim, remova o elemento indicado e retorne seu valor
+                # yes, remove that element and return its value
                 result = child.pop(inx)
 
-        # o item pai contem a última chave da cadeia ?
+        # does the parent item contain the last key in the chain ?
         elif key in parent:
-            # sim, remova o elemento indicado e retorne seu valor
+            # yes, remove that element and return its value
             result = parent.pop(key)
 
     return result
@@ -267,14 +266,14 @@ def dict_replace_value(target: dict, old_value: any, new_value: any) -> None:
 
 def dict_get_key(source: dict, value: any) -> any:
     """
-    Retorna a chave em *source*, associada à primeira ocorrência de *value* encontrada.
+    Return the key in *source*, mapping the first occurrence of *value* found.
 
-    Retorna *None*, se nenhuma chave for encontrada. Apenas os atributos no primeiro nível
-    em *source* são inspecionados.
+    Return *None*, if no key is found.
+    No recursion is attempted; only the first-level attributes in *source* are inspected.
 
-    :param source: dicionário a ser pesquisado
-    :param value: valor de referência
-    :return: primeira chave associada ao valor de referência
+    :param source: dict to search
+    :param value: the reference value
+    :return: first key mapping the reference value
     """
     result: any = None
     for key, val in source.items():
@@ -287,13 +286,13 @@ def dict_get_key(source: dict, value: any) -> any:
 
 def dict_get_keys(source: dict, value: any) -> list[str]:
     """
-    Restorna lista com todas as chaves ne primeiro nível em *source*, associadas a *value*.
+    Return all keys in *source*, mapping the value *value*.
 
-    Retorna *[]* se nenhuma chave for encontrada.
+    Return *[]* if no key is found.
 
-    :param source: dicionário a ser pesquisado
-    :param value: valor de referência
-    :return: lista de chaves associadas ao valor de referência
+    :param source: dict to search
+    :param value: the reference value
+    :return: list containing all keys mapping the reference value
     """
     return [key for key, val in source.items() if val == value]
 
@@ -688,18 +687,18 @@ if __name__ == "__main__":
     ]
     s2 = dict_transform(s1, mapping)
 
-    print(f"dict original:     {s1}")
+    print(f"original dict:  {s1}")
     keys: list[str] = ["a1", "b1"]
-    print(f"cadeia de redução: {keys}")
+    print(f"reduced chain:  {keys}")
     dict_reduce(s1, keys)
-    print(f"dict reduzido:     {s1}")
+    print(f"reduced dict:   {s1}")
     keys = ["a1", "c1", "d"]
-    print(f"cadeia para list.: {keys}")
+    print(f"listified chain: {keys}")
     dict_listify(s1, keys)
-    print(f"dict listificado:  {s1}")
+    print(f"listified dict:  {s1}")
     keys = ["a1", "c1", "d"]
-    print(f"cadeia para coal.: {keys}")
+    print(f"coalesced chain: {keys}")
     dict_coalesce(s1, keys)
-    print(f"dict coalescido:   {s1}")
-    print(f"mapeamento:        {mapping}")
-    print(f"dict transformado: {s2}")
+    print(f"coalesced dict:   {s1}")
+    print(f"mapping:          {mapping}")
+    print(f"transformed dict: {s2}")

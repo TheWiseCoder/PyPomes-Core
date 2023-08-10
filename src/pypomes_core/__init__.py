@@ -35,14 +35,14 @@ from .http_pomes import (
 from .json_pomes import (
     json_normalize_dict, json_normalize_iterable,
 )
-from .list_pomes import (
-    list_compare, list_flatten, list_unflatten,
-    list_find_coupled, list_elem_starting_with, list_transform,
-)
 from .logging_pomes import (
     LOGGING_ID, LOGGING_LEVEL, LOGGING_FORMAT, LOGGING_STYLE,
     LOGGING_FILE_PATH, LOGGING_FILE_MODE, PYPOMES_LOGGER,
-    logging_log_msgs, logging_get_entries,
+    logging_log_msgs, logging_get_entries, logging_request_entries
+)
+from .list_pomes import (
+    list_compare, list_flatten, list_unflatten,
+    list_find_coupled, list_elem_starting_with, list_transform,
 )
 from .str_pomes import (
     str_between, str_split_on_mark, str_find_whitespace,
@@ -87,13 +87,13 @@ __all__ = [
     "http_json_from_get", "http_json_from_post",
     # json_pomes
     "json_normalize_dict", "json_normalize_iterable",
-    # list_pomes
-    "list_compare", "list_flatten", "list_unflatten",
-    "list_find_coupled", "list_elem_starting_with", "list_transform",
     # logging_pomes
     "LOGGING_ID", "LOGGING_LEVEL", "LOGGING_FORMAT", "LOGGING_STYLE",
     "LOGGING_FILE_PATH", "LOGGING_FILE_MODE", "PYPOMES_LOGGER",
-    "logging_log_msgs", "logging_get_entries",
+    "logging_log_msgs", "logging_get_entries", "logging_request_entries",
+    # list_pomes
+    "list_compare", "list_flatten", "list_unflatten",
+    "list_find_coupled", "list_elem_starting_with", "list_transform",
     # validation_pomes
     "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX",
     "validate_value", "validate_bool", "validate_int", "validate_float", "validate_str",

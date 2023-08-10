@@ -4,7 +4,7 @@ force-exclude = true
 required-version = "0.0.282"
 target-version = "py310"
 respect-gitignore = true
-task-tags = ["TODO", "FIXME", "HACK"]
+task-tags = ["TODO", "FIXME", "HACK", "HAZARD"]
 select = [
     # flake8 group
     "A",     # flake8-builtins - prevent shadowing of python builtins
@@ -18,14 +18,14 @@ select = [
     "EM",    # flake8-errmsg - enforce good formatting of error messages
     "FA",    # flake8-future-annotations - verify use of 'from __future__ import annotations'
     "FIX",   # flake8-fix_me - check for FIXMEs, TODOs and other temporary developer notes
-    "G",     # flake8-logging-format - vlidate logging format strings
+    "G",     # flake8-logging-format - validate logging format strings
     "ICN",   # flake8-import-conventions - check for proper importing and aliasing of packages
-    "INP",   # flake8-no-pep420 - preven  PEP-420 implicit namespace packages
+    "INP",   # flake8-no-pep420 - prevent PEP-420 implicit namespace packages
     "INT",   # flake8-gettext - check formats resolved before function call
     "ISC",   # flake8-implicit-str-concat - enforce correct string literal concatenation
     "PIE",   # flake8-pie - miscellaneous lints
     "PT",    # flake8-pytest-style - check common style issues or inconsistencies with pytest-based tests
-    "PTH",   # flake8-use-pathlib - check use of functions that can be replaced by 'pathlib' module
+    "PTH",   # flake8-use-pathlib - check use of functions that can be replaced by pathlib module
     "Q",     # flake8-quotes - linter for quotes
     "RET",   # flake8-return - check return values
     "RSE",   # flake8-raise - enforce proper coding of 'raise' statements
@@ -52,7 +52,7 @@ select = [
     "N",     # pep8-naming - enforce naming conventions in PEP 8
     "PERF",  # Perflint - linter for performance anti-patterns
     "PGH",   # pygrep-hooks - check pre-commit hooks
-    "PD",    # pandas-vet - provide opinionated linting for 'pandas' code
+    "PD",    # pandas-vet - provide opinionated linting for pandas code
     "PL",    # Pylint - Python classic static code analyser
     "SLF",   # flake8-return - lint private member access
     "TRY",   # tryceratops - prevent exception handling antipatterns
@@ -71,12 +71,12 @@ select = [
 ]
 ignore = [
     "ANN002",   # missing type annotation for *kargs
-    "ANN101",   # missing type annotation for `self` in method
-    "COM819",   # prohibited trailing comma
+    "ANN101",   # missing type annotation for 'self' in method
+    "COM819",   # prohibited trailing commas
     "D200",     # one-line docstring should fit on one line
     "D204",     # 1 blank line required after class docstring
     "D210",     # whitespaces surrounding docstring text
-    "G004",     # logging statement uses f-string
+    "G004",     # logging statement uses 'f-string'
     "PGH004",   # use specific rule codes when using noqa
     "PLR2004",  # magic value used in comparison, consider replacing it with a constant variable
     "PTH118",   # os.{module}.join() should be replaced by Path with / operator

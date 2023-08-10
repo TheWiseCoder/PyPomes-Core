@@ -4,12 +4,12 @@ from collections.abc import Iterable
 
 def json_normalize_dict(source: dict) -> None:
     """
-    Turn the values in *source* into values that can be serialized to JSON, avoiding *TypeError*.
+    Turn the values in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
 
     Possible transformations:
         - *bytes* e *bytearray* are changed to *str* in *Base64* format
         - *Iterable* is changed into a *list*
-        - all other types kept as they are
+        - all other types are left unchanged
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
     :param source: the dict to be made serializable
@@ -25,16 +25,16 @@ def json_normalize_dict(source: dict) -> None:
 
 def json_normalize_iterable(source: Iterable) -> list[any]:
     """
-    Turn the values in *source* into values that can be serialized to JSON, avoiding *TypeError*.
+    Return in a *list* the values in *source* that can be serialized to JSON, thus avoiding *TypeError*.
 
     Possible operations:
         - *bytes* e *bytearray* are changed to *str* in *Base64* format
         - *Iterable* is changed into a *list*
-        - all other types kept as they are
+        - all other types are left unchanged
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
     :param source: the dict to be made serializable
-    :return
+    :return: list with serialized values
     """
     result: list[any] = []
     for value in source:

@@ -122,11 +122,11 @@ __HTTP_STATUS: Final[dict] = {
     "description": ""
   },
   408: {
-    "name": "",
+    "name": "REQUEST TIMEOUT",
     "description": ""
   },
   409: {
-    "name": "REQUEST TIMEOUT",
+    "name": "CONFLICT",
     "description": ""
   },
   410: {

@@ -2,26 +2,26 @@ def list_compare(list1: list[any], list2: list[any]) -> bool:
     """
     Compare the contents of the two lists *list1* e *list2*.
 
-    Return *True* if all the elements in *list1* are also in *list2*, and vice-versa, in the same quantity.
+    Return *True* if all the elements in *list1* are also in *list2*, and vice-versa, with the same cardinality.
 
     :param list1: the first list
     :param list2: the second list
     :return: True if the two lists contain the same elements, in the same quantity, in any order
     """
-    # inicializa variável de retorno
+    # initialize the return variable
     result: bool = True
 
-    # os parâmetros são listas, e contêm o mesmo número de elementos ?
+    # are the input parameters lists containing the same number of elements ?
     if isinstance(list1, list) and isinstance(list2, list) and len(list1) == len(list2):
-        # sim, verifique se todos os elementos de 'list1' estão em 'list2', na mesma quantidade
+        # yes, verify whether all elements in 'list1' are also in 'list2', in the same quantity
         for elem in list1:
-            # 'elem' está nas duas listas, na mesma quantidade ?
+            # is 'elem' in both lists, in thew same quantity ?
             if list1.count(elem) != list2.count(elem):
-                # não, as listas não são iguais
+                # no, the lists are not equal
                 result = False
                 break
     else:
-        # não, as listas não são iguais
+        # no, the lists are not equal
         result = False
 
     return result

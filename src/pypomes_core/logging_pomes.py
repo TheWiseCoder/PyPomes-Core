@@ -1,11 +1,14 @@
+import json
 import logging
 import tempfile
 from dateutil import parser
+from flask import Request, Response, send_file
 from io import BytesIO
 from pathlib import Path
 from typing import Final, Literal, TextIO
 from .datetime_pomes import DATETIME_FORMAT_INV
 from .env_pomes import APP_PREFIX, env_get_str, env_get_path
+from .http_pomes import MIMETYPE_TEXT
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -14,7 +17,7 @@ if TYPE_CHECKING:
 
 def __get_logging_level(level: Literal["debug", "info", "warning", "error", "critical"]) -> int:
     """
-    Translate the log severity string *level* into the *logging*'s internal logging severity value.
+    Translate the log severity string *level* into the logging's internal severity value.
 
     :param level: the string log severity
     :return: the internal logging severity value
@@ -66,20 +69,76 @@ for _handler in logging.root.handlers:
     _handler.addFilter(logging.Filter(LOGGING_ID))
 
 
+def logging_request_entries(request: Request) -> Response:
+    """
+    Retrieve from the log file, and return, the entries matching the criteria specified.
+
+    These criteria are specified in the query string of the HTTP request, according to the pattern
+    *path=<log-path>&level=<log-level>&from=YYYYMMDDhhmmss&to=YYYYMMDDhhmmss>*
+
+    All criteria are optional:
+        - path: the path of the log file
+        - level: the logging level of the entries
+        - from: the start timestamp
+        - to: the finish timestamp
+
+    :param request: the HTTP request
+    :return: file containing the log entries requested on success, or incidental errors on fail
+    """
+    # declare the return variable
+    result: Response
+
+    # initialize the error messages list
+    errors: list[str] = []
+
+    # obtain the logging level
+    log_level: str = request.args.get("level")
+
+    # obtain the initial and final timestamps
+    log_from: str = request.args.get("from")
+    log_to: str = request.args.get("to")
+
+    # obtain the path for the log file
+    log_path: str = request.args.get("path")
+
+    # retrieve the entries
+    # noinspection PyTypeChecker
+    log_entries: BytesIO = logging_get_entries(errors, log_level, log_from, log_to, log_path)
+
+    # any error ?
+    if len(errors) == 0:
+        # no, retrieve the log entries requested, and return them as an attached file
+        log_file: str = (
+            f"log{'_'.join(ch for ch in log_from if ch.isdigit())}"
+            f"{'_'.join(ch for ch in log_to if ch.isdigit())}.log"
+        )
+        log_entries.seek(0)
+        result = send_file(path_or_file=log_entries,
+                           mimetype=MIMETYPE_TEXT,
+                           as_attachment=True,
+                           download_name=log_file)
+    else:
+        # yes, report the failure
+        result = Response(json.dumps({"errors": errors}), status=401,  mimetype="text/plain")
+
+    return result
+
+
 def logging_get_entries(errors: list[str],
                         log_level:  Literal["debug", "info", "warning", "error", "critical"] = None,
                         log_from: str = None, log_to: str = None,
-                        file_path: Path = LOGGING_FILE_PATH) -> BytesIO:
+                        log_path: Path | str = LOGGING_FILE_PATH) -> BytesIO:
     """
-    Extract and return all entries in *PYPOMES_LOGGER*'s logging file.
+    Extract and return all entries in the logging file *file_path*.
 
-    The extraction meets the criteria specified by *log_level* and by the inclusive interval *[log_from, log_to]*.
+    It is expected for this logging file to be compliant with *PYPOMES_LOGGER*'s default format.
+    The extraction meets the criteria specified by *log_level*, and by the inclusive interval *[log_from, log_to]*.
 
-    :param errors: errors eventually generated during execution
+    :param errors: incidental error messages
     :param log_level: the logging level (defaults to all levels)
     :param log_from: the initial timestamp (defaults to unspecified)
     :param log_to: the finaL timestamp (defaults to unspecified)
-    :param file_path: the path of the log file
+    :param log_path: the path of the log file
     :return: the logging entries meeting the specified criteria
     """
     # inicializa variável de retorno
@@ -104,6 +163,7 @@ def logging_get_entries(errors: list[str],
            (from_stamp is not None and from_stamp > to_stamp):
             errors.append(f"Value '{to_stamp}' of 'to' attribute invalid")
 
+    file_path: Path = Path(log_path)
     # does the log file exist ?
     if not Path.exists(file_path):
         # no, report the error

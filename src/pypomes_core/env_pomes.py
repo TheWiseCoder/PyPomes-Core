@@ -72,7 +72,7 @@ def env_get_float(key: str, def_value: float = None) -> float:
 
 def env_get_path(key: str, def_value: Path = None) -> Path:
     """
-    Retrieve and return the string value defined for *key* in the current operating environment.
+    Retrieve and return the path value defined for *key* in the current operating environment.
 
     :param key: The key the value is associated with
     :param def_value: The default value to return, if the key has not been defined
