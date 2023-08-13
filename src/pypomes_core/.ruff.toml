@@ -85,6 +85,7 @@ ignore = [
     "S301",     # 'pickle' and modules that wrap it can be unsafe when used to deserialize untrusted data
     "S608",     # possible SQL injection vector through string-based query construction
     "SIM108",   # use ternary operator instead of if-else-block
+    "TRY400",   # use 'logging.exception' instead of 'logging.error'
 ]
 
 # rules

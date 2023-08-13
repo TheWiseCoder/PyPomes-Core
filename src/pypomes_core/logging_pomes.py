@@ -193,9 +193,9 @@ def logging_log_msgs(msgs: list[str], output_dev: TextIO = None,
                      log_level: Literal["debug", "info", "warning", "error", "critical"] = "error",
                      logger: logging.Logger = PYPOMES_LOGGER) -> None:
     """
-    Write all messages in *msgs* to *PYPOMES_LOGGER*'s logging file, and to *output_dev*.
+    Write all messages in *msgs* to *logger*'s logging file, and to *output_dev*.
 
-    The output device is tipically *sys.stdout* ou *sys.stderr*.
+    The output device is tipically *sys.stdout* or *sys.stderr*.
 
     :param msgs: the messages list
     :param output_dev: output device where the message is to be printed (None for no device printing)

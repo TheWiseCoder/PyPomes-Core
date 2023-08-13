@@ -258,7 +258,7 @@ def http_json_from_request(request: Request) -> dict:
     return result
 
 
-def http_json_from_get(errors: list[str], url: str, headers: dict = None,
+def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
                        params: dict = None, timeout: int = HTTP_GET_TIMEOUT,
                        logger: logging.Logger = None) -> dict:
     """
@@ -272,11 +272,11 @@ def http_json_from_get(errors: list[str], url: str, headers: dict = None,
     :param headers: optional headers
     :param params: optional parameters
     :param timeout: timeout, in seconds (defaults to HTTP_GET_TIMEOUT - use None to omit)
-    :param logger: optional logger to log the operation with
+    :param logger: optional logger
     :return: the contents of the JSON string
     """
     if logger is not None:
-        logger.info(f"Invoking GET: '{url}'")
+        logger.debug(f"Invoking GET: '{url}'")
 
     # initialize the return variable
     result: dict | None = None
@@ -287,24 +287,25 @@ def http_json_from_get(errors: list[str], url: str, headers: dict = None,
                                                    params=params,
                                                    timeout=timeout)
         if logger is not None:
-            logger.info(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
+            logger.debug(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
         result = response.json()
     except Exception as e:
-        msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
+        err_msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
         if logger is not None:
-            logger.info(msg)
-        errors.append(msg)
+            logger.error(err_msg)
+        if errors:
+            errors.append(err_msg)
 
     return result
 
 
-def http_json_from_post(errors: list[str], url: str, headers: dict = None, params: dict = None,
-                        data: dict = None, json: dict = None, timeout: int = HTTP_GET_TIMEOUT,
-                        logger: logging.Logger = None) -> dict:
+def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None,
+                        params: dict = None, data: dict = None, json: dict = None,
+                        timeout: int = HTTP_POST_TIMEOUT, logger: logging.Logger = None) -> dict:
     """
     Retrieve a *JSON* string by issuing a *POST* request to the given *url*.
 
-    The contents of the *JSON* string are returned as a *dict* .
+    The contents of the *JSON* string are returned as a *dict*.
     The request might contain *headers* and *parameters*.
 
     :param errors: incidental error messages
@@ -313,12 +314,12 @@ def http_json_from_post(errors: list[str], url: str, headers: dict = None, param
     :param params: optional parameters
     :param data: optionaL data to send in the body of the request
     :param json: optional JSON to send in the body of the request
-    :param timeout: timeout, in seconds (defaults to HTTP_GET_TIMEOUT - use None to omit)
+    :param timeout: timeout, in seconds (defaults to HTTP_POST_TIMEOUT - use None to omit)
     :param logger: optional logger to log the operation with
     :return: the contents of the JSON string
     """
     if logger is not None:
-        logger.info(f"Invoking POST: '{url}'")
+        logger.debug(f"Invoking POST: '{url}'")
 
     # initialize the return variable
     result: dict | None = None
@@ -331,12 +332,13 @@ def http_json_from_post(errors: list[str], url: str, headers: dict = None, param
                                                     params=params,
                                                     timeout=timeout)
         if logger is not None:
-            logger.info(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
+            logger.debug(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
         result = response.json()
     except Exception as e:
-        msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
+        err_msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
         if logger is not None:
-            logger.info(msg)
-        errors.append(msg)
+            logger.error(err_msg)
+        if errors:
+            errors.append(err_msg)
 
     return result
