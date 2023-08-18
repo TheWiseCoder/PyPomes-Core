@@ -558,5 +558,5 @@ def __validate_log(errors: list[str], err_msg: str, logger: Logger) -> None:
 
     if logger:
         logger.error(err_msg)
-    if errors:
+    if errors is not None:
         errors.append(err_msg)

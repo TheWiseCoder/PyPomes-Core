@@ -291,9 +291,9 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
         result = response.json()
     except Exception as e:
         err_msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
-        if logger is not None:
+        if logger:
             logger.error(err_msg)
-        if errors:
+        if errors is not None:
             errors.append(err_msg)
 
     return result
@@ -336,9 +336,9 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
         result = response.json()
     except Exception as e:
         err_msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
-        if logger is not None:
+        if logger:
             logger.error(err_msg)
-        if errors:
+        if errors is not None:
             errors.append(err_msg)
 
     return result

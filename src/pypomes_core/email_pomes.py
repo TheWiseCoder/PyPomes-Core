@@ -3,7 +3,7 @@ from email.message import EmailMessage
 from logging import Logger
 from smtplib import SMTP
 from typing import Final
-from .env_pomes import APP_PREFIX, env_get_str, env_get_int
+from src.pypomes_core.env_pomes import APP_PREFIX, env_get_str, env_get_int
 
 EMAIL_ACCOUNT: Final[str] = env_get_str(f"{APP_PREFIX}_EMAIL_ACCOUNT")
 EMAIL_PWD: Final[str] = env_get_str(f"{APP_PREFIX}_EMAIL_PWD")
@@ -48,5 +48,5 @@ def email_send(errors: list[str] | None, user_email: str,
         err_msg: str = f"Error sending the email: {exc_format(e, sys.exc_info())}"
         if logger:
             logger.error(err_msg)
-        if errors:
+        if errors is not None:
             errors.append(err_msg)
