@@ -108,10 +108,12 @@ def logging_request_entries(request: Request) -> Response:
     # any error ?
     if len(errors) == 0:
         # no, retrieve the log entries requested, and return them as an attached file
-        log_file: str = (
-            f"log{'_'.join(ch for ch in log_from if ch.isdigit())}"
-            f"{'_'.join(ch for ch in log_to if ch.isdigit())}.log"
-        )
+        base: str = "entries" if not log_from or not log_to else \
+            (
+                f"{''.join(ch for ch in log_from if ch.isdigit())}"
+                f"{'_'.join(ch for ch in log_to if ch.isdigit())}"
+            )
+        log_file = f"log_{base}.log"
         log_entries.seek(0)
         result = send_file(path_or_file=log_entries,
                            mimetype=MIMETYPE_TEXT,
