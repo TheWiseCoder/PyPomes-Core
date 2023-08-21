@@ -3,7 +3,7 @@ from email.message import EmailMessage
 from logging import Logger
 from smtplib import SMTP
 from typing import Final
-from src.pypomes_core.env_pomes import APP_PREFIX, env_get_str, env_get_int
+from .env_pomes import APP_PREFIX, env_get_str, env_get_int
 
 EMAIL_ACCOUNT: Final[str] = env_get_str(f"{APP_PREFIX}_EMAIL_ACCOUNT")
 EMAIL_PWD: Final[str] = env_get_str(f"{APP_PREFIX}_EMAIL_PWD")

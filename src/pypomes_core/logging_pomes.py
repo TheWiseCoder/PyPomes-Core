@@ -1,6 +1,5 @@
 import json
 import logging
-import tempfile
 from dateutil import parser
 from flask import Request, Response, send_file
 from io import BytesIO
@@ -8,6 +7,7 @@ from pathlib import Path
 from typing import Final, Literal, TextIO
 from .datetime_pomes import DATETIME_FORMAT_INV
 from .env_pomes import APP_PREFIX, env_get_str, env_get_path
+from .file_pomes import TEMP_DIR
 from .http_pomes import MIMETYPE_TEXT
 
 from typing import TYPE_CHECKING
@@ -47,7 +47,7 @@ LOGGING_FORMAT: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_FORMAT",
 LOGGING_STYLE: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_STYLE", "{")
 
 LOGGING_FILE_PATH: Final[Path] = env_get_path(f"{APP_PREFIX}_LOGGING_FILE_PATH",
-                                              Path(tempfile.gettempdir()) / f"{APP_PREFIX}.log")
+                                              TEMP_DIR / f"{APP_PREFIX}.log")
 LOGGING_FILE_MODE: Final[str] = env_get_str(f"{APP_PREFIX}_LOGGING_FILE_MODE", "a")
 
 # define and configure the logger
@@ -99,7 +99,7 @@ def logging_request_entries(request: Request) -> Response:
     log_to: str = request.args.get("to")
 
     # obtain the path for the log file
-    log_path: str = request.args.get("path")
+    log_path: str = request.args.get("path") or LOGGING_FILE_PATH
 
     # retrieve the entries
     # noinspection PyTypeChecker

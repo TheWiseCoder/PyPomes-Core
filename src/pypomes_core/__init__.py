@@ -22,7 +22,7 @@ from .exception_pomes import (
     exc_format,
 )
 from .file_pomes import (
-    file_from_request,
+    TEMP_DIR, file_from_request,
 )
 from .http_pomes import (
     HTTP_DELETE_TIMEOUT, HTTP_GET_TIMEOUT, HTTP_POST_TIMEOUT, HTTP_PUT_TIMEOUT,
@@ -76,7 +76,7 @@ __all__ = [
     # exception_pomes
     "exc_format",
     # file_pomes
-    "file_from_request",
+    "TEMP_DIR", "file_from_request",
     # http_pomes
     "HTTP_DELETE_TIMEOUT", "HTTP_GET_TIMEOUT", "HTTP_POST_TIMEOUT", "HTTP_PUT_TIMEOUT",
     "MIMETYPE_BINARY", "MIMETYPE_CSS", "MIMETYPE_CSV", "MIMETYPE_HTML", "MIMETYPE_JAVASCRIPT",
