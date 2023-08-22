@@ -1,8 +1,5 @@
 import inspect
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    import types
+import types
 
 
 def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
