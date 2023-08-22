@@ -101,13 +101,13 @@ def logging_request_entries(request: Request) -> Response:
     # obtain the path for the log file
     log_path: str = request.args.get("path") or LOGGING_FILE_PATH
 
-    # retrieve the entries
+    # retrieve the log entries
     # noinspection PyTypeChecker
     log_entries: BytesIO = logging_get_entries(errors, log_level, log_from, log_to, log_path)
 
     # any error ?
     if len(errors) == 0:
-        # no, retrieve the log entries requested, and return them as an attached file
+        # no, return the log entries requested as an attached file
         base: str = "entries" if not log_from or not log_to else \
             (
                 f"{''.join(ch for ch in log_from if ch.isdigit())}"

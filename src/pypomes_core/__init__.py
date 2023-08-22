@@ -29,7 +29,7 @@ from .http_pomes import (
     MIMETYPE_BINARY, MIMETYPE_CSS, MIMETYPE_CSV, MIMETYPE_HTML, MIMETYPE_JAVASCRIPT,
     MIMETYPE_JSON, MIMETYPE_MULTIPART, MIMETYPE_PDF, MIMETYPE_PKCS7, MIMETYPE_SOAP,
     MIMETYPE_TEXT, MIMETYPE_URLENCODED, MIMETYPE_XML, MIMETYPE_ZIP,
-    http_status_name, http_status_description,
+    http_status_code, http_status_name, http_status_description,
     http_json_from_form, http_json_from_request, http_json_from_get, http_json_from_post,
 )
 from .json_pomes import (
@@ -82,7 +82,7 @@ __all__ = [
     "MIMETYPE_BINARY", "MIMETYPE_CSS", "MIMETYPE_CSV", "MIMETYPE_HTML", "MIMETYPE_JAVASCRIPT",
     "MIMETYPE_JSON", "MIMETYPE_MULTIPART", "MIMETYPE_PDF", "MIMETYPE_PKCS7", "MIMETYPE_SOAP",
     "MIMETYPE_TEXT", "MIMETYPE_URLENCODED", "MIMETYPE_XML", "MIMETYPE_ZIP",
-    "http_status_name", "http_status_description",
+    "http_status_code", "http_status_name", "http_status_description",
     "http_json_from_form", "http_json_from_request",
     "http_json_from_get", "http_json_from_post",
     # json_pomes

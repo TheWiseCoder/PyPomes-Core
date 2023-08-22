@@ -10,10 +10,10 @@ from .exception_pomes import exc_format
 
 # https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status
 
-HTTP_DELETE_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_DELETE_TIMEOUT", 10)
-HTTP_GET_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_GET_TIMEOUT", 10)
-HTTP_POST_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_POST_TIMEOUT", 10)
-HTTP_PUT_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_PUT_TIMEOUT", 10)
+HTTP_DELETE_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_DELETE_TIMEOUT", 300)
+HTTP_GET_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_GET_TIMEOUT", 300)
+HTTP_POST_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_POST_TIMEOUT", 300)
+HTTP_PUT_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_PUT_TIMEOUT", 300)
 
 MIMETYPE_BINARY: Final[str] = "application/octet-stream"
 MIMETYPE_CSS: Final[str] = "text/css"
@@ -31,7 +31,7 @@ MIMETYPE_XML: Final[str] = "application/xml"
 MIMETYPE_ZIP: Final[str] = "application/zip"
 
 
-# TODO (add description)
+# TODO (add descriptions)
 __HTTP_STATUS: Final[dict] = {
   200: {
     "name": "OK",
@@ -196,12 +196,28 @@ __HTTP_STATUS: Final[dict] = {
 }
 
 
+def http_status_code(status_name: str) -> int:
+    """
+    Return the corresponding code of the HTTP status *status_name*.
+
+    :param status_name: the name of HTTP the status
+    :return: the corresponding HTTP status code
+    """
+    # initialize the return variable
+    result: int | None = None
+    for key, value in __HTTP_STATUS:
+        if status_name == value["name"]:
+            result = key
+
+    return result
+
+
 def http_status_name(status_code: int) -> str:
     """
-    Return the name of the status message identified to by *status_code*.
+    Return the corresponding name of the HTTP status *status_code*.
 
-    :param status_code: the code of the status
-    :return: the corresponding name given to the status
+    :param status_code: the code of the HTTP status
+    :return: the corresponding HTTP status name
     """
     item: dict = __HTTP_STATUS.get(status_code, {"name": "Unknown status code"})
     return f"HTTP status code {status_code}: {item.get('name')}"
@@ -209,10 +225,10 @@ def http_status_name(status_code: int) -> str:
 
 def http_status_description(status_code: int) -> str:
     """
-    Return the description of the status message identified to by *status_code*.
+    Return the description of the HTTP status *status_code*.
 
-    :param status_code: the code of the status
-    :return: the corresponding status description
+    :param status_code: the code of the HTTP status
+    :return: the corresponding HTTP status description
     """
     item: dict = __HTTP_STATUS.get(status_code, {"description": "Unknown status code"})
     return f"HTTP status code {status_code}: {item.get('description')}"
@@ -259,7 +275,7 @@ def http_json_from_request(request: Request) -> dict:
 
 
 def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
-                       params: dict = None, timeout: int = HTTP_GET_TIMEOUT,
+                       params: dict = None, timeout: int | None = HTTP_GET_TIMEOUT,
                        logger: logging.Logger = None) -> dict:
     """
     Retrieve a *JSON* string by issuing a *GET* request to the given *url*.
@@ -301,7 +317,7 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
 
 def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None,
                         params: dict = None, data: dict = None, json: dict = None,
-                        timeout: int = HTTP_POST_TIMEOUT, logger: logging.Logger = None) -> dict:
+                        timeout: int | None = HTTP_POST_TIMEOUT, logger: logging.Logger = None) -> dict:
     """
     Retrieve a *JSON* string by issuing a *POST* request to the given *url*.
 
