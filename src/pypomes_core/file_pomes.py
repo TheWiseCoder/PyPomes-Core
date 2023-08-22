@@ -1,11 +1,9 @@
 from flask import Request
 from pathlib import Path
 from tempfile import gettempdir
-from typing import TYPE_CHECKING, Final
+from typing import Final
+from werkzeug.datastructures import FileStorage
 from .env_pomes import APP_PREFIX, env_get_path
-
-if TYPE_CHECKING:
-    from werkzeug.datastructures import FileStorage
 
 TEMP_DIR: Final[Path] = env_get_path(f"{APP_PREFIX}_TEMP_DIR", Path(gettempdir()))
 

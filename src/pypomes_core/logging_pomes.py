@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import datetime
 from dateutil import parser
 from flask import Request, Response, send_file
 from io import BytesIO
@@ -9,10 +10,6 @@ from .datetime_pomes import DATETIME_FORMAT_INV
 from .env_pomes import APP_PREFIX, env_get_str, env_get_path
 from .file_pomes import TEMP_DIR
 from .http_pomes import MIMETYPE_TEXT
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from datetime import datetime
 
 
 def __get_logging_level(level: Literal["debug", "info", "warning", "error", "critical"]) -> int:
