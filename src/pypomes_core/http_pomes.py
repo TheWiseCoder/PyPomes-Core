@@ -291,18 +291,18 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
     :param logger: optional logger
     :return: the contents of the JSON string
     """
-    if logger is not None:
-        logger.debug(f"Invoking GET: '{url}'")
-
     # initialize the return variable
     result: dict | None = None
+
+    if logger:
+        logger.debug(f"Invoking GET: '{url}'")
 
     try:
         response: requests.Response = requests.get(url=url,
                                                    headers=headers,
                                                    params=params,
                                                    timeout=timeout)
-        if logger is not None:
+        if logger:
             logger.debug(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
         result = response.json()
     except Exception as e:
@@ -334,11 +334,11 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
     :param logger: optional logger to log the operation with
     :return: the contents of the JSON string
     """
-    if logger is not None:
-        logger.debug(f"Invoking POST: '{url}'")
-
     # initialize the return variable
     result: dict | None = None
+
+    if logger:
+        logger.debug(f"Invoking POST: '{url}'")
 
     try:
         response: requests.Response = requests.post(url=url,
@@ -347,7 +347,7 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
                                                     json=json,
                                                     params=params,
                                                     timeout=timeout)
-        if logger is not None:
+        if logger:
             logger.debug(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
         result = response.json()
     except Exception as e:

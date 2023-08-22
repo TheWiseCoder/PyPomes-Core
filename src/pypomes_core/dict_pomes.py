@@ -582,7 +582,7 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
     for key, value in source.items():
 
         # define a cadeia de chaves de origem
-        if prefix_from is None:
+        if prefix_from:
             from_keys: str = key
         else:
             from_keys: str = f"{prefix_from}.{key}"
@@ -591,7 +591,7 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
         to_keys: str = list_find_coupled(from_to_keys, from_keys)
 
         # o destino foi definido ?
-        if to_keys is not None:
+        if to_keys:
             # sim, obtenha o valor de destino
             if isinstance(value, dict):
                 # valor é um dicionário, transforme-o
@@ -604,7 +604,7 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
                 to_value: any = value
 
             # o prefixo de destino foi definido e ocorre na cadeia de destino ?
-            if prefix_to is not None and to_keys.startswith(prefix_to):
+            if prefix_to and to_keys.startswith(prefix_to):
                 # sim, remova o prefixo
                 to_keys = to_keys[len(prefix_to)+1:]
             to_keys_deep: list[str] = list_unflatten(to_keys)

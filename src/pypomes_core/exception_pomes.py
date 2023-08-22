@@ -22,7 +22,7 @@ def exc_format(exc: Exception,
 
     # retrieve the execution point where the exception was raised (bottom of the stack)
     tlast: traceback = tback
-    while tlast.tb_next is not None:
+    while tlast.tb_next:
         tlast = tlast.tb_next
 
     # retrieve the module name and the line number within the module

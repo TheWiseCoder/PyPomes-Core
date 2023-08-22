@@ -31,7 +31,7 @@ def date_reformat(dt_str: str, to_format: str, **kwargs: any) -> str:
     """
     result: str | None = None
     ts: datetime = parser.parse(dt_str, **kwargs)
-    if ts is not None:
+    if ts:
         result = datetime.strftime(ts, to_format)
 
     return result
@@ -48,7 +48,7 @@ def date_parse(dt_str: str, **kwargs: any) -> date:
     :return: The corresponding date object, or None.
     """
     result: date | None = None
-    if dt_str is not None:
+    if dt_str:
         result = parser.parse(dt_str, **kwargs).date()
 
     return result
@@ -65,7 +65,7 @@ def datetime_parse(dt_str: str, **kwargs: any) -> datetime:
     :return: The corresponding datetime object, or None.
     """
     result: datetime | None = None
-    if dt_str is not None:
+    if dt_str:
         result = parser.parse(dt_str, **kwargs)
 
     return result

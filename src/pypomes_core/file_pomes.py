@@ -36,7 +36,7 @@ def file_from_request(request: Request, file_name: str = None, file_seq: int = 0
             file_in: str = list(request.files)[file_seq]
             file = request.files[file_in]
 
-        if file is not None:
+        if file:
             result: bytes = file.stream.read()
 
     return result

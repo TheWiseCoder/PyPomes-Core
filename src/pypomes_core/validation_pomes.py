@@ -91,7 +91,7 @@ def validate_bool(errors: list[str] | None, scheme: dict, attr: str,
         elif mandatory:
             stat = __format_error(10)
 
-    if stat is not None:
+    if stat:
         __validate_log(errors, f"{stat} @{attr}", logger)
 
     return result
@@ -138,10 +138,10 @@ def validate_int(errors: list[str] | None, scheme: dict, attr: str,
             (isinstance(result, bool) or not isinstance(result, int)):
         stat = __format_error(18, result, "int")
 
-    if stat is None:
+    if not stat:
         stat = validate_value(result, min_val, max_val, default)
 
-    if stat is not None:
+    if stat:
         __validate_log(errors, f"{stat} @{attr}", logger)
 
     return result
@@ -185,10 +185,10 @@ def validate_float(errors: list[str] | None, scheme: dict, attr: str,
     if result is not None and not isinstance(result, float):
         stat = __format_error(18, result, "float")
 
-    if stat is None:
+    if not stat:
         stat = validate_value(result, min_val, max_val, default)
 
-    if stat is not None:
+    if stat:
         result = None
         __validate_log(errors, f"{stat} @{attr}", logger)
 
@@ -220,7 +220,7 @@ def validate_str(errors: list[str] | None, scheme: dict, attr: str,
 
     # obtain and validate the value
     result: str = scheme.get(suffix)
-    if result is not None and not isinstance(result, str):
+    if result and not isinstance(result, str):
         stat = __format_error(18, result, "str")
     elif isinstance(default, str):
         if result is None:
@@ -230,7 +230,7 @@ def validate_str(errors: list[str] | None, scheme: dict, attr: str,
     else:
         stat = validate_value(result, min_length, max_length, default)
 
-    if stat is not None:
+    if stat:
         __validate_log(errors, f"{stat} @{attr}", logger)
 
     return result
@@ -274,7 +274,7 @@ def validate_date(errors: list[str] | None, scheme: dict, attr: str,
         elif isinstance(default, date):
             result = default
 
-    if stat is not None:
+    if stat:
         __validate_log(errors, f"{stat} @{attr}", logger)
 
     return result
@@ -318,7 +318,7 @@ def validate_datetime(errors: list[str] | None, scheme: dict, attr: str,
         elif isinstance(default, datetime):
             result = default
 
-    if stat is not None:
+    if stat:
         __validate_log(errors, f"{stat} @{attr}", logger)
 
     return result
@@ -358,7 +358,7 @@ def validate_ints(errors: list[str] | None, scheme: dict, attr: str,
                         stat: str = validate_value(value, min_val, max_val)
                     else:
                         stat: str = __format_error(18, value, "int")
-                    if stat is not None:
+                    if stat:
                         err_msg = f"{stat} @{attr}[{inx+1}]"
             elif mandatory:
                 err_msg = __format_error(10, f"@{attr}")
@@ -408,7 +408,7 @@ def validate_strs(errors: list[str] | None, scheme: dict,
                         stat: str = validate_value(value, min_length, max_length)
                     else:
                         stat: str = __format_error(18, value, "str")
-                    if stat is not None:
+                    if stat:
                         err_msg = f"{stat} @{attr}[{inx+1}]"
             elif mandatory:
                 err_msg = __format_error(11, f"@{attr}")
@@ -439,22 +439,20 @@ def validate_format_error(error_id: int, err_msgs: dict, *args) -> str:
     # initialize the return variable
     result: str = VALIDATION_MSG_PREFIX + str(error_id) + ": " + err_msgs.get(error_id)
 
-    if result is not None:
-        # apply the provided  arguments
-        for arg in args:
-            if arg is None:
-                result = result.replace(" {}", "", 1)
-            elif isinstance(arg, str) and arg.startswith("@"):
-                result += " " + arg
-            elif isinstance(arg, str) and arg.find(" ") > 0:
-                result = result.replace("{}", arg, 1)
-            else:
-                result = result.replace("{}", f"'{arg}'", 1)
+    # apply the provided  arguments
+    for arg in args:
+        if arg is None:
+            result = result.replace(" {}", "", 1)
+        elif isinstance(arg, str) and arg.startswith("@"):
+            result += " " + arg
+        elif isinstance(arg, str) and arg.find(" ") > 0:
+            result = result.replace("{}", arg, 1)
+        else:
+            result = result.replace("{}", f"'{arg}'", 1)
 
     return result
 
 
-# formata itens na lista de erros: <codigo> <descricao> [@<atributo>]
 def validate_format_errors(errors: list[str]) -> list[dict]:
     """
     Build and return a *dict* to be used as the value representing a list of errors.
@@ -472,7 +470,7 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
 
     # extract error code, description, and attribute from text
     for error in errors:
-        # localiza o último indicador do atributo
+        # locate the last attribute indicator
         pos = error.rfind("@")
 
         # is there a whitespace in the attribute ?

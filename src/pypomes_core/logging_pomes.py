@@ -152,18 +152,18 @@ def logging_get_entries(errors: list[str],
 
     # obtain the initial timestamp
     from_stamp: datetime | None = None
-    if log_from is not None:
+    if log_from:
         from_stamp = parser.parse(log_from)
-        if from_stamp is None:
-            errors.append(f"Value '{from_stamp}' of 'from' attribute invalid")
+        if not from_stamp:
+            errors.append(f"Value '{from_stamp}' of 'log_from' attribute invalid")
 
     # obtaind the final timestamp
     to_stamp: datetime | None = None
-    if log_to is not None:
+    if log_to:
         to_stamp = parser.parse(log_to)
-        if to_stamp is None or \
-           (from_stamp is not None and from_stamp > to_stamp):
-            errors.append(f"Value '{to_stamp}' of 'to' attribute invalid")
+        if not to_stamp or \
+           (from_stamp and from_stamp > to_stamp):
+            errors.append(f"Value '{to_stamp}' of 'log_to' attribute invalid")
 
     file_path: Path = Path(log_path)
     # does the log file exist ?
@@ -183,8 +183,8 @@ def logging_get_entries(errors: list[str],
                 msg_level: int = __get_logging_level(items[2])
                 if msg_level >= logging_level:
                     timestamp: datetime = parser.parse(f"{items[0]} {items[1]}")
-                    if (from_stamp is None or timestamp >= from_stamp) and \
-                       (to_stamp is None or timestamp <= to_stamp):
+                    if (not from_stamp or timestamp >= from_stamp) and \
+                       (not to_stamp or timestamp <= to_stamp):
                         result.write(line.encode())
                 line = f.readline()
 
@@ -221,12 +221,12 @@ def logging_log_msgs(msgs: list[str], output_dev: TextIO = None,
     # traverse the messages list
     for msg in msgs:
         # has the log writer been defined ?
-        if log_writer is not None:
+        if log_writer:
             # yes, log the message
             log_writer(msg)
 
         # the output device has been defined ?
-        if output_dev is not None:
+        if output_dev:
             # yes, write the message to it
             output_dev.write(msg)
 
