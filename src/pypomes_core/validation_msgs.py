@@ -82,18 +82,22 @@ __ERR_MSGS: Final[dict] = {
         "pt": "Mais de um(a) {} encontrado(a)",
     },
     121: {
+        "en": "Invalid operation {}",
+        "pt": "Operação {} inválida",
+    },
+    122: {
         "en": "Invalid value {}: must be one of {}",
         "pt": "Valor {} inválido: deve ser um de {}",
     },
-    122: {
+    123: {
         "en": "Invalid value {}: must be in the range {}",
         "pt": "Valor {} inválido: deve estar no intervalo {}",
     },
-    123: {
+    124: {
         "en": "Invalid value {}: must be type {}",
         "pt": "Valor {} inválido: deve ser do tipo {}",
     },
-    124: {
+    125: {
         "en": "The values provided {} do not constitute a valid set of values",
         "pt": "Os valores fornecidos {} não formam um conjunto válido de valores",
     },
