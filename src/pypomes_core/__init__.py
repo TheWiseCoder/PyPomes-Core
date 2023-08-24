@@ -47,6 +47,9 @@ from .list_pomes import (
 from .str_pomes import (
     str_between, str_split_on_mark, str_find_whitespace,
 )
+from validation_msgs import (
+    validation_add_msgs, validation_set_msgs
+)
 from .validation_pomes import (
     VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
     validate_value, validate_bool, validate_int, validate_float, validate_str,
@@ -94,6 +97,8 @@ __all__ = [
     # list_pomes
     "list_compare", "list_flatten", "list_unflatten",
     "list_find_coupled", "list_elem_starting_with", "list_transform",
+    # validation_msgs
+    "validation_add_msgs", "validation_set_msgs",
     # validation_pomes
     "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX",
     "validate_value", "validate_bool", "validate_int", "validate_float", "validate_str",

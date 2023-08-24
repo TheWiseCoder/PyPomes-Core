@@ -302,9 +302,9 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
                                                    headers=headers,
                                                    params=params,
                                                    timeout=timeout)
-        if logger:
-            logger.debug(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
         result = response.json()
+        if logger:
+            logger.debug(f"Invoked '{url}', status '{http_status_name(response.status_code)}, reply: {result}'")
     except Exception as e:
         err_msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
         if logger:
@@ -347,9 +347,9 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
                                                     json=json,
                                                     params=params,
                                                     timeout=timeout)
-        if logger:
-            logger.debug(f"Invoked '{url}', status: '{http_status_name(response.status_code)}'")
         result = response.json()
+        if logger:
+            logger.debug(f"Invoked '{url}', status '{http_status_name(response.status_code)}, reply: {result}'")
     except Exception as e:
         err_msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
         if logger:

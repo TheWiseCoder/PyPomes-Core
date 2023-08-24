@@ -3,6 +3,7 @@ from logging import Logger
 from typing import Final
 from .datetime_pomes import TIMEZONE_LOCAL
 from .env_pomes import APP_PREFIX, env_get_str
+from.validation_msgs import _ERR_MSGS_EN, _ERR_MSGS_PT
 
 VALIDATION_MSG_LANGUAGE: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_LANGUAGE", "pt")
 VALIDATION_MSG_PREFIX: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_PREFIX", APP_PREFIX)
@@ -15,7 +16,7 @@ def validate_value(val: str | int | float, min_val: int = None,
 
     :param val: the value to be validated
     :param min_val: if val is a string, specifies its minimum length; otherwise, specifies its minimum value
-    :param max_val:  if val is a string, specifies its maximum length; otherwise, specifies its maximum value
+    :param max_val: if val is a string, specifies its maximum length; otherwise, specifies its maximum value
     :param default: if boolean, requires val to be specified; if list, requires val to be in it
     :return: None if val passes validation, or the corresponding error message otherwise
     """
@@ -26,31 +27,28 @@ def validate_value(val: str | int | float, min_val: int = None,
     if isinstance(default, list):
         if val not in default:
             if val is None:
-                result = __format_error(10)
+                result = validate_format_error(105)
             else:
                 length: int = len(default)
-                if length == 1:
-                    result = __format_error(15, val, default[0])
-                else:
-                    # o último elemento da lista é None ?
-                    if default[-1] is None:
-                        # sim, omita-o da mensagem
-                        length -= 1
-                    result = __format_error(16, val, [default[:length]])
+                # is 'None' the last element in list ?
+                if default[-1] is None:
+                    # yes, omit it from the message
+                    length -= 1
+                result = validate_format_error(121, val, [default[:length]])
     elif val is None:
         if isinstance(default, bool) and default:
-            result = __format_error(10)
+            result = validate_format_error(105)
     elif isinstance(val, str):
         length: int = len(val)
         if min_val is not None and max_val == min_val and length != min_val:
-            result = __format_error(14, val, min_val)
+            result = validate_format_error(109, val, min_val)
         elif max_val is not None and max_val < length:
-            result = __format_error(13, val, max_val)
+            result = validate_format_error(108, val, max_val)
         elif min_val is not None and length < min_val:
-            result = __format_error(12, val, min_val)
+            result = validate_format_error(107, val, min_val)
     elif (min_val is not None and val < min_val) or \
          (max_val is not None and val > max_val):
-        result = __format_error(17, val, [min_val, max_val])
+        result = validate_format_error(122, val, [min_val, max_val])
 
     return result
 
@@ -84,12 +82,12 @@ def validate_bool(errors: list[str] | None, scheme: dict, attr: str,
             elif result.lower() in ["f", "false"]:
                 result = False
         if not isinstance(result, bool):
-            stat = __format_error(18, result, "bool")
+            stat = validate_format_error(123, result, "bool")
     except (KeyError, TypeError):
         if default is not None:
             result = default
         elif mandatory:
-            stat = __format_error(10)
+            stat = validate_format_error(105)
 
     if stat:
         __validate_log(errors, f"{stat} @{attr}", logger)
@@ -131,12 +129,12 @@ def validate_int(errors: list[str] | None, scheme: dict, attr: str,
             result = int(result)
         except ValueError:
             result = None
-            stat = __format_error(18, result, "int")
+            stat = validate_format_error(123, result, "int")
 
     # bool is subtype of int
     if result is not None and \
             (isinstance(result, bool) or not isinstance(result, int)):
-        stat = __format_error(18, result, "int")
+        stat = validate_format_error(123, result, "int")
 
     if not stat:
         stat = validate_value(result, min_val, max_val, default)
@@ -180,10 +178,10 @@ def validate_float(errors: list[str] | None, scheme: dict, attr: str,
         try:
             result = float(result)
         except ValueError:
-            stat = __format_error(18, result, "int")
+            stat = validate_format_error(123, result, "int")
 
     if result is not None and not isinstance(result, float):
-        stat = __format_error(18, result, "float")
+        stat = validate_format_error(123, result, "float")
 
     if not stat:
         stat = validate_value(result, min_val, max_val, default)
@@ -221,7 +219,7 @@ def validate_str(errors: list[str] | None, scheme: dict, attr: str,
     # obtain and validate the value
     result: str = scheme.get(suffix)
     if result and not isinstance(result, str):
-        stat = __format_error(18, result, "str")
+        stat = validate_format_error(123, result, "str")
     elif isinstance(default, str):
         if result is None:
             result = default
@@ -265,12 +263,12 @@ def validate_date(errors: list[str] | None, scheme: dict, attr: str,
         date_str: str = scheme[suffix]
         result = date_parse(date_str, dayfirst=day_first)
         if result is None:
-            stat = __format_error(11, date_str)
+            stat = validate_format_error(106, date_str)
         elif result > datetime.now(TIMEZONE_LOCAL).date():
-            stat = __format_error(19, date_str)
+            stat = validate_format_error(110, date_str)
     except KeyError:
         if isinstance(default, bool) and default:
-            stat = __format_error(10)
+            stat = validate_format_error(105)
         elif isinstance(default, date):
             result = default
 
@@ -309,12 +307,12 @@ def validate_datetime(errors: list[str] | None, scheme: dict, attr: str,
         date_str: str = scheme[suffix]
         result = datetime_parse(date_str, dayfirst=day_first)
         if result is None:
-            stat = __format_error(21, date_str)
+            stat = validate_format_error(106, date_str)
         elif result > datetime.now(TIMEZONE_LOCAL):
-            stat = __format_error(18, date_str)
+            stat = validate_format_error(123, date_str)
     except KeyError:
         if isinstance(default, bool) and default:
-            stat = __format_error(10)
+            stat = validate_format_error(105)
         elif isinstance(default, datetime):
             result = default
 
@@ -357,16 +355,16 @@ def validate_ints(errors: list[str] | None, scheme: dict, attr: str,
                     if isinstance(value, int):
                         stat: str = validate_value(value, min_val, max_val)
                     else:
-                        stat: str = __format_error(18, value, "int")
+                        stat: str = validate_format_error(123, value, "int")
                     if stat:
                         err_msg = f"{stat} @{attr}[{inx+1}]"
             elif mandatory:
-                err_msg = __format_error(10, f"@{attr}")
+                err_msg = validate_format_error(105, f"@{attr}")
         else:
-            err_msg = __format_error(18, result, "list", f"@{attr}")
+            err_msg = validate_format_error(123, result, "list", f"@{attr}")
     except (KeyError, TypeError):
         if mandatory:
-            err_msg = __format_error(10, f"@{attr}")
+            err_msg = validate_format_error(105, f"@{attr}")
 
     if err_msg:
         __validate_log(errors, err_msg, logger)
@@ -407,16 +405,16 @@ def validate_strs(errors: list[str] | None, scheme: dict,
                     if isinstance(value, str):
                         stat: str = validate_value(value, min_length, max_length)
                     else:
-                        stat: str = __format_error(18, value, "str")
+                        stat: str = validate_format_error(123, value, "str")
                     if stat:
                         err_msg = f"{stat} @{attr}[{inx+1}]"
             elif mandatory:
-                err_msg = __format_error(11, f"@{attr}")
+                err_msg = validate_format_error(105, f"@{attr}")
         else:
-            err_msg = __format_error(18, result, "list", f"@{attr}")
+            err_msg = validate_format_error(123, result, "list", f"@{attr}")
     except (KeyError, TypeError):
         if mandatory:
-            err_msg = __format_error(11, f"@{attr}")
+            err_msg = validate_format_error(105, f"@{attr}")
 
     if err_msg:
         __validate_log(errors, err_msg, logger)
@@ -424,22 +422,30 @@ def validate_strs(errors: list[str] | None, scheme: dict,
     return result
 
 
-def validate_format_error(error_id: int, err_msgs: dict, *args) -> str:
+def validate_format_error(error_id: int, *args) -> str:
     """
-    Format and return the error message identified by *err_id* in *err_msgs*.
+    Format and return the error message identified by *err_id* in the standard messages list.
 
-    The message is built from the message element in *err_msgs* identified by *err_id*.
+    The message is built from the message element in the standard messages list, identified by *err_id*.
     The occurrences of '{}' in the element are sequentially replaced by the given *args*.
 
     :param error_id: the identification of the message element
-    :param err_msgs: the message elements
     :param args: optional arguments to format the error message with
     :return: the formatted error message
     """
+    # retrieve the standard validation messages list
+    match VALIDATION_MSG_LANGUAGE:
+        case "en":
+            err_msgs = _ERR_MSGS_EN
+        case "pt":
+            err_msgs = _ERR_MSGS_PT
+        case _:
+            err_msgs = {}
+
     # initialize the return variable
     result: str = VALIDATION_MSG_PREFIX + str(error_id) + ": " + err_msgs.get(error_id)
 
-    # apply the provided  arguments
+    # apply the provided arguments
     for arg in args:
         if arg is None:
             result = result.replace(" {}", "", 1)
@@ -485,7 +491,7 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
             desc: str = error
         else:
             # yes
-            term: str = "attribute" if VALIDATION_MSG_LANGUAGE == "en" else "atributo"
+            term: str = "parameter" if VALIDATION_MSG_LANGUAGE == "en" else "parametro"
             out_error: dict = {term: error[pos + 1:]}
             desc = error[:pos - 1]
 
@@ -502,54 +508,6 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
         result.append(out_error)
 
     return result
-
-
-def __format_error(err_id: int, *args) -> str:
-    """
-    Format and return the error message identified by *err_id*.
-
-    The message is built from the message element in the error list herein, identified by *err_id*.
-    The occurrences of '{}' in the element are sequentially replaced by the given *args*.
-
-    :param error_id: the identification of the message element
-    :param err_msgs: the message elements
-    :param args: optional arguments to format the error message with
-    :return: the formatted error message
-    """
-    err_msgs_en: Final[dict] = {
-        10: "Value must be provided",
-        11: "Invalid value {}",
-        12: "Invalid value {}: length shorter than {}",
-        13: "Invalid value {}: length longer than {}",
-        14: "Invalid value {}: length must be {}",
-        15: "Invalid value {}: must be {}",
-        16: "Invalid value {}: must be one of {}",
-        17: "Invalid value {}: must be in the range {}",
-        18: "Invalid value {}: must be type {}",
-        19: "Invalid value {}: date is later than the current date"
-    }
-
-    err_msgs_pt: Final[dict] = {
-        10: "Valor deve ser fornecido",
-        11: "Valor {} inválido",
-        12: "Valor {} inválido: comprimento menor que {}",
-        13: "Valor {} inválido: comprimento maior que {}",
-        14: "Valor {} inválido: comprimento deve ser {}",
-        15: "Valor {} inválido: deve ser {}",
-        16: "Valor {} inválido: deve ser um de {}",
-        17: "Valor {} inválido: deve estar no intervalo {}",
-        18: "Valor {} inválido: deve ser do tipo {}",
-        19: "Valor {} inválido: data posterior à data atual"
-    }
-
-    err_msgs: dict | None = None
-    match VALIDATION_MSG_LANGUAGE:
-        case "en":
-            err_msgs = err_msgs_en
-        case "pt":
-            err_msgs = err_msgs_pt
-
-    return validate_format_error(err_id, err_msgs, args)
 
 
 def __validate_log(errors: list[str], err_msg: str, logger: Logger) -> None:

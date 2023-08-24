@@ -76,17 +76,19 @@ ignore = [
     "D200",     # one-line docstring should fit on one line
     "D204",     # 1 blank line required after class docstring
     "D210",     # whitespaces surrounding docstring text
-    "G004",     # logging statement uses 'f-string'
-    "PGH004",   # use specific rule codes when using noqa
-    "PLR2004",  # magic value used in comparison, consider replacing it with a constant variable
-    "PTH118",   # os.{module}.join() should be replaced by Path with / operator
     "D212",     # multi-line docstring summary to start at the second line
+    "G004",     # logging statement uses 'f-string'
+    "PGH004",   # use specific rule codes when using 'noqa'
+    "PLR2004",  # magic value used in comparison, consider replacing it with a constant variable
+    "PLW0603",  # using the global statement to update a variable is discouraged
+    "PTH118",   # os.{module}.join() should be replaced by Path with / operator
     "RUF013",   # implicit Optional in type annotations when the default parameter value is None
+    "S104",     # possible binding to all interfaces
     "S301",     # 'pickle' and modules that wrap it can be unsafe when used to deserialize untrusted data
     "S608",     # possible SQL injection vector through string-based query construction
     "SIM108",   # use ternary operator instead of if-else-block
     "TCH001",   # move application import into a type-checking block
-    "TCH002",   # Move third-party import {} into a type-checking block
+    "TCH002",   # Move third-party import into a type-checking block
     "TCH003",   # move standard library import into a type-checking block
     "TRY400",   # use 'logging.exception' instead of 'logging.error'
 ]
