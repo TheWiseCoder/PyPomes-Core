@@ -14,12 +14,12 @@ __ERR_MSGS: Final[dict] = {
         "pt": "Nenhum(a) {} encontrado(a)",
     },
     104: {
-        "en": "Unknown parameter",
-        "pt": "Parâmetro desconhecido",
+        "en": "Unknown parameter: {}",
+        "pt": "Parâmetro desconhecido: {}",
     },
     105: {
-        "en": "Mandatory parameter",
-        "pt": "Parâmetro obrigatório",
+        "en": "Mandatory parameter: {}",
+        "pt": "Parâmetro obrigatório: {}",
     },
     106: {
         "en": "Invalid value {}",
