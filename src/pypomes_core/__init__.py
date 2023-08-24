@@ -47,7 +47,7 @@ from .list_pomes import (
 from .str_pomes import (
     str_between, str_split_on_mark, str_find_whitespace,
 )
-from validation_msgs import (
+from .validation_msgs import (
     validation_add_msgs, validation_set_msgs
 )
 from .validation_pomes import (

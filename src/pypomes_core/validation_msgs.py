@@ -82,8 +82,8 @@ __ERR_MSGS: Final[dict] = {
         "pt": "Mais de um(a) {} encontrado(a)",
     },
     121: {
-        "en": "Invalid operation {}",
-        "pt": "Operação {} inválida",
+        "en": "Invalid operation: {}",
+        "pt": "Operação inválida: {}",
     },
     122: {
         "en": "Invalid value {}: must be one of {}",
@@ -111,11 +111,11 @@ __ERR_MSGS: Final[dict] = {
     },
 }
 _ERR_MSGS_EN: dict = {}
-for key, value in __ERR_MSGS:
+for key, value in __ERR_MSGS.items():
     _ERR_MSGS_EN[key] = value["en"]
 
 _ERR_MSGS_PT: dict = {}
-for key, value in __ERR_MSGS:
+for key, value in __ERR_MSGS.items():
     _ERR_MSGS_PT[key] = value["pt"]
 
 
