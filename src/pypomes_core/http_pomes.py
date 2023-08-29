@@ -7,8 +7,7 @@ from werkzeug.exceptions import BadRequest
 
 from .env_pomes import APP_PREFIX, env_get_int
 from .exception_pomes import exc_format
-
-# https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status
+from .http_statuses import _HTTP_STATUSES
 
 HTTP_DELETE_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_DELETE_TIMEOUT", 300)
 HTTP_GET_TIMEOUT: Final[int] = env_get_int(f"{APP_PREFIX}_HTTP_GET_TIMEOUT", 300)
@@ -31,171 +30,6 @@ MIMETYPE_XML: Final[str] = "application/xml"
 MIMETYPE_ZIP: Final[str] = "application/zip"
 
 
-# TODO (add descriptions)
-__HTTP_STATUS: Final[dict] = {
-  200: {
-    "name": "OK",
-    "description": ""
-  },
-  201: {
-    "name": "CREATED",
-    "description": ""
-  },
-  202: {
-    "name": "ACCEPTED",
-    "description": ""
-  },
-  203: {
-    "name": "NON AUTHORITATIVE INFORMATION",
-    "description": ""
-  },
-  204: {
-    "name": "NO CONTENT",
-    "description": ""
-  },
-  205: {
-    "name": "RESET CONTENT",
-    "description": ""
-  },
-  206: {
-    "name": "PARTIAL CONTENT",
-    "description": ""
-  },
-  300: {
-    "name": "MULTIPLE CHOICE",
-    "description": ""
-  },
-  301: {
-    "name": "MOVED PERMANENTLY",
-    "description": ""
-  },
-  302: {
-    "name": "FOUND",
-    "description": ""
-  },
-  303: {
-    "name": "SEE OTHER",
-    "description": ""
-  },
-  304: {
-    "name": "NOT MODIFIED",
-    "description": ""
-  },
-  305: {
-    "name": "USE PROXY",
-    "description": ""
-  },
-  307: {
-    "name": "TEMPORARY REDIRECT",
-    "description": ""
-  },
-  308: {
-    "name": "PERMANENT REDIRECT",
-    "description": ""
-  },
-  400: {
-    "name": "BAD REQUEST",
-    "description": ""
-  },
-  401: {
-    "name": "UNAUTHORIZED",
-    "description": ""
-  },
-  403: {
-    "name": "FORBIDDEN",
-    "description": ""
-  },
-  404: {
-    "name": "NOT FOUND",
-    "description": ""
-  },
-  405: {
-    "name": "METHOD NOT ALLOWED",
-    "description": ""
-  },
-  406: {
-    "name": "NOT ACCEPTABLE",
-    "description": ""
-  },
-  407: {
-    "name": "AUTHENTICATION REQUIRED",
-    "description": ""
-  },
-  408: {
-    "name": "REQUEST TIMEOUT",
-    "description": ""
-  },
-  409: {
-    "name": "CONFLICT",
-    "description": ""
-  },
-  410: {
-    "name": "GONE",
-    "description": ""
-  },
-  411: {
-    "name": "LENGTH REQUIRED",
-    "description": ""
-  },
-  412: {
-    "name": "PRECONDITION FAILED",
-    "description": ""
-  },
-  413: {
-    "name": "PAYLOAD TOO LARGE",
-    "description": ""
-  },
-  414: {
-    "name": "URI TOO LONG",
-    "description": ""
-  },
-  500: {
-    "name": "INTERNAL SERVER ERROR",
-    "description": ""
-  },
-  501: {
-    "name": "NOT IMPLEMENTED",
-    "description": ""
-  },
-  502: {
-    "name": "BAD GATEWAY",
-    "description": ""
-  },
-  503: {
-    "name": "SERVICE UNAVAILABLE",
-    "description": ""
-  },
-  504: {
-    "name": "GATEWAY TIMEOPUT",
-    "description": ""
-  },
-  505: {
-    "name": "HTTP VERSION NOT SUPPORTED",
-    "description": ""
-  },
-  506: {
-    "name": "VARIANT ALSO NEGOTIATES",
-    "description": ""
-  },
-  507: {
-    "name": "INSUFFICIENT STORAGE",
-    "description": ""
-  },
-  508: {
-    "name": "LOOP DETECTED",
-    "description": ""
-  },
-  510: {
-    "name": "NOT EXTENDED",
-    "description": ""
-  },
-  511: {
-    "name": "NETWORK AUTHENTICATION REQUIRED",
-    "description": ""
-  }
-}
-
-
 def http_status_code(status_name: str) -> int:
     """
     Return the corresponding code of the HTTP status *status_name*.
@@ -205,7 +39,8 @@ def http_status_code(status_name: str) -> int:
     """
     # initialize the return variable
     result: int | None = None
-    for key, value in __HTTP_STATUS:
+
+    for key, value in _HTTP_STATUSES:
         if status_name == value["name"]:
             result = key
 
@@ -219,19 +54,20 @@ def http_status_name(status_code: int) -> str:
     :param status_code: the code of the HTTP status
     :return: the corresponding HTTP status name
     """
-    item: dict = __HTTP_STATUS.get(status_code, {"name": "Unknown status code"})
-    return f"HTTP status code {status_code}: {item.get('name')}"
+    item: dict = _HTTP_STATUSES.get(status_code)
+    return (item or {"name": "Unknown status code"}).get("name")
 
 
-def http_status_description(status_code: int) -> str:
+def http_status_description(status_code: int, lang: str = "en") -> str:
     """
     Return the description of the HTTP status *status_code*.
 
     :param status_code: the code of the HTTP status
-    :return: the corresponding HTTP status description
+    :param lang: optional language ('en' or 'pt' - defaults to 'en')
+    :return: the corresponding HTTP status description, in the given language
     """
-    item: dict = __HTTP_STATUS.get(status_code, {"description": "Unknown status code"})
-    return f"HTTP status code {status_code}: {item.get('description')}"
+    item: dict = _HTTP_STATUSES.get(status_code)
+    return (item or {"en": "Unknown status code", "pt": "Status desconhecido"}).get(lang)
 
 
 def http_json_from_form(request: Request) -> dict:
