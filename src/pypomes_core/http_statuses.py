@@ -95,44 +95,58 @@ _HTTP_STATUSES: Final[dict] = {
     },
     # Redirection messages
     300: {
-        "name": "MULTIPLE CHOICE",
-        "en": "",
-        "pt": ""
+        "name": "MULTIPLE CHOICES",
+        "en": ("The request has more than one possible response. "
+               "The user agent or user should choose one of them."),
+        "pt": ("A solicitação tem mais de uma resposta possível. "
+               "O agente do usuário ou usuário deve escolher uma delas.")
     },
     301: {
         "name": "MOVED PERMANENTLY",
-        "en": "",
-        "pt": ""
+        "en": "The URL of the requested resource has been changed permanently. The new URL is given in the response.",
+        "pt": "A URL do recurso solicitado foi permanentemente alterada. A nova URL é fornecida na resposta."
     },
     302: {
         "name": "FOUND",
-        "en": "",
-        "pt": ""
+        "en": ("The URI of requested resource has been changed temporarily. "
+               "Further changes in the URI might be made in the future. "),
+        "pt": ("A URI do recurso solicitado foi alterado temporariamente. "
+               "Outras alterações na URI podem ser feitas no futuro.")
     },
     303: {
         "name": "SEE OTHER",
-        "en": "",
-        "pt": ""
+        "en": ("The server sent this response to direct the client to get "
+                "the requested resource at another URI with a 'GET' request."),
+        "pt": ("O servidor enviou esta resposta para direcionar o cliente "
+               "a obter o recurso solicitado em outro URI com uma solicitação 'GET'.")
     },
     304: {
         "name": "NOT MODIFIED",
-        "en": "",
-        "pt": ""
+        "en": ("Tells the client that the response has not been modified, "
+               "so the client can continue to use the same cached version of the response."),
+        "pt": ("Informa ao cliente que a resposta não foi modificada; "
+               "portanto, o cliente pode continuar a usar a mesma versão em cache da resposta.")
     },
     305: {
         "name": "USE PROXY",
-        "en": "",
-        "pt": ""
+        "en": ("Indicates that a requested response must be accessed by a proxy. "
+               "It has been deprecated due to security concerns regarding in-band configuration of a proxy."),
+        "pt": ("Indica que uma resposta solicitada deve ser acessada por um proxy. "
+               "Foi descontinuado devido a questões de segurança em relação à configuração em banda de um proxy.")
     },
     307: {
         "name": "TEMPORARY REDIRECT",
-        "en": "",
-        "pt": ""
+        "en": ("The server sends this response to direct the client to get the "
+               "requested resource at another URI with the same method that was used in the prior request."),
+        "pt": ("O servidor envia esta resposta para direcionar o cliente a obter "
+               "o recurso solicitado em outra URI com o mesmo método usado na solicitação anterior.")
     },
     308: {
         "name": "PERMANENT REDIRECT",
-        "en": "",
-        "pt": ""
+        "en": "Indicates that the resource is now permanently located at another URI, "
+              "specified by the 'Location:' HTTP Response header.",
+        "pt": "Indica que o recurso agora está permanentemente localizado em outra URI, "
+              "especificada pelo cabeçalho de resposta HTTP 'Location:'."
     },
     # Client error responses
     400: {
