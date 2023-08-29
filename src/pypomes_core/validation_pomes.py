@@ -9,11 +9,12 @@ VALIDATION_MSG_LANGUAGE: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_
 VALIDATION_MSG_PREFIX: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_PREFIX", APP_PREFIX)
 
 
-def validate_value(val: str | int | float, min_val: int = None,
+def validate_value(attr: str, val: str | int | float, min_val: int = None,
                    max_val: int = None, default: bool | list[any] = None) -> str:
     """
     Validate *val* according to type, range, or membership in values list, as specified.
 
+    :param attr: the name of the attribute
     :param val: the value to be validated
     :param min_val: if val is a string, specifies its minimum length; otherwise, specifies its minimum value
     :param max_val: if val is a string, specifies its maximum length; otherwise, specifies its maximum value
@@ -27,28 +28,28 @@ def validate_value(val: str | int | float, min_val: int = None,
     if isinstance(default, list):
         if val not in default:
             if val is None:
-                result = validate_format_error(105)
+                result = validate_format_error(105, attr)
             else:
                 length: int = len(default)
                 # is 'None' the last element in list ?
                 if default[-1] is None:
                     # yes, omit it from the message
                     length -= 1
-                result = validate_format_error(122, val, [default[:length]])
+                result = validate_format_error(122, val, attr, [default[:length]])
     elif val is None:
         if isinstance(default, bool) and default:
-            result = validate_format_error(105)
+            result = validate_format_error(105, attr)
     elif isinstance(val, str):
         length: int = len(val)
         if min_val is not None and max_val == min_val and length != min_val:
-            result = validate_format_error(109, val, min_val)
+            result = validate_format_error(109, val, attr, min_val)
         elif max_val is not None and max_val < length:
-            result = validate_format_error(108, val, max_val)
+            result = validate_format_error(108, val, attr, max_val)
         elif min_val is not None and length < min_val:
-            result = validate_format_error(107, val, min_val)
+            result = validate_format_error(107, val, attr, min_val)
     elif (min_val is not None and val < min_val) or \
          (max_val is not None and val > max_val):
-        result = validate_format_error(123, val, [min_val, max_val])
+        result = validate_format_error(123, val, attr, [min_val, max_val])
 
     return result
 
@@ -82,15 +83,15 @@ def validate_bool(errors: list[str] | None, scheme: dict, attr: str,
             elif result.lower() in ["f", "false"]:
                 result = False
         if not isinstance(result, bool):
-            stat = validate_format_error(124, result, "bool")
+            stat = validate_format_error(124, result, attr, "bool")
     except (KeyError, TypeError):
         if default is not None:
             result = default
         elif mandatory:
-            stat = validate_format_error(105)
+            stat = validate_format_error(105, attr)
 
     if stat:
-        __validate_log(errors, f"{stat} @{attr}", logger)
+        __validate_log(errors, stat, logger)
 
     return result
 
@@ -129,15 +130,15 @@ def validate_int(errors: list[str] | None, scheme: dict, attr: str,
             result = int(result)
         except ValueError:
             result = None
-            stat = validate_format_error(124, result, "int")
+            stat = validate_format_error(124, result, attr, "int")
 
     # bool is subtype of int
     if result is not None and \
             (isinstance(result, bool) or not isinstance(result, int)):
-        stat = validate_format_error(124, result, "int")
+        stat = validate_format_error(124, result, attr, "int")
 
     if not stat:
-        stat = validate_value(result, min_val, max_val, default)
+        stat = validate_value(attr, result, min_val, max_val, default)
 
     if stat:
         __validate_log(errors, f"{stat} @{attr}", logger)
@@ -178,17 +179,17 @@ def validate_float(errors: list[str] | None, scheme: dict, attr: str,
         try:
             result = float(result)
         except ValueError:
-            stat = validate_format_error(124, result, "int")
+            stat = validate_format_error(124, result, attr, "int")
 
     if result is not None and not isinstance(result, float):
-        stat = validate_format_error(124, result, "float")
+        stat = validate_format_error(124, result, attr, "float")
 
     if not stat:
-        stat = validate_value(result, min_val, max_val, default)
+        stat = validate_value(attr, result, min_val, max_val, default)
 
     if stat:
         result = None
-        __validate_log(errors, f"{stat} @{attr}", logger)
+        __validate_log(errors, stat, logger)
 
     return result
 
@@ -219,17 +220,17 @@ def validate_str(errors: list[str] | None, scheme: dict, attr: str,
     # obtain and validate the value
     result: str = scheme.get(suffix)
     if result and not isinstance(result, str):
-        stat = validate_format_error(124, result, "str")
+        stat = validate_format_error(124, result, attr, "str")
     elif isinstance(default, str):
         if result is None:
             result = default
         else:
-            stat = validate_value(result, min_length, max_length)
+            stat = validate_value(attr, result, min_length, max_length)
     else:
-        stat = validate_value(result, min_length, max_length, default)
+        stat = validate_value(attr,result, min_length, max_length, default)
 
     if stat:
-        __validate_log(errors, f"{stat} @{attr}", logger)
+        __validate_log(errors, stat, logger)
 
     return result
 
@@ -263,17 +264,17 @@ def validate_date(errors: list[str] | None, scheme: dict, attr: str,
         date_str: str = scheme[suffix]
         result = date_parse(date_str, dayfirst=day_first)
         if result is None:
-            stat = validate_format_error(106, date_str)
+            stat = validate_format_error(106, date_str, attr)
         elif result > datetime.now(TIMEZONE_LOCAL).date():
-            stat = validate_format_error(110, date_str)
+            stat = validate_format_error(110, date_str, attr)
     except KeyError:
         if isinstance(default, bool) and default:
-            stat = validate_format_error(105)
+            stat = validate_format_error(105, attr)
         elif isinstance(default, date):
             result = default
 
     if stat:
-        __validate_log(errors, f"{stat} @{attr}", logger)
+        __validate_log(errors, stat, logger)
 
     return result
 
@@ -307,17 +308,17 @@ def validate_datetime(errors: list[str] | None, scheme: dict, attr: str,
         date_str: str = scheme[suffix]
         result = datetime_parse(date_str, dayfirst=day_first)
         if result is None:
-            stat = validate_format_error(106, date_str)
+            stat = validate_format_error(106, date_str, attr)
         elif result > datetime.now(TIMEZONE_LOCAL):
-            stat = validate_format_error(124, date_str)
+            stat = validate_format_error(110, date_str, attr)
     except KeyError:
         if isinstance(default, bool) and default:
-            stat = validate_format_error(105)
+            stat = validate_format_error(105, attr)
         elif isinstance(default, datetime):
             result = default
 
     if stat:
-        __validate_log(errors, f"{stat} @{attr}", logger)
+        __validate_log(errors, stat, logger)
 
     return result
 
@@ -353,18 +354,16 @@ def validate_ints(errors: list[str] | None, scheme: dict, attr: str,
                 for inx, value in enumerate(values):
                     result.append(value)
                     if isinstance(value, int):
-                        stat: str = validate_value(value, min_val, max_val)
+                        err_msg = validate_value(f"@{attr}[{inx+1}]", value, min_val, max_val)
                     else:
-                        stat: str = validate_format_error(124, value, "int")
-                    if stat:
-                        err_msg = f"{stat} @{attr}[{inx+1}]"
+                        err_msg = validate_format_error(124, value, f"@{attr}[{inx+1}]", "int")
             elif mandatory:
-                err_msg = validate_format_error(105, f"@{attr}")
+                err_msg = validate_format_error(105, attr)
         else:
-            err_msg = validate_format_error(124, result, "list", f"@{attr}")
+            err_msg = validate_format_error(124, result, attr, "list")
     except (KeyError, TypeError):
         if mandatory:
-            err_msg = validate_format_error(105, f"@{attr}")
+            err_msg = validate_format_error(105, attr)
 
     if err_msg:
         __validate_log(errors, err_msg, logger)
@@ -403,18 +402,16 @@ def validate_strs(errors: list[str] | None, scheme: dict,
                 for inx, value in enumerate(values):
                     result.append(value)
                     if isinstance(value, str):
-                        stat: str = validate_value(value, min_length, max_length)
+                        err_msg = validate_value(f"@{attr}[{inx+1}]", value, min_length, max_length)
                     else:
-                        stat: str = validate_format_error(124, value, "str")
-                    if stat:
-                        err_msg = f"{stat} @{attr}[{inx+1}]"
+                        err_msg = validate_format_error(124, value, f"@{attr}[{inx+1}]", "str")
             elif mandatory:
-                err_msg = validate_format_error(105, f"@{attr}")
+                err_msg = validate_format_error(105, attr)
         else:
-            err_msg = validate_format_error(124, result, "list", f"@{attr}")
+            err_msg = validate_format_error(124, result, attr, "list")
     except (KeyError, TypeError):
         if mandatory:
-            err_msg = validate_format_error(105, f"@{attr}")
+            err_msg = validate_format_error(105, attr)
 
     if err_msg:
         __validate_log(errors, err_msg, logger)
@@ -449,8 +446,6 @@ def validate_format_error(error_id: int, *args) -> str:
     for arg in args:
         if arg is None:
             result = result.replace(" {}", "", 1)
-        elif isinstance(arg, str) and arg.startswith("@"):
-            result += " " + arg
         elif isinstance(arg, str) and arg.find(" ") > 0:
             result = result.replace("{}", arg, 1)
         else:
@@ -466,34 +461,15 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
     This list is tipically used in a returning *JSON* string.
 
     :param errors: the errors to build the list with
-    :return: the list built
+    :return: the built list
     """
-    # import needed module
-    from .str_pomes import str_find_whitespace
-
     # initialize the return variable
     result: list[dict] = []
 
     # extract error code, description, and attribute from text
     for error in errors:
-        # locate the last attribute indicator
-        pos = error.rfind("@")
-
-        # is there a whitespace in the attribute ?
-        if pos > 0 and str_find_whitespace(error[pos:]) > 0:
-            # yes, disregard it
-            pos = -1
-
-        # does the text contain the attribute ?
-        if pos == -1:
-            # no
-            out_error: dict = {}
-            desc: str = error
-        else:
-            # yes
-            term: str = "parameter" if VALIDATION_MSG_LANGUAGE == "en" else "parametro"
-            out_error: dict = {term: error[pos + 1:]}
-            desc = error[:pos - 1]
+        desc: str = error
+        out_error: dict = {}
 
         # does the text contain an error code ?
         if desc.startswith(VALIDATION_MSG_PREFIX):
@@ -511,7 +487,13 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
 
 
 def __validate_log(errors: list[str], err_msg: str, logger: Logger) -> None:
+    """
+    LOg *err_msg* using *logger*, and add it to the error messages list *errors*.
 
+    :param errors: the error messages list
+    :param err_msg: the message to log
+    :param logger: the logger
+    """
     if logger:
         logger.error(err_msg)
     if errors is not None:

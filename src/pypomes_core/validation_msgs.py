@@ -22,28 +22,28 @@ __ERR_MSGS: Final[dict] = {
         "pt": "Parâmetro obrigatório: {}",
     },
     106: {
-        "en": "Invalid value {}",
-        "pt": "Valor {} inválido",
+        "en": "Invalid value {} for parameter {}",
+        "pt": "Valor {} inválido para o parâmetro {}",
     },
     107: {
         "en": "Invalid value {}: length shorter than {}",
         "pt": "Valor {} inválido: comprimento menor que {}",
     },
     108: {
-        "en": "Invalid value {}: length longer than {}",
-        "pt": "Valor {} inválido: comprimento maior que {}",
+        "en": "Invalid value {} for parameter {}: length longer than {}",
+        "pt": "Valor {} inválido para o parâmetro {}: comprimento maior que {}",
     },
     109: {
-        "en": "Invalid value {}: length must be {}",
-        "pt": "Valor {} inválido: comprimento deve ser igual a {}",
+        "en": "Invalid value {} for parameter {}: length must be {}",
+        "pt": "Valor {} inválido para o parâmetro {}: comprimento deve ser igual a {}",
     },
     110: {
-        "en": "Invalid value {}: date is later than the current date",
-        "pt": "Valor {} inválido: data posterior à data atual",
+        "en": "Invalid value {} for parameter {}: date is later than the current date",
+        "pt": "Valor {} inválido para o parâmetro {}: data posterior à data atual",
     },
     111: {
-        "en": "Invalid value {}: wrong date format",
-        "pt": "Valor {} inválido: formato de data inválido",
+        "en": "Invalid value {} for parameter {}: wrong date format",
+        "pt": "Valor {} inválido para o parâmetro {}: formato de data inválido",
     },
     112: {
         "en": "Error executing operation {}: {}",
@@ -67,7 +67,7 @@ __ERR_MSGS: Final[dict] = {
     },
     117: {
         "en": "Register for {} already exists",
-        "pt": "Registro para {} já existe",
+        "pt": "Registro de {} já existe",
     },
     118: {
         "en": "Authentication token required",
@@ -86,20 +86,20 @@ __ERR_MSGS: Final[dict] = {
         "pt": "Operação inválida: {}",
     },
     122: {
-        "en": "Invalid value {}: must be one of {}",
-        "pt": "Valor {} inválido: deve ser um de {}",
+        "en": "Invalid value {} for parameter {}: must be one of {}",
+        "pt": "Valor {} inválido para o parâmetro {}: deve ser um de {}",
     },
     123: {
-        "en": "Invalid value {}: must be in the range {}",
-        "pt": "Valor {} inválido: deve estar no intervalo {}",
+        "en": "Invalid value {} for parameter {}: must be in the range {}",
+        "pt": "Valor {} inválido para o parâmetro {}: deve estar no intervalo {}",
     },
     124: {
-        "en": "Invalid value {}: must be type {}",
-        "pt": "Valor {} inválido: deve ser do tipo {}",
+        "en": "Invalid value {} for parameter {}: must be type {}",
+        "pt": "Valor {} inválido para o parâmetro {}: deve ser do tipo {}",
     },
     125: {
-        "en": "The values provided {} do not constitute a valid set of values",
-        "pt": "Os valores fornecidos {} não formam um conjunto válido de valores",
+        "en": "The values provided {} for parameter {} do not constitute a valid set of values",
+        "pt": "Os valores fornecidos {} para o parâmetro {} não formam um conjunto válido de valores",
     },
     140: {
         "en": "Error retrieving environment variable {}: {}",
@@ -124,7 +124,7 @@ def validation_add_msgs(msgs: dict, lang: str = "en") -> None:
     Add the messages in *msgs* to the standard validation messages list for language *lang".
 
     :param msgs: list of messages to be added
-    :param lang: reference language
+    :param lang: the reference language
     """
     match lang:
         case "en":
@@ -135,10 +135,10 @@ def validation_add_msgs(msgs: dict, lang: str = "en") -> None:
 
 def validation_set_msgs(msgs: dict, lang: str = "en") -> None:
     """
-    Set  the standard validation messages list for language *lang" to the messages in *msgs*.
+    Set  the standard validation messages list for language *lang* to the messages in *msgs*.
 
-    :param msgs: list of messages to set the  standard validation messages to
-    :param lang: reference language
+    :param msgs: list of messages to set the standard validation messages to
+    :param lang: the reference language
     """
     global _ERR_MSGS_EN, _ERR_MSGS_PT
 

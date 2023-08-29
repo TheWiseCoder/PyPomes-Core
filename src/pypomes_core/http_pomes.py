@@ -138,7 +138,7 @@ __HTTP_STATUS: Final[dict] = {
     "description": ""
   },
   412: {
-    "name": "",
+    "name": "PRECONDITION FAILED",
     "description": ""
   },
   413: {
@@ -158,11 +158,11 @@ __HTTP_STATUS: Final[dict] = {
     "description": ""
   },
   502: {
-    "name": "",
+    "name": "BAD GATEWAY",
     "description": ""
   },
   503: {
-    "name": "BAD GATEWAY",
+    "name": "SERVICE UNAVAILABLE",
     "description": ""
   },
   504: {
@@ -170,7 +170,7 @@ __HTTP_STATUS: Final[dict] = {
     "description": ""
   },
   505: {
-    "name": "",
+    "name": "HTTP VERSION NOT SUPPORTED",
     "description": ""
   },
   506: {

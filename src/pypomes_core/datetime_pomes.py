@@ -24,10 +24,14 @@ def date_reformat(dt_str: str, to_format: str, **kwargs: any) -> str:
     The argument *dt_str* must represent a valid date, with or without time-of-day information.
     The argument *to_format* must be a valid format for *date* ou *datetime*.
 
-    :param dt_str: The date to convert.
-    :param to_format: The format for the conversion.
-    :param kwargs: Optional arguments for the parser in python-dateutil ('dayfirst' is a common argument).
-    :return:  The converted date.
+    In *kwargs*, it may optionally be specified:
+        -   *dayfirst*, to signal that *day* comes before *month* in *dt_str*
+        -   *fmt=<format>*, to force use of a specific format
+
+    :param dt_str: the date to convert
+    :param to_format: the format for the conversion
+    :param kwargs: optional arguments for the parser in python-dateutil
+    :return:  the converted date
     """
     result: str | None = None
     ts: datetime = parser.parse(dt_str, **kwargs)
@@ -41,11 +45,14 @@ def date_parse(dt_str: str, **kwargs: any) -> date:
     """
     Obtain and return the *date* object corresponding to *dt_str*.
 
+    In *kwargs*, it may optionally be specified:
+        -   *dayfirst*, to signal that *day* comes before *month* in *dt_str*
+        -   *fmt=<format>*, to force use of a specific format
     Return *None* se *dt_str* does not contain a valid date.
 
-    :param dt_str: The date, in a supported format.
-    :param kwargs: Optional arguments for the parser in python-dateutil ('dayfirst' is a common argument).
-    :return: The corresponding date object, or None.
+    :param dt_str: the date, in a supported format
+    :param kwargs: optional arguments for the parser in python-dateutil
+    :return: the corresponding date object, or None
     """
     result: date | None = None
     if dt_str:
@@ -58,11 +65,14 @@ def datetime_parse(dt_str: str, **kwargs: any) -> datetime:
     """
     Obtain and return the *datetime* object corresponding to *dt_str*.
 
+    In *kwargs*, it may optionally be specified:
+        -   *dayfirst*, to signal that *day* comes before *month* in *dt_str*
+        -   *fmt=<format>*, to force use of a specific format
    Return *None* se *dt_str* does not contain a valid date.
 
-    :param dt_str: The date, in a supported format.
-    :param kwargs: Optional arguments for the parser in python-dateutil ('dayfirst' is a common argument).
-    :return: The corresponding datetime object, or None.
+    :param dt_str: the date, in a supported format
+    :param kwargs: optional arguments for the parser in python-dateutil
+    :return: the corresponding datetime object, or None
     """
     result: datetime | None = None
     if dt_str:
