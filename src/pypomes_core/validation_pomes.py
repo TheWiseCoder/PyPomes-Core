@@ -227,7 +227,7 @@ def validate_str(errors: list[str] | None, scheme: dict, attr: str,
         else:
             stat = validate_value(attr, result, min_length, max_length)
     else:
-        stat = validate_value(attr,result, min_length, max_length, default)
+        stat = validate_value(attr, result, min_length, max_length, default)
 
     if stat:
         __validate_log(errors, stat, logger)
