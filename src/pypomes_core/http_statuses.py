@@ -1,7 +1,7 @@
 from typing import Final
 
-# https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+# https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status
 
 # TODO: complete the descriptions
 _HTTP_STATUSES: Final[dict] = {
@@ -137,67 +137,88 @@ _HTTP_STATUSES: Final[dict] = {
     307: {
         "name": "TEMPORARY REDIRECT",
         "en": ("The server sends this response to direct the client to get the "
-               "requested resource at another URI with the same method that was used in the prior request."),
+               "requested resource at another URI, with the same method that was used in the prior request."),
         "pt": ("O servidor envia esta resposta para direcionar o cliente a obter "
-               "o recurso solicitado em outra URI com o mesmo método usado na solicitação anterior.")
+               "o recurso solicitado em outra URI, com o mesmo método usado na solicitação anterior.")
     },
     308: {
         "name": "PERMANENT REDIRECT",
-        "en": "Indicates that the resource is now permanently located at another URI, "
-              "specified by the 'Location:' HTTP Response header.",
-        "pt": "Indica que o recurso agora está permanentemente localizado em outra URI, "
-              "especificada pelo cabeçalho de resposta HTTP 'Location:'."
+        "en": ("Indicates that the resource is now permanently located at another URI, "
+               "specified by the 'Location:' HTTP Response header."),
+        "pt": ("Indica que o recurso agora está permanentemente localizado em outra URI, "
+               "especificada pelo cabeçalho de resposta HTTP 'Location:'.")
     },
     # Client error responses
     400: {
         "name": "BAD REQUEST",
-        "en": "",
-        "pt": ""
+        "en": ("The server cannot process the request due to something that is perceived to be a client error "
+               "(e.g., malformed request syntax, invalid request message framing, or deceptive request routing)."),
+        "pt": ("O servidor não pode processar a solicitação devido a algo que é percebido como um erro do cliente "
+               "(e.g., solicitação malformada, roteamento ou enquadramento de mensagem de solicitação inválida).")
     },
     401: {
         "name": "UNAUTHORIZED",
-        "en": "",
-        "pt": ""
+        "en": ("Semantically, this response means 'unauthenticated'. "
+               "The client must authenticate itself to get the requested response."),
+        "pt": ("Semanticamente, essa resposta significa 'unauthenticated'. "
+               "O cliente deve se autenticar para obter a resposta solicitada.")
+    },
+    402: {
+        "name": "PAYMENT REQUIRED",
+        "en": "This response code is reserved for future use; no standard exists.",
+        "pt": "Este código de resposta está reservado para uso futuro; não existe convenção padrão."
     },
     403: {
         "name": "FORBIDDEN",
-        "en": "",
-        "pt": ""
+        "en": ("The client does not have access rights to the content. "
+               "Unlike '401 Unauthorized', the client's identity is known to the server."),
+        "pt": ("O cliente não tem direitos de acesso ao conteúdo. "
+               "Ao contrário do '401 Unauthorized', a identidade do cliente é conhecida pelo servidor.")
     },
     404: {
         "name": "NOT FOUND",
-        "en": "",
-        "pt": ""
+        "en": ("The server cannot find the requested resource. Either the URL is not recognized, the resource "
+               "does not exist, or the server is hiding the existence of a resource from an unauthorized client."),
+        "pt": ("O servidor não pode encontrar o recurso solicitado. A URL não é reconhecida, o recurso não existe, "
+               "ou o servidor está ocultando a existência de um recurso de um cliente não autorizado.")
     },
     405: {
         "name": "METHOD NOT ALLOWED",
-        "en": "",
-        "pt": ""
+        "en": "The request method is known by the server but is not supported by the target resource. "
+              "For example, an API may not allow calling 'DELETE' to remove a resource.",
+        "pt": "O método de solicitação é conhecido pelo servidor, mas não é suportado pelo recurso de destino. "
+              "Por exemplo, uma API pode não permitir chamar 'DELETE' para remover um recurso."
     },
     406: {
         "name": "NOT ACCEPTABLE",
-        "en": "",
-        "pt": ""
+        "en": ("After performing server-driven content negotiation, the server "
+               "does not find any content that conforms to the criteria given by the user agent."),
+        "pt": ("Após realizar negociação de conteúdo, o servidor não encontra conteúdo "
+               "que esteja em conformidade com os critérios fornecidos pelo o agente do usuário.")
     },
     407: {
-        "name": "AUTHENTICATION REQUIRED",
-        "en": "",
-        "pt": ""
+        "name": "PROXY AUTHENTICATION REQUIRED",
+        "en": "Semelhante a '401 Unauthorized', mas a autenticação precisa ser feita por um proxy.",
+        "pt": "This is similar to '401 Unauthorized' but the authentication needs to be done by a proxy."
     },
     408: {
         "name": "REQUEST TIMEOUT",
-        "en": "",
-        "pt": ""
+        "en": ("This response is sent on an idle or unused connection "
+               "by the server, whenever it feels the need to shut it down."),
+        "pt": ("Esta resposta é enviada pelo servidor em uma conexão ociosa ou "
+               "não utilizada, sempre que seu desligamento se fizer necessário.")
     },
     409: {
         "name": "CONFLICT",
-        "en": "",
-        "pt": ""
+        "en": "This response is sent when a request conflicts with the current state of the server.",
+        "pt": "Esta resposta é enviada quando uma requisição conflitar com o estado atual do servidor."
     },
     410: {
         "name": "GONE",
-        "en": "",
-        "pt": ""
+        "en": ("This response is sent when the requested content "
+               "has been permanently deleted from server, with no forwarding address."),
+        "pt": ("Esta resposta é enviada quando o conteúdo solicitado "
+               "foi excluído permanentemente do servidor, sem endereço de encaminhamento.")
     },
     411: {
         "name": "LENGTH REQUIRED",
@@ -219,60 +240,142 @@ _HTTP_STATUSES: Final[dict] = {
         "en": "",
         "pt": ""
     },
+    415: {
+        "name": "UNSUPPORTED MEDIA TYPE",
+        "en": "",
+        "pt": ""
+    },
+    416: {
+        "name": "RANGE NOT SATISFIABLE",
+        "en": "",
+        "pt": ""
+    },
+    417: {
+        "name": "EXPECTATION FAILED",
+        "en": "",
+        "pt": ""
+    },
+    418: {
+        "name": "I'M A TEAPOT",
+        "en": "The server refuses the attempt to brew coffee with a teapot. "
+              "This was an April Fools joke from 1998, kept in the official standard by popular demand.",
+        "pt": "O servidor recusa a tentativa de coar café num bule de chá. "
+              "Essa foi uma brincadeira de 1o. de Abril em 1998, mantida no padrão oficial por clamor popular."
+    },
+    421: {
+        "name": "MISDIRECTED REQUEST",
+        "en": "",
+        "pt": ""
+    },
+    422: {
+        "name": "UNPROCESSABLE CONTENT",
+        "en": "",
+        "pt": ""
+    },
+    423: {
+        "name": "LOCKED",
+        "en": "",
+        "pt": ""
+    },
+    424: {
+        "name": "FAILED DEPENDENCY",
+        "en": "",
+        "pt": ""
+    },
+    425: {
+        "name": "TOO EARLY",
+        "en": "",
+        "pt": ""
+    },
+    426: {
+        "name": "UPGRADE REQUIRED",
+        "en": "",
+        "pt": ""
+    },
+    428: {
+        "name": "PRECONDITION REQUIRED",
+        "en": "",
+        "pt": ""
+    },
+    429: {
+        "name": "TOO MANY REQUESTS",
+        "en": "",
+        "pt": ""
+    },
+    431: {
+        "name": "REQUEST HEADER FIELDS TOO LARGE",
+        "en": "",
+        "pt": ""
+    },
+    451: {
+        "name": "UNAVAILABLE FOR LEGAL REASONS",
+        "en": "",
+        "pt": ""
+    },
     # Server error responses
     500: {
         "name": "INTERNAL SERVER ERROR",
-        "en": "",
-        "pt": ""
+        "en": "The server has encountered a situation it does not know how to handle.",
+        "pt": "O servidor encontrou uma situação com a qual não sabe lidar."
     },
     501: {
         "name": "NOT IMPLEMENTED",
-        "en": "",
-        "pt": ""
+        "en": "The request method is not supported by the server and cannot be handled. "
+              "The only methods that servers are required to support are 'GET' and 'HEAD'.",
+        "pt": "O método da requisição não é suportado pelo servidor e não pode ser manipulado. "
+              "Os únicos métodos que servidores são obrigados a suportar são 'GET' e 'HEAD'."
     },
     502: {
         "name": "BAD GATEWAY",
-        "en": "",
-        "pt": ""
+        "en": ("The server, while working as a gateway to get a response "
+               "needed to handle the request, got an invalid response."),
+        "pt": ("O servidor, enquanto trabalhava como um gateway para obter uma resposta "
+               "necessária para lidar com a solicitação, obteve uma resposta inválida.")
     },
     503: {
         "name": "SERVICE UNAVAILABLE",
-        "en": "",
-        "pt": ""
+        "en": ("The server is not ready to handle the request. "
+               "Common causes are a server that is down for maintenance or is overloaded."),
+        "pt": ("O servidor não está pronto para manipular a requisição. "
+               "Causas comuns são um servidor em manutenção ou sobrecarregado.")
     },
     504: {
         "name": "GATEWAY TIMEOUT",
-        "en": "",
-        "pt": ""
+        "en": "The server is acting as a gateway and cannot get a response in time.",
+        "pt": "O servidor está atuando como um gateway e não consegue obter uma resposta a tempo."
     },
     505: {
         "name": "HTTP VERSION NOT SUPPORTED",
-        "en": "",
-        "pt": ""
+        "en": "The HTTP version used in the request is not supported by the server.",
+        "pt": "A versão HTTP usada na requisição não é suportada pelo servidor."
     },
     506: {
         "name": "VARIANT ALSO NEGOTIATES",
-        "en": "",
-        "pt": ""
+        "en": ("The chosen variant resource is configured to engage in transparent content negotiation itself, "
+               "and is therefore not a proper end point in the negotiation process."),
+        "pt": ("O recurso variante escolhido está configurado para se envolver em negociação "
+               "de conteúdo transparente, e portanto, não é um 'endpoint' adequado no processo de negociação.")
     },
     507: {
         "name": "INSUFFICIENT STORAGE",
-        "en": "",
-        "pt": ""
+        "en": ("The method could not be performed on the resource, because the server "
+               "is unable to store the representation needed to successfully complete the request."),
+        "pt": ("O método não pôde ser executado no recurso porque o servidor "
+               "não pode armazenar a representação necessária para concluir a solicitação com êxito.")
     },
     508: {
         "name": "LOOP DETECTED",
-        "en": "",
-        "pt": ""
+        "en": "The server detected an infinite loop while processing the request.",
+        "pt": "O servidor detectou um loop infinito ao processar a solicitação."
     },
     510: {
         "name": "NOT EXTENDED",
-        "en": "",
-        "pt": ""
+        "en": "Further extensions to the request are required for the server to fulfill it.",
+        "pt": "Extensões adicionais à solicitação são necessárias para que o servidor a atenda."
     },
     511: {
         "name": "NETWORK AUTHENTICATION REQUIRED",
-        "en": "",
-        "pt": ""
+        "en": "Indicates that the client needs to authenticate to gain network access.",
+        "pt": "Indica que o cliente precisa se autenticar para obter acesso à rede."
     }
 }
