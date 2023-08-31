@@ -236,7 +236,7 @@ def validate_str(errors: list[str] | None, scheme: dict, attr: str,
 
 
 def validate_date(errors: list[str] | None, scheme: dict, attr: str,
-                  default: bool | date = None, day_first: bool = True, logger: Logger = None) -> date:
+                  day_first: bool = False, default: bool | date = None, logger: Logger = None) -> date:
     """
     Validate the *date* value associated with *attr* in *scheme*.
 
@@ -280,7 +280,7 @@ def validate_date(errors: list[str] | None, scheme: dict, attr: str,
 
 
 def validate_datetime(errors: list[str] | None, scheme: dict, attr: str,
-                      default: bool | datetime = None, day_first: bool = True, logger: Logger = None) -> datetime:
+                      day_first: bool = True, default: bool | datetime = None, logger: Logger = None) -> datetime:
     """
     Validate the *datetime* value associated with *attr* in *scheme*.
 
