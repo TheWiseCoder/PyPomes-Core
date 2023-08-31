@@ -54,7 +54,7 @@ from .validation_pomes import (
     VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
     validate_value, validate_bool, validate_int, validate_float, validate_str,
     validate_date, validate_datetime, validate_ints, validate_strs,
-    validate_format_error, validate_format_errors,
+    validate_format_error, validate_format_errors, validate_unformat_errors,
 )
 from .xml_pomes import (
     XML_FILE_HEADER, xml_to_dict, xml_normalize_keys,
@@ -103,7 +103,7 @@ __all__ = [
     "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX",
     "validate_value", "validate_bool", "validate_int", "validate_float", "validate_str",
     "validate_date", "validate_datetime", "validate_ints", "validate_strs",
-    "validate_format_error", "validate_format_errors",
+    "validate_format_error", "validate_format_errors", "validate_unformat_errors",
     # str_pomes
     "str_between", "str_split_on_mark", "str_find_whitespace",
     # xml_pomes

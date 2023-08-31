@@ -456,11 +456,12 @@ def validate_format_error(error_id: int, *args) -> str:
 
 def validate_format_errors(errors: list[str]) -> list[dict]:
     """
-    Build and return a *dict* to be used as the value representing a list of errors.
+    Build and return a list of dicts from the list of errors *errors*.
 
+    Each element in *errors* is encoded as a *dict*.
     This list is tipically used in a returning *JSON* string.
 
-    :param errors: the errors to build the list with
+    :param errors: the list of errors to build the list of dicts with
     :return: the built list
     """
     # initialize the return variable
@@ -482,6 +483,30 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
         term: str = "description" if VALIDATION_MSG_LANGUAGE == "en" else "descricao"
         out_error[term] = desc
         result.append(out_error)
+
+    return result
+
+
+def validate_unformat_errors(errors: list[dict | str]) -> list[str]:
+    """
+    Extract and return the list of errors used to build the list of dicts *errors*.
+
+    :param errors: the list of dicts to extract the errors from
+    :return: the built list
+    """
+    # initialize the return variable
+    result: list[str] = []
+
+    # define the dictionary keys
+    name: str = "code" if VALIDATION_MSG_LANGUAGE == "en" else "codigo"
+    desc: str = "description" if VALIDATION_MSG_LANGUAGE == "en" else "descricao"
+
+    # traverse the list of dicts
+    for error in errors:
+        if isinstance(error, dict):
+            result.append(f"{error.get(name)}: {error.get(desc)}")
+        else:
+            result.append(error)
 
     return result
 
