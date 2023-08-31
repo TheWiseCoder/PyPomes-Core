@@ -478,7 +478,7 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
             term: str = "code" if VALIDATION_MSG_LANGUAGE == "en" else "codigo"
             pos: int = desc.find(":")
             out_error[term] = desc[0:pos]
-            desc = desc[pos+1:]
+            desc = desc[pos+2:]
 
         term: str = "description" if VALIDATION_MSG_LANGUAGE == "en" else "descricao"
         out_error[term] = desc
