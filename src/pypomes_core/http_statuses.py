@@ -222,28 +222,34 @@ _HTTP_STATUSES: Final[dict] = {
     },
     411: {
         "name": "LENGTH REQUIRED",
-        "en": "",
-        "pt": ""
+        "en": ("The server rejected the request because the 'Content-Length' "
+               "header field is not defined, and the server requires it."),
+        "pt": ("O servidor rejeitou a solicitação porque o campo de cabeçalho "
+               "'Content-Length' não está definido, e o servidor o exige.")
     },
     412: {
         "name": "PRECONDITION FAILED",
-        "en": "",
-        "pt": ""
+        "en": "The client has indicated preconditions in its headers which the server does not meet.",
+        "pt": "O cliente indicou nos seus cabeçalhos pré-condições que o servidor não atende."
     },
     413: {
         "name": "PAYLOAD TOO LARGE",
-        "en": "",
-        "pt": ""
+        "en": ("The request entity is larger than limits defined by server. "
+               "The server might close the connection or return a 'Retry-After' header field."),
+        "pt": ("A entidade requisição é maior do que os limites definidos pelo servidor. "
+               "O servidor pode fechar a conexão ou retornar um campo de cabeçalho 'Retry-After'.")
     },
     414: {
         "name": "URI TOO LONG",
-        "en": "",
-        "pt": ""
+        "en": "The URI requested by the client is longer than the server is willing to interpret.",
+        "pt": "A URI solicitada pelo cliente é mais longa do que o servidor está disposto a interpretar."
     },
     415: {
         "name": "UNSUPPORTED MEDIA TYPE",
-        "en": "",
-        "pt": ""
+        "en": ("The media format of the requested data is not supported by the server, "
+               "so the server is rejecting the request."),
+        "pt": ("O formato de mídia dos dados requisitados não é suportado pelo servidor, "
+               "que portanto está rejeitando a requisição.")
     },
     416: {
         "name": "RANGE NOT SATISFIABLE",
