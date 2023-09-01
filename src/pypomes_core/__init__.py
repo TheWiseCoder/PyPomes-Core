@@ -45,7 +45,7 @@ from .list_pomes import (
     list_find_coupled, list_elem_starting_with, list_transform,
 )
 from .str_pomes import (
-    str_between, str_split_on_mark, str_find_whitespace,
+    str_sanitize, str_between, str_split_on_mark, str_find_whitespace,
 )
 from .validation_msgs import (
     validation_add_msgs, validation_set_msgs
@@ -97,6 +97,8 @@ __all__ = [
     # list_pomes
     "list_compare", "list_flatten", "list_unflatten",
     "list_find_coupled", "list_elem_starting_with", "list_transform",
+    # str_pomes
+    "str_sanitize", "str_between", "str_split_on_mark", "str_find_whitespace",
     # validation_msgs
     "validation_add_msgs", "validation_set_msgs",
     # validation_pomes
@@ -104,8 +106,6 @@ __all__ = [
     "validate_value", "validate_bool", "validate_int", "validate_float", "validate_str",
     "validate_date", "validate_datetime", "validate_ints", "validate_strs",
     "validate_format_error", "validate_format_errors", "validate_unformat_errors",
-    # str_pomes
-    "str_between", "str_split_on_mark", "str_find_whitespace",
     # xml_pomes
     "XML_FILE_HEADER", "xml_to_dict", "xml_normalize_keys",
 ]

@@ -1,3 +1,23 @@
+def str_sanitize(target_str: str) -> str:
+    """
+    Clean the given *target_str* string.
+
+    The sanitization is carried out by:
+        - removing backslashes
+        - replacing double quotes with single quotes
+        - replacing newlines and tabs with whitespace
+        - replacing multiple consecutive spaces with a single space
+
+    :param target_str: the string to be cleaned
+    :return: the cleaned string
+    """
+    cleaned: str = target_str.replace("\\", "") \
+                             .replace('"', "'") \
+                             .replace("\n", " ") \
+                             .replace("\t", " ")
+    return " ".join(cleaned.split())
+
+
 def str_split_on_mark(source: str, mark: str) -> list[str]:
     """
     Extrai, de *source*, os segmentos de texto separados por *mark*, e os retorna em uma lista.
