@@ -140,7 +140,8 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
                                                    timeout=timeout)
         result = response.json()
         if logger:
-            logger.debug(f"Invoked '{url}', status '{http_status_name(response.status_code)}'")
+            logger.debug(f"Invoked '{url}', "
+                         f"status {response.status_code} ({http_status_name(response.status_code)})")
     except Exception as e:
         err_msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
         if logger:
@@ -185,7 +186,8 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
                                                     timeout=timeout)
         result = response.json()
         if logger:
-            logger.debug(f"Invoked '{url}', status '{http_status_name(response.status_code)}'")
+            logger.debug(f"Invoked '{url}', "
+                         f"status {response.status_code} ({http_status_name(response.status_code)})")
     except Exception as e:
         err_msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
         if logger:
