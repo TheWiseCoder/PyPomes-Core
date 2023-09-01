@@ -3,6 +3,7 @@ from logging import Logger
 from typing import Final
 from .datetime_pomes import TIMEZONE_LOCAL
 from .env_pomes import APP_PREFIX, env_get_str
+from .str_pomes import str_sanitize
 from.validation_msgs import _ERR_MSGS_EN, _ERR_MSGS_PT
 
 VALIDATION_MSG_LANGUAGE: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_LANGUAGE", "pt")
@@ -504,7 +505,7 @@ def validate_unformat_errors(errors: list[dict | str]) -> list[str]:
     # traverse the list of dicts
     for error in errors:
         if isinstance(error, dict):
-            result.append(f"{error.get(name)}: {error.get(desc)}")
+            result.append(f"{error.get(name)}: {str_sanitize(error.get(desc))}")
         else:
             result.append(error)
 
