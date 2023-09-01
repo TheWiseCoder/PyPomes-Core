@@ -66,7 +66,7 @@ for _handler in logging.root.handlers:
     _handler.addFilter(logging.Filter(LOGGING_ID))
 
 
-def logging_request_entries(request: Request) -> Response:
+def logging_request_entries(request: Request, as_attachment: bool = False) -> Response:
     """
     Retrieve from the log file, and return, the entries matching the criteria specified.
 
@@ -80,6 +80,7 @@ def logging_request_entries(request: Request) -> Response:
         - to: the finish timestamp
 
     :param request: the HTTP request
+    :param as_attachment: indicate to browser that it should offer to save the file, or just display it
     :return: file containing the log entries requested on success, or incidental errors on fail
     """
     # declare the return variable
@@ -114,7 +115,7 @@ def logging_request_entries(request: Request) -> Response:
         log_entries.seek(0)
         result = send_file(path_or_file=log_entries,
                            mimetype=MIMETYPE_TEXT,
-                           as_attachment=True,
+                           as_attachment=as_attachment,
                            download_name=log_file)
     else:
         # yes, report the failure

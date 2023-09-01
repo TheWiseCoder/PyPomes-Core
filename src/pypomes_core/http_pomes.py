@@ -104,7 +104,7 @@ def http_json_from_request(request: Request) -> dict:
         resp: str = request.get_data(as_text=True)
         # does the request contain input data ?
         if len(resp) > 0:
-            # yes, possibly mal-fomed JSON
+            # yes, possibly mal-formed JSON
             raise
 
     return result
@@ -131,7 +131,7 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
     result: dict | None = None
 
     if logger:
-        logger.debug(f"Invoking GET: '{url}'")
+        logger.debug(f"Invoking '{url}'")
 
     try:
         response: requests.Response = requests.get(url=url,
@@ -174,7 +174,7 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
     result: dict | None = None
 
     if logger:
-        logger.debug(f"Invoking POST: '{url}'")
+        logger.debug(f"Invoking '{url}'")
 
     try:
         response: requests.Response = requests.post(url=url,
