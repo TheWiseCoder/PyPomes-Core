@@ -253,70 +253,90 @@ _HTTP_STATUSES: Final[dict] = {
     },
     416: {
         "name": "RANGE NOT SATISFIABLE",
-        "en": "",
-        "pt": ""
+        "en": ("The range specified by the 'Range' header field in the request cannot be fulfilled. "
+               "It's possible that the range is outside the size of the target URI's data."),
+        "pt": ("O intervalo especificado pelo campo de cabeçalho 'Range' na solicitação não pode ser atendido. "
+               "É possível que o intervalo esteja fora do tamanho dos dados da URI de destino.")
     },
     417: {
         "name": "EXPECTATION FAILED",
-        "en": "",
-        "pt": ""
+        "en": "The expectation indicated by the 'Expect' request header field cannot be met by the server.",
+        "pt": "A expectativa indicada pelo campo de cabeçalho 'Expect' não pode ser atendida pelo servidor."
     },
     418: {
         "name": "I'M A TEAPOT",
-        "en": "The server refuses the attempt to brew coffee with a teapot. "
-              "This was an April Fools joke from 1998, kept in the official standard by popular demand.",
-        "pt": "O servidor recusa a tentativa de coar café num bule de chá. "
-              "Essa foi uma brincadeira de 1o. de Abril em 1998, mantida no padrão oficial por clamor popular."
+        "en": ("The server refuses the attempt to brew coffee with a teapot. "
+               "This was an April Fools joke from 1998, kept in the official standard by popular demand."),
+        "pt": ("O servidor recusa a tentativa de coar café num bule de chá. "
+               "Essa foi uma brincadeira de 1o. de Abril em 1998, mantida no padrão oficial por clamor popular.")
     },
     421: {
         "name": "MISDIRECTED REQUEST",
-        "en": "",
-        "pt": ""
+        "en": ("The request was directed at a server that is not able to produce a response. "
+               "The server is not configured to produce responses for the combination "
+               "of scheme and authority that are included in the request URI."),
+        "pt": ("A requisição foi direcionada a um servidor inapto a produzir a resposta. "
+               "O servidor não está configurado para produzir respostas para a combinação "
+               "de esquema e autoridade inclusas na URI da requisição.")
     },
     422: {
         "name": "UNPROCESSABLE CONTENT",
-        "en": "",
-        "pt": ""
+        "en": "The request was well-formed but was unable to be followed, due to semantic errors.",
+        "pt": "A solicitação foi bem formada, mas não pôde ser atendida devido a erros semânticos."
     },
     423: {
         "name": "LOCKED",
-        "en": "",
-        "pt": ""
+        "en": "The resource that is being accessed is locked.",
+        "pt": "O recurso que está sendo acessado está bloqueado."
     },
     424: {
         "name": "FAILED DEPENDENCY",
-        "en": "",
-        "pt": ""
+        "en": "The request failed due to failure of a previous request.",
+        "pt": "A solicitação falhou devido à falha de uma solicitação anterior."
     },
     425: {
         "name": "TOO EARLY",
-        "en": "",
-        "pt": ""
+        "en": "The server is unwilling to risk processing a request that might be replayed.",
+        "pt": "O servidor não está disposto a correr o risco de processar uma solicitação que pode ser repetida."
     },
     426: {
         "name": "UPGRADE REQUIRED",
-        "en": "",
-        "pt": ""
+        "en": ("The server refuses to perform the request using the current protocol, "
+               "but might be willing to do so after the client upgrades to a different protocol. "
+               "The server sends an 'Upgrade' header in this response to indicate the required protocol(s)."),
+        "pt": "O servidor se recusa a executar a solicitação usando o protocolo atual, "
+              "mas pode estar disposto a fazê-lo depois que o cliente atualizar para um protocolo diferente. "
+              "O servidor envia um cabeçalho 'Upgrade' nessa resposta, para indicar os protocolos necessários."
     },
     428: {
         "name": "PRECONDITION REQUIRED",
-        "en": "",
-        "pt": ""
+        "en": ("The origin server requires the request to be conditional. "
+               "Intended to prevent the 'lost update' problem, where a client 'GET's a resource's state, "
+               "modifies it, and 'PUT's it back to the server, when meanwhile a third party has modified "
+               "the state on the server, leading to a conflict."),
+        "pt": ("O servidor de origem exige que a solicitação seja condicional. "
+               "Previne o problema da 'atualização perdida', onde um cliente obtem ('GET') "
+               "o estado de um recurso, o modifica e o coloca ('PUT') de volta no servidor, "
+               "quando entretanto um terceiro modificou o estado no servidor, levando a um conflito.")
     },
     429: {
         "name": "TOO MANY REQUESTS",
-        "en": "",
-        "pt": ""
+        "en": "The user has sent too many requests in a given amount of time ('rate limiting').",
+        "pt": "O usuário enviou muitas requisições num dado tempo ('limitação de taxa')."
     },
     431: {
         "name": "REQUEST HEADER FIELDS TOO LARGE",
-        "en": "",
-        "pt": ""
+        "en": ("The server is unwilling to process the request because its header fields are too large. "
+               "The request may be resubmitted after the reduction of the size of the request header fields."),
+        "pt": ("O servidor recusa-se a processar a solicitação porque seus campos de cabeçalho são muito grandes. "
+               "A solicitação pode ser reenviada após a redução o tamanho dos campos do cabeçalho da solicitação.")
     },
     451: {
         "name": "UNAVAILABLE FOR LEGAL REASONS",
-        "en": "",
-        "pt": ""
+        "en": ("The user agent requested a resource that cannot legally be provided, "
+               "such as a web page censored by a government."),
+        "pt": ("O agente do usuário solicitou um recurso que não pode ser fornecido legalmente, "
+               "tal como uma página da Web censurada por um governo.")
     },
     # Server error responses
     500: {
