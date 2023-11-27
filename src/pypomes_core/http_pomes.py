@@ -2,7 +2,7 @@ import logging
 import requests
 import sys
 from flask import Request
-from typing import Final
+from typing import Any, Final
 from werkzeug.exceptions import BadRequest
 
 from .env_pomes import APP_PREFIX, env_get_int
@@ -112,11 +112,11 @@ def http_json_from_request(request: Request) -> dict:
 
 def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
                        params: dict = None, timeout: int | None = HTTP_GET_TIMEOUT,
-                       logger: logging.Logger = None) -> dict:
+                       logger: logging.Logger = None) -> Any:
     """
-    Retrieve a *JSON* string by issuing a *GET* request to the given *url*.
+    Retrieve the *JSON* content of a *GET* request to the given *url*.
 
-    The contents of the *JSON* string are returned as a *dict* .
+    The *JSON* content is typically returned as a *dict*, or as a *list[dict]* .
     The request might contain *headers* and *parameters*.
 
     :param errors: incidental error messages
@@ -128,7 +128,7 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
     :return: the contents of the JSON string
     """
     # initialize the return variable
-    result: dict | None = None
+    result: Any = None
 
     if logger:
         logger.debug(f"Invoking '{url}'")
@@ -154,11 +154,11 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
 
 def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None,
                         params: dict = None, data: dict = None, json: dict = None,
-                        timeout: int | None = HTTP_POST_TIMEOUT, logger: logging.Logger = None) -> dict:
+                        timeout: int | None = HTTP_POST_TIMEOUT, logger: logging.Logger = None) -> Any:
     """
-    Retrieve a *JSON* string by issuing a *POST* request to the given *url*.
+    Retrieve the *JSON* content of a *POST* request to the given *url*.
 
-    The contents of the *JSON* string are returned as a *dict*.
+    The *JSON* content is typically returned as a *dict*, or as a *list[dict]* .
     The request might contain *headers* and *parameters*.
 
     :param errors: incidental error messages
@@ -172,7 +172,7 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
     :return: the contents of the JSON string
     """
     # initialize the return variable
-    result: dict | None = None
+    result: Any = None
 
     if logger:
         logger.debug(f"Invoking '{url}'")

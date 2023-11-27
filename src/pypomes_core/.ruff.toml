@@ -46,7 +46,6 @@ select = [
     # others
     "C90",   # mccabe - check for excessive McCabe complexity
     "D",     # pydocstyle - enforce docstring conventions
-    'ERA',   # eradicate  - check for commented-out code
     "F",     # Pyflakes - Python classic checker
     "FLY",   # flynt - enforce use of 'f-strings' for formatting
     "N",     # pep8-naming - enforce naming conventions in PEP 8
@@ -62,6 +61,7 @@ select = [
 #   "BLE",   # flake8-blind-except - check for except clauses that catch all exceptions
 #   "CPY",   # flake8-copyright - check for copyright notices in all python files
 #   "DJ",    # flake8-django - detect bad practices on Django projects
+#   'ERA',   # eradicate - check for commented-out code
 #   "EXE",   # flake8-executable - ensure the executable permissions and shebangs of Python files are correctly set
 #   "FBT",   # flake8-boolean-trap - check for boolean traps
 #   "I",     # isort - organize imports
