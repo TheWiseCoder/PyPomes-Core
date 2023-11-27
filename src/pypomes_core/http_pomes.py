@@ -131,7 +131,7 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
     result: Any = None
 
     if logger:
-        logger.debug(f"Invoking '{url}'")
+        logger.debug(f"GETing '{url}'")
 
     try:
         response: requests.Response = requests.get(url=url,
@@ -140,10 +140,10 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
                                                    timeout=timeout)
         result = response.json()
         if logger:
-            logger.debug(f"Invoked '{url}', "
+            logger.debug(f"GETed '{url}', "
                          f"status {response.status_code} ({http_status_name(response.status_code)})")
     except Exception as e:
-        err_msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
+        err_msg: str = f"Error GETing '{url}': '{exc_format(e, sys.exc_info())}'"
         if logger:
             logger.error(err_msg)
         if errors is not None:
@@ -175,7 +175,7 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
     result: Any = None
 
     if logger:
-        logger.debug(f"Invoking '{url}'")
+        logger.debug(f"POSTing '{url}'")
 
     try:
         response: requests.Response = requests.post(url=url,
@@ -186,10 +186,56 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
                                                     timeout=timeout)
         result = response.json()
         if logger:
-            logger.debug(f"Invoked '{url}', "
+            logger.debug(f"POSTed '{url}', "
                          f"status {response.status_code} ({http_status_name(response.status_code)})")
     except Exception as e:
-        err_msg: str = f"Error invoking '{url}': '{exc_format(e, sys.exc_info())}'"
+        err_msg: str = f"Error POSTing '{url}': '{exc_format(e, sys.exc_info())}'"
+        if logger:
+            logger.error(err_msg)
+        if errors is not None:
+            errors.append(err_msg)
+
+    return result
+
+
+def http_json_from_put(errors: list[str] | None, url: str, headers: dict = None,
+                       params: dict = None, data: dict = None, json: dict = None,
+                       timeout: int | None = HTTP_POST_TIMEOUT, logger: logging.Logger = None) -> Any:
+    """
+    Retrieve the *JSON* content of a *PUT* request to the given *url*.
+
+    The *JSON* content is typically returned as a *dict*, or as a *list[dict]* .
+    The request might contain *headers* and *parameters*.
+
+    :param errors: incidental error messages
+    :param url: the destination URL
+    :param headers: optional headers
+    :param params: optional parameters
+    :param data: optionaL data to send in the body of the request
+    :param json: optional JSON to send in the body of the request
+    :param timeout: timeout, in seconds (defaults to HTTP_POST_TIMEOUT - use None to omit)
+    :param logger: optional logger to log the operation with
+    :return: the contents of the JSON string
+    """
+    # initialize the return variable
+    result: Any = None
+
+    if logger:
+        logger.debug(f"PUTing '{url}'")
+
+    try:
+        response: requests.Response = requests.put(url=url,
+                                                   headers=headers,
+                                                   data=data,
+                                                   json=json,
+                                                   params=params,
+                                                   timeout=timeout)
+        result = response.json()
+        if logger:
+            logger.debug(f"PUTed '{url}', "
+                         f"status {response.status_code} ({http_status_name(response.status_code)})")
+    except Exception as e:
+        err_msg: str = f"Error PUTing '{url}': '{exc_format(e, sys.exc_info())}'"
         if logger:
             logger.error(err_msg)
         if errors is not None:
