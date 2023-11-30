@@ -554,10 +554,10 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
     """
     Constrói um novo *dict*, segundo as regras seguintes.
 
-    Esse dicionário é construído atribuindo-se a cada elemento indicado pelo segundo elemento de uma
-    tupla contendo uma cadeia de chaves aninhadas em *from_to_keys*, o valor do elemento
-    de *source* indicado pelo primeiro elemento da tupla, também contendo uma cadeia de chaves
-    aninhadas, respectivamente para todos os elementos mapeados em *from_to_keys*.
+    Esse dicionário é construído criando-se, para cada elemento da lista de tuplas em
+    *from_to_keys*, o elemento indicado pelo segundo termo da tupla, atribuindo-se a ele
+    o valor do elemento de *source* indicado pelo primeiro termo da tupla. Ambos os elementos
+    das tuplas são representasdos por uma cadeia de chaves aninhadas.
 
     Os prefixos para as chaves de origem e de destino, se definidos, tem tratamentos distintos.
     São acrescentados na busca de valores em *Source*, e removidos na atribuição de valores
@@ -580,9 +580,9 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
 
         # define a cadeia de chaves de origem
         if prefix_from:
-            from_keys: str = key
-        else:
             from_keys: str = f"{prefix_from}.{key}"
+        else:
+            from_keys: str = key
 
         # obtem a cadeia de chaves de destino
         to_keys: str = list_find_coupled(from_to_keys, from_keys)
