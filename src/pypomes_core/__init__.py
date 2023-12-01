@@ -6,8 +6,8 @@ from .datetime_pomes import (
 )
 from .dict_pomes import (
     dict_has_key_chain, dict_get_value, dict_set_value, dict_reduce,
-    dict_listify, dict_transform, dict_merge, dict_coalesce, dict_get_key,
-    dict_get_keys, dict_from_object, dict_from_list, dict_replace_value, dict_pop_value,
+    dict_listify, dict_transform, dict_merge, dict_coalesce, dict_clone,
+    dict_get_key, dict_get_keys, dict_from_object, dict_from_list, dict_replace_value, dict_pop_value,
 )
 from .email_pomes import (
     EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SERVER, email_send,
@@ -69,8 +69,9 @@ __all__ = [
     "date_reformat", "date_parse", "datetime_parse",
     # dict_pomes
     "dict_has_key_chain", "dict_get_value", "dict_set_value", "dict_reduce",
-    "dict_listify", "dict_transform", "dict_merge", "dict_coalesce", "dict_get_key",
-    "dict_get_keys", "dict_from_object", "dict_from_list", "dict_replace_value", "dict_pop_value",
+    "dict_listify", "dict_transform", "dict_merge", "dict_coalesce", "dict_clone",
+    "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
+    "dict_replace_value", "dict_pop_value",
     # email_pomes
     "EMAIL_ACCOUNT", "EMAIL_PWD", "EMAIL_PORT", "EMAIL_SERVER", "email_send",
     # encoding_pomes

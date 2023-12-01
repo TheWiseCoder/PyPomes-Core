@@ -556,8 +556,8 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
 
     Esse dicionário é construído criando-se, para cada elemento da lista de tuplas em
     *from_to_keys*, o elemento indicado pelo segundo termo da tupla, atribuindo-se a ele
-    o valor do elemento de *source* indicado pelo primeiro termo da tupla. Ambos os elementos
-    das tuplas são representasdos por uma cadeia de chaves aninhadas.
+    o valor do elemento de *source* indicado pelo primeiro termo da tupla. Ambos os termos
+    das tuplas são representados por uma cadeia de chaves aninhadas.
 
     Os prefixos para as chaves de origem e de destino, se definidos, tem tratamentos distintos.
     São acrescentados na busca de valores em *Source*, e removidos na atribuição de valores
@@ -608,6 +608,38 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
 
             # atribui o valor transformado ao resultado
             dict_set_value(result, to_keys_deep, to_value)
+
+    return result
+
+
+def dict_clone(source: dict, from_to_keys: list[tuple[str, str]]) -> dict:
+    """
+    Constrói um novo *dict*, segundo as regras seguintes.
+
+    Esse dicionário é construído criando-se, para cada elemento da lista de tuplas em
+    *from_to_keys*, o elemento indicado pelo segundo termo da tupla, atribuindo-se a ele
+    o valor do elemento de *source* indicado pelo primeiro termo da tupla. O primeiro termo
+    da tupla pode ser representado por uma cadeia de chaves aninhadas. O segundo elemento
+    pode ser omitido, assumindo-se então o nome do primeiro elemento, que nesse caso não deve
+    ser representado por uma cadeia de chaves aninhadas. Se o valor correspondente não for
+    encontrado em *source*, *None* é atribuído.
+
+    :param source: o dict de origem dos valores
+    :param from_to_keys: a lista de tuplas contendo as sequências de chaves de origem e destino
+    :return: o novo dicionário
+    """
+    # import the neeeded functions
+    from .list_pomes import list_unflatten
+
+    # inicialize the return variable
+    result: dict = {}
+
+    # traverse the list of elements and add to the target dict
+    for elem in from_to_keys:
+        from_key: str = elem[0]
+        # note that 'elem[1] if len(elem) > 1 else from_key' fails if elem[1] == None
+        to_key: str = (elem[1] if len(elem) > 1 else None) or from_key
+        result[to_key] = dict_get_value(source, list_unflatten(from_key))
 
     return result
 
