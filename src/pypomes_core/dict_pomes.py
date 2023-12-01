@@ -1,5 +1,6 @@
 import inspect
 import types
+from typing import Any
 
 
 def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
@@ -612,23 +613,23 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
     return result
 
 
-def dict_clone(source: dict, from_to_keys: list[tuple[str, str]]) -> dict:
+def dict_clone(source: dict, from_to_keys: list[Any]) -> dict:
     """
-    Constrói um novo *dict*, segundo as regras seguintes.
+    Buiild a new *dict*, according to the rules presented herein.
 
-    Esse dicionário é construído criando-se, para cada elemento da lista de tuplas em
-    *from_to_keys*, o elemento indicado pelo segundo termo da tupla, atribuindo-se a ele
-    o valor do elemento de *source* indicado pelo primeiro termo da tupla. O primeiro termo
-    da tupla pode ser representado por uma cadeia de chaves aninhadas. O segundo elemento
-    pode ser omitido, assumindo-se então o nome do primeiro elemento, que nesse caso não deve
-    ser representado por uma cadeia de chaves aninhadas. Se o valor correspondente não for
-    encontrado em *source*, *None* é atribuído.
+    This dictionary is constructed by creating a new element for each element in the list
+    *from_to_keys*. When the element of this list is a tuple, the name indicated by its
+    second term is used, assigning it the value of the *source* element indicated
+    by tuple´s first term. This first term can be represented by a chain of  nested keys.
+    The name of the element to be created can be omitted, in which case the name of the term
+    indicative of the value to be assigned, is used. If the corresponding value is not found
+    in *source*, *None* is assigned.
 
-    :param source: o dict de origem dos valores
-    :param from_to_keys: a lista de tuplas contendo as sequências de chaves de origem e destino
-    :return: o novo dicionário
+    :param source: the source dict
+    :param from_to_keys: list of elements indicative of the source and target keys
+    :return: the new dict
     """
-    # import the neeeded functions
+    # import the neeeded function
     from .list_pomes import list_unflatten
 
     # inicialize the return variable
@@ -636,9 +637,8 @@ def dict_clone(source: dict, from_to_keys: list[tuple[str, str]]) -> dict:
 
     # traverse the list of elements and add to the target dict
     for elem in from_to_keys:
-        from_key: str = elem[0]
-        # note that 'elem[1] if len(elem) > 1 else from_key' fails if elem[1] == None
-        to_key: str = (elem[1] if len(elem) > 1 else None) or from_key
+        from_key: str = elem[0] if isinstance(elem, tuple) else elem
+        to_key: str = (elem[1] if isinstance(elem, tuple) and len(elem) > 1 else None) or from_key
         result[to_key] = dict_get_value(source, list_unflatten(from_key))
 
     return result
