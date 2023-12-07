@@ -61,7 +61,7 @@ select = [
 #   "BLE",   # flake8-blind-except - check for except clauses that catch all exceptions
 #   "CPY",   # flake8-copyright - check for copyright notices in all python files
 #   "DJ",    # flake8-django - detect bad practices on Django projects
-#   'ERA',   # eradicate - check for commented-out code
+#   "ERA",   # eradicate - check for commented-out code
 #   "EXE",   # flake8-executable - ensure the executable permissions and shebangs of Python files are correctly set
 #   "FBT",   # flake8-boolean-trap - check for boolean traps
 #   "I",     # isort - organize imports
@@ -72,6 +72,7 @@ select = [
 ignore = [
     "ANN002",   # missing type annotation for *kargs
     "ANN101",   # missing type annotation for 'self' in method
+    "ANN401",   # dynamically typed expressions (typing.Any) are disallowed
     "COM819",   # prohibited trailing commas
     "D200",     # one-line docstring should fit on one line
     "D204",     # 1 blank line required after class docstring
