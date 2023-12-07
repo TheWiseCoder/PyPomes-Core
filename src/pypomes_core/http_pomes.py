@@ -235,13 +235,13 @@ def __http_json_from_rest(errors: list[str], rest_op: str, url: str, headers: di
         else:
             # no, report the problem
             err_msg = (
-                f"{rest_op} '{url}' failed: "
+                f"{rest_op} '{url}': failed, "
                 f"status {response.status_code}, reason '{response.reason}'"
             )
     except Exception as e:
         # the operation raised an exception
         err_msg = (
-            f"Error on {rest_op} '{url}': "
+            f"{rest_op} '{url}': error, "
             f"'{exc_format(e, sys.exc_info())}'"
         )
 
