@@ -155,7 +155,7 @@ def logging_get_entries(errors: list[str],
         if not from_stamp:
             errors.append(f"Value '{from_stamp}' of 'log_from' attribute invalid")
 
-    # obtaind the final timestamp
+    # obtain the final timestamp
     to_stamp: datetime | None = None
     if log_to:
         to_stamp = parser.parse(log_to)
@@ -223,12 +223,12 @@ def logging_log_msgs(msgs: list[str], output_dev: TextIO = None,
             # yes, log the message
             log_writer(msg)
 
-        # the output device has been defined ?
+        # has the output device been defined ?
         if output_dev:
             # yes, write the message to it
             output_dev.write(msg)
 
-            # the output device is 'stderr' ou 'stdout' ?
+            # is the output device 'stderr' ou 'stdout' ?
             if output_dev.name.startswith("<std"):
                 # yes, skip to the next line
                 output_dev.write("\n")

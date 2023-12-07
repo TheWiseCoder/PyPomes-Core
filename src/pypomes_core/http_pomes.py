@@ -217,7 +217,7 @@ def __http_json_from_rest(errors: list[str], rest_op: str, url: str, headers: di
                                          data=data,
                                          json=json,
                                          timeout=timeout)
-            case _:
+            case _:  # PUT
                 response = requests.put(url=url,
                                         headers=headers,
                                         params=params,
@@ -239,10 +239,12 @@ def __http_json_from_rest(errors: list[str], rest_op: str, url: str, headers: di
         # the operation raised an exception
         err_msg = f"Error on {rest_op} '{url}': '{exc_format(e, sys.exc_info())}'"
 
+    # is there an error message ?
     if err_msg:
+        # yes, log and/or save it
         if logger:
             logger.error(err_msg)
-        if errors is not None:
+        if errors:
             errors.append(err_msg)
 
     return result
