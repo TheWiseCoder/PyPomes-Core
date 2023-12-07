@@ -78,6 +78,7 @@ ignore = [
     "D204",     # 1 blank line required after class docstring
     "D210",     # whitespaces surrounding docstring text
     "D212",     # multi-line docstring summary to start at the second line
+    "DTZ005",   # the use of datetime.datetime.now() without tz argument is not allowed
     "G004",     # logging statement uses 'f-string'
     "PGH004",   # use specific rule codes when using 'noqa'
     "PLR2004",  # magic value used in comparison, consider replacing it with a constant variable
