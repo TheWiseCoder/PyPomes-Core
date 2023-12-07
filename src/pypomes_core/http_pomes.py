@@ -127,29 +127,7 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
     :param logger: optional logger
     :return: the contents of the JSON string
     """
-    # initialize the return variable
-    result: Any = None
-
-    if logger:
-        logger.debug(f"GETing '{url}'")
-
-    try:
-        response: requests.Response = requests.get(url=url,
-                                                   headers=headers,
-                                                   params=params,
-                                                   timeout=timeout)
-        result = response.json()
-        if logger:
-            logger.debug(f"GETed '{url}', "
-                         f"status {response.status_code} ({http_status_name(response.status_code)})")
-    except Exception as e:
-        err_msg: str = f"Error GETing '{url}': '{exc_format(e, sys.exc_info())}'"
-        if logger:
-            logger.error(err_msg)
-        if errors is not None:
-            errors.append(err_msg)
-
-    return result
+    return __http_json_from_rest(errors, "GET", url, headers, params, None, None, timeout, logger)
 
 
 def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None,
@@ -171,31 +149,7 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
     :param logger: optional logger to log the operation with
     :return: the contents of the JSON string
     """
-    # initialize the return variable
-    result: Any = None
-
-    if logger:
-        logger.debug(f"POSTing '{url}'")
-
-    try:
-        response: requests.Response = requests.post(url=url,
-                                                    headers=headers,
-                                                    data=data,
-                                                    json=json,
-                                                    params=params,
-                                                    timeout=timeout)
-        result = response.json()
-        if logger:
-            logger.debug(f"POSTed '{url}', "
-                         f"status {response.status_code} ({http_status_name(response.status_code)})")
-    except Exception as e:
-        err_msg: str = f"Error POSTing '{url}': '{exc_format(e, sys.exc_info())}'"
-        if logger:
-            logger.error(err_msg)
-        if errors is not None:
-            errors.append(err_msg)
-
-    return result
+    return __http_json_from_rest(errors, "POST", url, headers, params, data, json, timeout, logger)
 
 
 def http_json_from_put(errors: list[str] | None, url: str, headers: dict = None,
@@ -217,25 +171,75 @@ def http_json_from_put(errors: list[str] | None, url: str, headers: dict = None,
     :param logger: optional logger to log the operation with
     :return: the contents of the JSON string
     """
+    return __http_json_from_rest(errors, "PUT", url, headers, params, data, json, timeout, logger)
+
+
+def __http_json_from_rest(errors: list[str], rest_op: str, url: str, headers: dict,
+                          params: dict, data: dict | None, json: dict | None,
+                          timeout: int, logger: logging.Logger) -> Any:
+    """
+    Retrieve the *JSON* content of a REST request to the given *url*.
+
+    The *JSON* content is typically returned as a *dict*, or as a *list[dict]* .
+    The request might contain *headers* and *parameters*.
+
+    :param errors: incidental error messages
+    :param rest_op: the REST operation (GET, POST or PUT)
+    :param url: the destination URL
+    :param headers: optional headers
+    :param params: optional parameters
+    :param data: optionaL data to send in the body of the request
+    :param json: optional JSON to send in the body of the request
+    :param timeout: timeout, in seconds (defaults to HTTP_POST_TIMEOUT - use None to omit)
+    :param logger: optional logger to log the operation with
+    :return: the contents of the JSON string
+    """
     # initialize the return variable
     result: Any = None
 
     if logger:
-        logger.debug(f"PUTing '{url}'")
+        logger.debug(f"{rest_op} '{url}'")
+    err_msg: str | None = None
 
     try:
-        response: requests.Response = requests.put(url=url,
-                                                   headers=headers,
-                                                   data=data,
-                                                   json=json,
-                                                   params=params,
-                                                   timeout=timeout)
-        result = response.json()
+        # send the REST request
+        response: requests.Response
+        match rest_op:
+            case "GET":
+                response = requests.get(url=url,
+                                        headers=headers,
+                                        params=params,
+                                        timeout=timeout)
+            case "POST":
+                response = requests.post(url=url,
+                                         headers=headers,
+                                         params=params,
+                                         data=data,
+                                         json=json,
+                                         timeout=timeout)
+            case _:
+                response = requests.put(url=url,
+                                        headers=headers,
+                                        params=params,
+                                        data=data,
+                                        json=json,
+                                        timeout=timeout)
         if logger:
-            logger.debug(f"PUTed '{url}', "
+            logger.debug(f"{rest_op} '{url}', "
                          f"status {response.status_code} ({http_status_name(response.status_code)})")
+
+        # was the request successful ?
+        if response.status_code in [200, 201, 202, 203]:
+            # yes, retrieve the JSON returned
+            result = response.json()
+        else:
+            # no, report the problem
+            err_msg = f"{rest_op} request failed: status {response.status_code}, reason '{response.reason}'"
     except Exception as e:
-        err_msg: str = f"Error PUTing '{url}': '{exc_format(e, sys.exc_info())}'"
+        # the operation raised an exception
+        err_msg = f"Error on {rest_op} '{url}': '{exc_format(e, sys.exc_info())}'"
+
+    if err_msg:
         if logger:
             logger.error(err_msg)
         if errors is not None:
