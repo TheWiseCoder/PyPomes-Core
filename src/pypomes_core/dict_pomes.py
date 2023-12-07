@@ -1,6 +1,5 @@
 import inspect
 import types
-from typing import Any
 
 
 def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
@@ -79,7 +78,7 @@ def dict_get_value(source: dict, key_chain: list[str]) -> any:
             result = None
             break
 
-        # dos the key refer to an elemenent in a list ?
+        # does the key refer to an elemenent in a list ?
         if key[-1] == "]":
             # yes, retrieve it
             pos: int = key.find("[")
@@ -96,7 +95,7 @@ def dict_get_value(source: dict, key_chain: list[str]) -> any:
                 # no, abort the operation
                 result = None
         else:
-            # no, retrieve the element corresponding to 'key' in the dictionary
+            # proceeding is not possible, the element corresponding to 'key' in the dictionary
             result = result.get(key)
 
     return result
@@ -297,43 +296,43 @@ def dict_get_keys(source: dict, value: any) -> list[str]:
 
 def dict_merge(target: dict, source: dict) -> None:
     """
-    Percorre os elementos de *source* para atualizar *target*, obedecendo um conjunto de critérios.
+    Traverse the elements in *source* to update *target*, according to a set of criteria.
 
-    Os critérios a sere mseguidos são:
-      - acrescentar o elemento a *target*, se não existir
-      - se o elemento existir em *target*:
+    The criteria to be followed are:
+      - add the element to *target*, if it does not exist
+      - if the element exists in *target*:
 
-        - processar recursivamente os dois elementos, se ambos forem do tipo *dict*
-        - acrescentar os itens faltantes, se ambos forem do tipo *list*
-        - substituir o elemento em *target* se for de outro tipo, ou se os tipos forem diferentes entre si
+        - recursively process both elements, if both are type *dict*
+        - add the missing items, if both are type *list*
+        - replace the element in *target* se it is a different type, ou if both elements are not the same type
 
-    :param target: o dicionário a ser atualizado
-    :param source: o dicionário com os novos elementos
+    :param target: the dictionary to be updated
+    :param source: the dictionary with the new elements
     """
-    # percorre o dicionário com os novos elementos
+    # traverse the dictionary with the new elements
     for skey, svalue in source.items():
 
-        # o item existe em target ?
+        # is the item in target ?
         if skey in target:
-            # sim, prossiga
+            # yes, proceed
             tvalue: any = target.get(skey)
 
-            # ambos os elementos são dicionários ?
+            # are both elements dictionaries  ?
             if isinstance(svalue, dict) and isinstance(tvalue, dict):
-                # sim, processe-os recursivamente
+                # yes, recursively process them
                 dict_merge(tvalue, svalue)
 
-            # ambos os elementos são listas ?
+            # are both elements lists ?
             elif isinstance(svalue, list) and isinstance(tvalue, list):
-                # sim, acrescente os elementos faltantes
+                # yes, add the missing elements
                 for item in svalue:
                     if item not in tvalue:
                         tvalue.append(item)
             else:
-                # os elementos não são ambos listas ou dicionários, substitua o valor em target
+                # both elements are not lists or dictionarie, replace the value in target
                 target[skey] = svalue
         else:
-            # não, acrescente-o
+            # the item is not in target, add it
             target[skey] = svalue
 
 
@@ -613,16 +612,16 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
     return result
 
 
-def dict_clone(source: dict, from_to_keys: list[Any]) -> dict:
+def dict_clone(source: dict, from_to_keys: list) -> dict:
     """
-    Buiild a new *dict*, according to the rules presented herein.
+    Build a new *dict*, according to the rules presented herein.
 
     This dictionary is constructed by creating a new element for each element in the list
     *from_to_keys*. When the element of this list is a tuple, the name indicated by its
-    second term is used, assigning it the value of the *source* element indicated
-    by tuple´s first term. This first term can be represented by a chain of  nested keys.
+    second term is used, and the value of the *source* element indicated by the tuple´s
+    first term is assigned. This first term can be represented by a chain of  nested keys.
     The name of the element to be created can be omitted, in which case the name of the term
-    indicative of the value to be assigned, is used. If the corresponding value is not found
+    indicative of the value to be assigned is used. If the corresponding value is not found
     in *source*, *None* is assigned.
 
     :param source: the source dict
@@ -646,49 +645,48 @@ def dict_clone(source: dict, from_to_keys: list[Any]) -> dict:
 
 def dict_listify(target: dict, key_chain: list[str]) -> None:
     """
-    Insere o valor do item de *target* apontado pela cadeia de chaves *[keys[0]: ... :keys[n]* em uma lista.
+    Insert the value of the item pointed to by the key chain *[keys[0]: ... :keys[n]* in a list.
 
-    Essa inserção ocorrerá apenas se esse valor já não for uma lista.
-    Todas as listas eventualmente encontradas no percurso até a penúltima chava
-    da cadeia serão recursivamente processadas.
+    This insertion will happen only if such a value is not itself a list.
+    All lists eventually found, up to the penultimate key in the chain, will be processed recursively.
 
-    :param target: dicionário a ser modificado
-    :param key_chain: cadeia de chaves aninhadas apontando para o item em questão
+    :param target: the dictionary to be modified
+    :param key_chain: the chain of nested keys pointing to the item in question
     """
     def items_listify(in_targets: list, in_keys: list[str]) -> None:
 
-        # percorra os itens da lista
+        # traverse the list
         for in_target in in_targets:
-            # o elemento é um dicionário ?
+            # is the element a dictionary ?
             if isinstance(in_target, dict):
-                # sim, processe-o
+                # yes, process it
                 dict_listify(in_target, in_keys)
-            # o elemento é uma lista ?
+            # is the element a list ?
             elif isinstance(in_target, list):
-                # sim, processe-o recursivamente
-                # (cadeia de chaves também se aplica a listas diretamente aninhadas em listas)
+                # yes, recursively process it
+                # (key chain is also applicable to lists directly nested in lists)
                 items_listify(in_target, in_keys)
 
     parent: any = target
-    # percorre a cadeia até a penúltima chave
+    # traverse the chain up to its penultimate key
     for inx, key in enumerate(key_chain[:-1]):
         parent = parent.get(key)
-        # o item é uma lista ?
+        # is the item a list ?
         if isinstance(parent, list):
-            # sim, processe-o e encerre a operação
+            # yess, process it and close the operation
             items_listify(parent, key_chain[inx+1:])
             parent = None
 
-        # é possível prosseguir ?
+        # is it possible to proceed ?
         if not isinstance(parent, dict):
-            # não, aborte o loop
+            # no, exit the loop
             break
 
     if isinstance(parent, dict) and len(key_chain) > 0:
         key: str = key_chain[-1]
-        # o item existe e não é uma lista ?
+        # does the item exist and is not a list ?
         if key in parent and not isinstance(parent.get(key), list):
-            # sim, insira-o em uma lista
+            # yes, insert it in a list
             item: any = parent.pop(key)
             parent[key] = [item]
 
