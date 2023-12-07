@@ -225,7 +225,7 @@ def __http_json_from_rest(errors: list[str], rest_op: str, url: str, headers: di
                                         json=json,
                                         timeout=timeout)
         if logger:
-            logger.debug(f"{rest_op} '{url}', "
+            logger.debug(f"{rest_op} '{url}': "
                          f"status {response.status_code} ({http_status_name(response.status_code)})")
 
         # was the request successful ?
@@ -234,10 +234,16 @@ def __http_json_from_rest(errors: list[str], rest_op: str, url: str, headers: di
             result = response.json()
         else:
             # no, report the problem
-            err_msg = f"{rest_op} request failed: status {response.status_code}, reason '{response.reason}'"
+            err_msg = (
+                f"{rest_op} '{url}' request failed: "
+                f"status {response.status_code}, reason '{response.reason}'"
+            )
     except Exception as e:
         # the operation raised an exception
-        err_msg = f"Error on {rest_op} '{url}': '{exc_format(e, sys.exc_info())}'"
+        err_msg = (
+            f"Error on {rest_op} '{url}': "
+            f"'{exc_format(e, sys.exc_info())}'"
+        )
 
     # is there an error message ?
     if err_msg:

@@ -2,7 +2,7 @@ from typing import Final
 
 __ERR_MSGS: Final[dict] = {
     101: {
-        "en": "Error accessing the DB {} in { }: {}",
+        "en": "Error accessing the DB {} in {}: {}",
         "pt": "Erro na interação com o BD {} em {}: {}",
     },
     102: {
@@ -107,7 +107,7 @@ __ERR_MSGS: Final[dict] = {
     },
     141: {
         "en": "Error invoking service {}: {}",
-        "pt": "Erro na interação com o serviço {}: {}",
+        "pt": "Erro na invocação do serviço {}: {}",
     },
 }
 _ERR_MSGS_EN: dict = {}

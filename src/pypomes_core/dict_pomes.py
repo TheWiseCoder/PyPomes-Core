@@ -296,7 +296,7 @@ def dict_get_keys(source: dict, value: any) -> list[str]:
 
 def dict_merge(target: dict, source: dict) -> None:
     """
-    Traverse the elements in *source* to update *target*, according to a set of criteria.
+    Traverse the elements in *source* to update *target*, according to the criteria presented herein.
 
     The criteria to be followed are:
       - add the element to *target*, if it does not exist
