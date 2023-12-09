@@ -31,7 +31,7 @@ from .http_pomes import (
     MIMETYPE_TEXT, MIMETYPE_URLENCODED, MIMETYPE_XML, MIMETYPE_ZIP,
     http_status_code, http_status_name, http_status_description,
     http_json_from_form, http_json_from_request,
-    http_json_from_get, http_json_from_post, http_json_from_put,
+    http_get, http_post, http_put,
 )
 from .json_pomes import (
     json_normalize_dict, json_normalize_iterable,
@@ -89,7 +89,7 @@ __all__ = [
     "MIMETYPE_TEXT", "MIMETYPE_URLENCODED", "MIMETYPE_XML", "MIMETYPE_ZIP",
     "http_status_code", "http_status_name", "http_status_description",
     "http_json_from_form", "http_json_from_request",
-    "http_json_from_get", "http_json_from_post", "http_json_from_put",
+    "http_get", "http_post", "http_put",
     # json_pomes
     "json_normalize_dict", "json_normalize_iterable",
     # logging_pomes

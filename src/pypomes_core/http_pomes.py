@@ -2,7 +2,8 @@ import logging
 import requests
 import sys
 from flask import Request
-from typing import Any, Final
+from requests import Response
+from typing import Final
 from werkzeug.exceptions import BadRequest
 
 from .env_pomes import APP_PREFIX, env_get_int
@@ -110,13 +111,13 @@ def http_json_from_request(request: Request) -> dict:
     return result
 
 
-def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
-                       params: dict = None, timeout: int | None = HTTP_GET_TIMEOUT,
-                       logger: logging.Logger = None) -> Any:
+def http_get(errors: list[str] | None, url: str, headers: dict = None,
+             params: dict = None, timeout: int | None = HTTP_GET_TIMEOUT,
+             logger: logging.Logger = None) -> Response:
     """
-    Retrieve the *JSON* content of a *GET* request to the given *url*.
+    Issue a *GET* request to the given *url*, and retriever the returned response.
 
-    The *JSON* content is typically returned as a *dict*, or as a *list[dict]* .
+    The returned response might be *None*.
     The request might contain *headers* and *parameters*.
 
     :param errors: incidental error messages
@@ -125,18 +126,18 @@ def http_json_from_get(errors: list[str] | None, url: str, headers: dict = None,
     :param params: optional parameters
     :param timeout: timeout, in seconds (defaults to HTTP_GET_TIMEOUT - use None to omit)
     :param logger: optional logger
-    :return: the contents of the JSON string
+    :return: the response to the GET operation
     """
-    return __http_json_from_rest(errors, "GET", url, headers, params, None, None, timeout, logger)
+    return __http_rest(errors, "GET", url, headers, params, None, None, timeout, logger)
 
 
-def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None,
-                        params: dict = None, data: dict = None, json: dict = None,
-                        timeout: int | None = HTTP_POST_TIMEOUT, logger: logging.Logger = None) -> Any:
+def http_post(errors: list[str] | None, url: str, headers: dict = None,
+              params: dict = None, data: dict = None, json: dict = None,
+              timeout: int | None = HTTP_POST_TIMEOUT, logger: logging.Logger = None) -> Response:
     """
-    Retrieve the *JSON* content of a *POST* request to the given *url*.
+    Issue a *POST* request to the given *url*, and retriever the returned response.
 
-    The *JSON* content is typically returned as a *dict*, or as a *list[dict]* .
+    The returned response might be *None*.
     The request might contain *headers* and *parameters*.
 
     :param errors: incidental error messages
@@ -147,18 +148,18 @@ def http_json_from_post(errors: list[str] | None, url: str, headers: dict = None
     :param json: optional JSON to send in the body of the request
     :param timeout: timeout, in seconds (defaults to HTTP_POST_TIMEOUT - use None to omit)
     :param logger: optional logger to log the operation with
-    :return: the contents of the JSON string
+    :return: the response to the POST operation
     """
-    return __http_json_from_rest(errors, "POST", url, headers, params, data, json, timeout, logger)
+    return __http_rest(errors, "POST", url, headers, params, data, json, timeout, logger)
 
 
-def http_json_from_put(errors: list[str] | None, url: str, headers: dict = None,
-                       params: dict = None, data: dict = None, json: dict = None,
-                       timeout: int | None = HTTP_POST_TIMEOUT, logger: logging.Logger = None) -> Any:
+def http_put(errors: list[str] | None, url: str, headers: dict = None,
+             params: dict = None, data: dict = None, json: dict = None,
+             timeout: int | None = HTTP_POST_TIMEOUT, logger: logging.Logger = None) -> Response:
     """
-    Retrieve the *JSON* content of a *PUT* request to the given *url*.
+    Issue a *PUT* request to the given *url*, and retriever the returned response.
 
-    The *JSON* content is typically returned as a *dict*, or as a *list[dict]* .
+    The returned response might be *None*.
     The request might contain *headers* and *parameters*.
 
     :param errors: incidental error messages
@@ -169,18 +170,18 @@ def http_json_from_put(errors: list[str] | None, url: str, headers: dict = None,
     :param json: optional JSON to send in the body of the request
     :param timeout: timeout, in seconds (defaults to HTTP_POST_TIMEOUT - use None to omit)
     :param logger: optional logger to log the operation with
-    :return: the contents of the JSON string
+    :return: the response to the PUT operation
     """
-    return __http_json_from_rest(errors, "PUT", url, headers, params, data, json, timeout, logger)
+    return __http_rest(errors, "PUT", url, headers, params, data, json, timeout, logger)
 
 
-def __http_json_from_rest(errors: list[str], rest_op: str, url: str, headers: dict,
-                          params: dict, data: dict | None, json: dict | None,
-                          timeout: int, logger: logging.Logger) -> Any:
+def __http_rest(errors: list[str], rest_op: str, url: str, headers: dict,
+                params: dict, data: dict | None, json: dict | None,
+                timeout: int, logger: logging.Logger) -> Response:
     """
-    Retrieve the *JSON* content of a REST request to the given *url*.
+    Issue a *REST* request to the given *url*, and retriever the returned response.
 
-    The *JSON* content is typically returned as a *dict*, or as a *list[dict]* .
+    The returned response might be *None*.
     The request might contain *headers* and *parameters*.
 
     :param errors: incidental error messages
@@ -192,10 +193,10 @@ def __http_json_from_rest(errors: list[str], rest_op: str, url: str, headers: di
     :param json: optional JSON to send in the body of the request
     :param timeout: timeout, in seconds (defaults to HTTP_POST_TIMEOUT - use None to omit)
     :param logger: optional logger to log the operation with
-    :return: the contents of the JSON string
+    :return: the response to the REST operation
     """
     # initialize the return variable
-    result: Any = None
+    result: Response | None = None
 
     if logger:
         logger.debug(f"{rest_op} '{url}'")
@@ -203,40 +204,36 @@ def __http_json_from_rest(errors: list[str], rest_op: str, url: str, headers: di
 
     try:
         # send the REST request
-        response: requests.Response
         match rest_op:
             case "GET":
-                response = requests.get(url=url,
-                                        headers=headers,
-                                        params=params,
-                                        timeout=timeout)
+                result = requests.get(url=url,
+                                      headers=headers,
+                                      params=params,
+                                      timeout=timeout)
             case "POST":
-                response = requests.post(url=url,
-                                         headers=headers,
-                                         params=params,
-                                         data=data,
-                                         json=json,
-                                         timeout=timeout)
-            case _:  # PUT
-                response = requests.put(url=url,
-                                        headers=headers,
-                                        params=params,
-                                        data=data,
-                                        json=json,
-                                        timeout=timeout)
+                result = requests.post(url=url,
+                                       headers=headers,
+                                       params=params,
+                                       data=data,
+                                       json=json,
+                                       timeout=timeout)
+            case "PUT":
+                result = requests.put(url=url,
+                                      headers=headers,
+                                      params=params,
+                                      data=data,
+                                      json=json,
+                                      timeout=timeout)
         if logger:
             logger.debug(f"{rest_op} '{url}': "
-                         f"status {response.status_code} ({http_status_name(response.status_code)})")
+                         f"status {result.status_code} ({http_status_name(result.status_code)})")
 
         # was the request successful ?
-        if response.status_code in [200, 201, 202, 203]:
-            # yes, retrieve the JSON returned
-            result = response.json()
-        else:
+        if result.status_code not in [200, 201, 202, 203]:
             # no, report the problem
             err_msg = (
                 f"{rest_op} '{url}': failed, "
-                f"status {response.status_code}, reason '{response.reason}'"
+                f"status {result.status_code}, reason '{result.reason}'"
             )
     except Exception as e:
         # the operation raised an exception
