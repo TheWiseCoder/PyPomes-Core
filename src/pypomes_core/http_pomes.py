@@ -247,7 +247,7 @@ def __http_rest(errors: list[str], rest_op: str, url: str, headers: dict,
         # yes, log and/or save it
         if logger:
             logger.error(err_msg)
-        if errors:
+        if errors is not None:
             errors.append(err_msg)
 
     return result
