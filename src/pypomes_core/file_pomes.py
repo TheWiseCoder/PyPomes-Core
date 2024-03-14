@@ -38,3 +38,35 @@ def file_from_request(request: Request, file_name: str = None, file_seq: int = 0
             result: bytes = file.stream.read()
 
     return result
+
+
+def file_get_data(file_data: str | bytes) -> bytes:
+    """
+    Retrieve and return the data in *file_data* (typeipo *bytes*), or in a file in path *file_data* (tipo *str*).
+
+    :param file_data: file data, or the path to locate the file
+    :return: the data
+    """
+    # declare the return variable
+    result: bytes
+
+    # what is the argument type ?
+    if isinstance(file_data, bytes):
+        # argument is type 'bytes'
+        result = file_data
+
+    else:  # isinstance(file_data, str)
+        # argumento is a file path
+        buf_size: int = 128 * 1024
+        file: Path = Path(file_data)
+        with file.open("rb") as f:
+            file_bytes: bytearray = bytearray()
+            while True:
+                in_bytes: bytes = f.read(buf_size)
+                if in_bytes:
+                    file_bytes += in_bytes
+                else:
+                    break
+        result = bytes(file_bytes)
+
+    return result

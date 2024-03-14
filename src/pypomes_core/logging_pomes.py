@@ -9,7 +9,6 @@ from typing import Final, Literal, TextIO
 from .datetime_pomes import DATETIME_FORMAT_INV
 from .env_pomes import APP_PREFIX, env_get_str, env_get_path
 from .file_pomes import TEMP_DIR
-from .http_pomes import MIMETYPE_TEXT
 
 
 def __get_logging_level(level: Literal["debug", "info", "warning", "error", "critical"]) -> int:
@@ -66,70 +65,12 @@ for _handler in logging.root.handlers:
     _handler.addFilter(logging.Filter(LOGGING_ID))
 
 
-def logging_request_entries(request: Request, as_attachment: bool = False) -> Response:
-    """
-    Retrieve from the log file, and return, the entries matching the criteria specified.
-
-    These criteria are specified in the query string of the HTTP request, according to the pattern
-    *path=<log-path>&level=<log-level>&from=YYYYMMDDhhmmss&to=YYYYMMDDhhmmss>*
-
-    All criteria are optional:
-        - path: the path of the log file
-        - level: the logging level of the entries
-        - from: the start timestamp
-        - to: the finish timestamp
-
-    :param request: the HTTP request
-    :param as_attachment: indicate to browser that it should offer to save the file, or just display it
-    :return: file containing the log entries requested on success, or incidental errors on fail
-    """
-    # declare the return variable
-    result: Response
-
-    # initialize the error messages list
-    errors: list[str] = []
-
-    # obtain the logging level
-    log_level: str = request.args.get("level")
-
-    # obtain the initial and final timestamps
-    log_from: str = request.args.get("from")
-    log_to: str = request.args.get("to")
-
-    # obtain the path for the log file
-    log_path: str = request.args.get("path") or LOGGING_FILE_PATH
-
-    # retrieve the log entries
-    # noinspection PyTypeChecker
-    log_entries: BytesIO = logging_get_entries(errors, log_level, log_from, log_to, log_path)
-
-    # any error ?
-    if len(errors) == 0:
-        # no, return the log entries requested as an attached file
-        base: str = "entries" if not log_from or not log_to else \
-            (
-                f"{''.join(ch for ch in log_from if ch.isdigit())}"
-                f"{'_'.join(ch for ch in log_to if ch.isdigit())}"
-            )
-        log_file = f"log_{base}.log"
-        log_entries.seek(0)
-        result = send_file(path_or_file=log_entries,
-                           mimetype=MIMETYPE_TEXT,
-                           as_attachment=as_attachment,
-                           download_name=log_file)
-    else:
-        # yes, report the failure
-        result = Response(json.dumps({"errors": errors}), status=401,  mimetype="text/plain")
-
-    return result
-
-
 def logging_get_entries(errors: list[str],
-                        log_level:  Literal["debug", "info", "warning", "error", "critical"] = None,
+                        log_level: Literal["debug", "info", "warning", "error", "critical"] = None,
                         log_from: str = None, log_to: str = None,
                         log_path: Path | str = LOGGING_FILE_PATH) -> BytesIO:
     """
-    Extract and return all entries in the logging file *file_path*.
+    Extract and return all entries in the logging file *log_path*.
 
     It is expected for this logging file to be compliant with *PYPOMES_LOGGER*'s default format.
     The extraction meets the criteria specified by *log_level*, and by the inclusive interval *[log_from, log_to]*.
@@ -189,6 +130,64 @@ def logging_get_entries(errors: list[str],
     return result
 
 
+def logging_get_entries_from_request(request: Request, as_attachment: bool = False) -> Response:
+    """
+    Retrieve from the log file, and return, the entries matching the criteria specified.
+
+    These criteria are specified in the query string of the HTTP request, according to the pattern
+    *path=<log-path>&level=<log-level>&from=YYYYMMDDhhmmss&to=YYYYMMDDhhmmss>*
+
+    All criteria are optional:
+        - path: the path of the log file
+        - level: the logging level of the entries
+        - from: the start timestamp
+        - to: the finish timestamp
+
+    :param request: the HTTP request
+    :param as_attachment: indicate to browser that it should offer to save the file, or just display it
+    :return: file containing the log entries requested on success, or incidental errors on fail
+    """
+    # declare the return variable
+    result: Response
+
+    # initialize the error messages list
+    errors: list[str] = []
+
+    # obtain the logging level
+    log_level: str = request.args.get("level")
+
+    # obtain the initial and final timestamps
+    log_from: str = request.args.get("from")
+    log_to: str = request.args.get("to")
+
+    # obtain the path for the log file
+    log_path: str = request.args.get("path") or LOGGING_FILE_PATH
+
+    # retrieve the log entries
+    # noinspection PyTypeChecker
+    log_entries: BytesIO = logging_get_entries(errors, log_level, log_from, log_to, log_path)
+
+    # any error ?
+    if len(errors) == 0:
+        # no, return the log entries requested as an attached file
+        base: str = "entries" if not log_from or not log_to else \
+            (
+                f"{''.join(ch for ch in log_from if ch.isdigit())}"
+                f"{'_'.join(ch for ch in log_to if ch.isdigit())}"
+            )
+        log_file = f"log_{base}.log"
+        log_entries.seek(0)
+        result = send_file(path_or_file=log_entries,
+                           mimetype="text/plain",
+                           as_attachment=as_attachment,
+                           download_name=log_file)
+    else:
+        # yes, report the failure
+        result = Response(json.dumps({"errors": errors}), status=401,  mimetype="text/plain")
+
+    return result
+
+
 def logging_log_msgs(msgs: list[str], output_dev: TextIO = None,
                      log_level: Literal["debug", "info", "warning", "error", "critical"] = "error",
                      logger: logging.Logger = PYPOMES_LOGGER) -> None:
@@ -223,12 +222,98 @@ def logging_log_msgs(msgs: list[str], output_dev: TextIO = None,
             # yes, log the message
             log_writer(msg)
 
-        # has the output device been defined ?
-        if output_dev:
-            # yes, write the message to it
-            output_dev.write(msg)
+        # write to output
+        __write_to_output(msg, output_dev)
 
-            # is the output device 'stderr' ou 'stdout' ?
-            if output_dev.name.startswith("<std"):
-                # yes, skip to the next line
-                output_dev.write("\n")
+
+def logging_log_debug(msg: str, output_dev: TextIO = None,
+                      logger: logging.Logger = PYPOMES_LOGGER) -> None:
+    """
+    Write debug-level message *msg* to *logger*'s logging file, and to *output_dev*.
+
+    The output device is tipically *sys.stdout* or *sys.stderr*.
+
+    :param msg: the message to log
+    :param output_dev: output device where the message is to be printed (None for no device printing)
+    :param logger: the logger to use
+    """
+    # log the message
+    logger.debug(msg)
+    __write_to_output(msg, output_dev)
+
+
+def logging_log_info(msg: str, output_dev: TextIO = None,
+                     logger: logging.Logger = PYPOMES_LOGGER) -> None:
+    """
+    Write info-level message *msg* to *logger*'s logging file, and to *output_dev*.
+
+    The output device is tipically *sys.stdout* or *sys.stderr*.
+
+    :param msg: the message to log
+    :param output_dev: output device where the message is to be printed (None for no device printing)
+    :param logger: the logger to use
+    """
+    # log the message
+    logger.info(msg)
+    __write_to_output(msg, output_dev)
+
+
+def logging_log_warning(msg: str, output_dev: TextIO = None,
+                        logger: logging.Logger = PYPOMES_LOGGER) -> None:
+    """
+    Write warning-level message *msg* to *logger*'s logging file, and to *output_dev*.
+
+    The output device is tipically *sys.stdout* or *sys.stderr*.
+
+    :param msg: the message to log
+    :param output_dev: output device where the message is to be printed (None for no device printing)
+    :param logger: the logger to use
+    """
+    # log the message
+    logger.debug(msg)
+    __write_to_output(msg, output_dev)
+
+
+def logging_log_error(msg: str, output_dev: TextIO = None,
+                      logger: logging.Logger = PYPOMES_LOGGER) -> None:
+    """
+    Write error-level message *msg* to *logger*'s logging file, and to *output_dev*.
+
+    The output device is tipically *sys.stdout* or *sys.stderr*.
+
+    :param msg: the message to log
+    :param output_dev: output device where the message is to be printed (None for no device printing)
+    :param logger: the logger to use
+    """
+    # log the message
+    logger.debug(msg)
+    __write_to_output(msg, output_dev)
+
+
+def logging_log_critical(msg: str, output_dev: TextIO = None,
+                         logger: logging.Logger = PYPOMES_LOGGER) -> None:
+    """
+    Write critical-level message *msg* to *logger*'s logging file, and to *output_dev*.
+
+    The output device is tipically *sys.stdout* or *sys.stderr*.
+
+    :param msg: the message to log
+    :param output_dev: output device where the message is to be printed (None for no device printing)
+    :param logger: the logger to use
+    """
+    # log the message
+    logger.debug(msg)
+    __write_to_output(msg, output_dev)
+
+
+def __write_to_output(msg: str, output_dev: TextIO) -> None:
+
+    # has the output device been defined ?
+    if output_dev:
+        # yes, write the message to it
+        output_dev.write(msg)
+
+        # is the output device 'stderr' ou 'stdout' ?
+        if output_dev.name.startswith("<std"):
+            # yes, skip to the next line
+            output_dev.write("\n")

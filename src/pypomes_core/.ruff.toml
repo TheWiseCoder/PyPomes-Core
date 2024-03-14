@@ -93,6 +93,7 @@ ignore = [
     "TCH001",   # move application import into a type-checking block
     "TCH002",   # Move third-party import into a type-checking block
     "TCH003",   # move standard library import into a type-checking block
+    "TRY003",   # avoid specifying long messages outside the exception class
     "TRY400",   # use 'logging.exception' instead of 'logging.error'
 ]
 
@@ -118,7 +119,7 @@ max-complexity = 20         # upper limit for McCabe code complexity
 max-doc-length = 120
 
 [pylint]
-max-args = 10
+max-args = 16
 max-branches = 32
 max-returns = 1
 max-statements = 60
