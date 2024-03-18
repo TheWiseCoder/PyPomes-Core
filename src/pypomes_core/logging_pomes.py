@@ -270,7 +270,7 @@ def logging_log_warning(msg: str, output_dev: TextIO = None,
     :param logger: the logger to use
     """
     # log the message
-    logger.debug(msg)
+    logger.warning(msg)
     __write_to_output(msg, output_dev)
 
 
@@ -286,7 +286,7 @@ def logging_log_error(msg: str, output_dev: TextIO = None,
     :param logger: the logger to use
     """
     # log the message
-    logger.debug(msg)
+    logger.error(msg)
     __write_to_output(msg, output_dev)
 
 
@@ -302,7 +302,7 @@ def logging_log_critical(msg: str, output_dev: TextIO = None,
     :param logger: the logger to use
     """
     # log the message
-    logger.debug(msg)
+    logger.critical(msg)
     __write_to_output(msg, output_dev)
 
 

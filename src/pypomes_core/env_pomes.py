@@ -29,7 +29,7 @@ def env_get_bool(key: str, def_value: bool = None) -> bool:
     """
     result: bool
     try:
-        result = bool(os.environ[key])
+        result = bool(int(os.environ[key]))
     except (KeyError, TypeError):
         result = def_value
 
