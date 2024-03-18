@@ -13,6 +13,4 @@ tmp
 *.ps1
 /dist
 /env
-.vscode
-*.py[cod]
 deploy.txt
