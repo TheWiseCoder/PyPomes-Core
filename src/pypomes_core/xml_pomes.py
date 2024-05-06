@@ -1,43 +1,44 @@
-from pathlib import Path
 from typing import Final
 from xmltodict3 import XmlTextToDict
+
+from .file_pomes import file_get_data
 
 XML_FILE_HEADER: Final[str] = '<?xml version="1.0" encoding="UTF-8" ?>'
 
 
 def xml_normalize_keys(source: dict) -> dict:
     """
-    Clona o *source*, removenda os *namespaces* e os prefixos *'@'* e *'#'* nos nomes de suas chaves.
+    Clone *source*, removing *namespaces* and the prefixes *'@'* e *'#'* from its key names.
 
-    A ordem das chaves é mantida.
+    The key order is kept unchanged.
 
-    :param source: o dict de referência
-    :return: um novo dict normalizado
+    :param source: the reference dict
+    :return: the new, normalized, dict
     """
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: dict = {}
 
-    # percorre o dicionário
+    # traverse the dictionary
     for curr_key, curr_value in source.items():
 
-        # o valor atual é um dicionário ?
+        # is 'curr_value' a dictionary ?
         if isinstance(curr_value, dict):
-            # sim, prossiga recursivamente
+            # yes, proceed recursively
             result[curr_key] = xml_normalize_keys(curr_value)
-        # o valor atual é uma lista ?
+        # is 'curr_value' a list ?
         elif isinstance(curr_value, list):
-            # sim, percorra-a
+            # yes, traverse it
             result[curr_key] = []
             for item in curr_value:
-                # o item da lista é um dicionário ?
+                # is 'item' a dictionary ?
                 if isinstance(item, dict):
-                    # sim, prossiga recursivamente
+                    # yes, proceed recursively
                     result[curr_key].append(xml_normalize_keys(item))
                 else:
                     result[curr_key].append(item)
-        # ä chave atual tem prefixo a ser removido ?
+        # does the current key have a prefix to be removed ?
         elif curr_key[0:1] in ["@", "#"]:
-            # sim
+            # yes, remove it
             result[curr_key[1:]] = curr_value
         else:
             pos: int = curr_key.find(":")
@@ -59,19 +60,13 @@ def xml_to_dict(file_data: bytes | str) -> dict:
     :param file_data: XML a ser convertido
     :return: dict normalizado
     """
-    # file_data é o próprio conteúdo XML ?
-    if isinstance(file_data, bytes):
-        # sim
-        file_bytes: bytes = file_data
-    else:  # elif isinstance(file_date, str):
-        # não, obtenha-o do arquivo
-        with Path.open(Path(file_data), "rb") as f:
-            file_bytes: bytes = f.read()
+    # obtain the file data
+    file_bytes: bytes = file_get_data(file_data)
 
     # converte o XML em dict
     xml_data = XmlTextToDict(xml_text=file_bytes.decode(),
                              ignore_namespace=True)
     result: dict = xml_data.get_dict()
 
-    # normaliza o dict, removendo namespaces e prefixos "@" e "#" nos nomes das chaves
+    # normalize the dict, removing namespaces, and prefixos '@' e '#' from the key names
     return xml_normalize_keys(result)

@@ -73,12 +73,14 @@ ignore = [
     "ANN002",   # missing type annotation for *kargs
     "ANN101",   # missing type annotation for 'self' in method
     "ANN401",   # dynamically typed expressions (typing.Any) are disallowed
+    "COM812",   # checks for the absence of trailing commas
     "COM819",   # prohibited trailing commas
     "D200",     # one-line docstring should fit on one line
     "D204",     # 1 blank line required after class docstring
     "D210",     # whitespaces surrounding docstring text
     "D212",     # multi-line docstring summary to start at the second line
     "DTZ005",   # the use of datetime.datetime.now() without tz argument is not allowed
+    "DTZ006",   # usage of 'datetime.datetime.fromtimestamp()' that do not specify a timezone
     "G004",     # logging statement uses 'f-string'
     "PGH004",   # use specific rule codes when using 'noqa'
     "PLR2004",  # magic value used in comparison, consider replacing it with a constant variable

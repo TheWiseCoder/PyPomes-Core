@@ -1,6 +1,6 @@
-from types import TracebackType
 import os
 import traceback
+from types import TracebackType
 
 
 def exc_format(exc: Exception,

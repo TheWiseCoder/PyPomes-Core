@@ -1,12 +1,12 @@
 [build-system]
 requires = [
-    "hatchling"
+    "hatchling>=1.22.2"
 ]
 build-backend = "hatchling.build"
 
 [project]
 name = "pypomes_core"
-version = "0.7.0"
+version = "0.9.7"
 authors = [
   { name="GT Nunes", email="wisecoder01@gmail.com" }
 ]
@@ -26,7 +26,7 @@ dependencies = [
     "requests>=2.31.0",
     "setuptools>=68.0.0",
     "wheel>=0.42.0",
-    "xmltodict3>=0.0.4",
+    "xmltodict3>=0.0.4"
 ]
 
 [project.urls]

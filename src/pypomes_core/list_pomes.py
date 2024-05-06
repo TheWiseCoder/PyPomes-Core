@@ -1,4 +1,5 @@
-def list_compare(list1: list[any], list2: list[any]) -> bool:
+def list_compare(list1: list[any],
+                 list2: list[any]) -> bool:
     """
     Compare the contents of the two lists *list1* e *list2*.
 
@@ -29,16 +30,16 @@ def list_compare(list1: list[any], list2: list[any]) -> bool:
 
 def list_flatten(source: list[str]) -> str:
     """
-    Transforma uma lista de *str* em uma *str* consistindo na concatenação com "." dos elementos da lista.
+    Buiild and return a *str* by concatenating with "." the elements in *source*.
 
-    Exemplos:
+    Exemples:
         - ['1', '2', '']     -> '1.2.'
         - ['', 'a', 'b']     -> '.a.b'
         - ['x', '', '', 'y'] -> 'x...y'
         - ['z']              -> 'z'
 
-    :param source: a lista de strings
-    :return: a string concatenada
+    :param source: the source list
+    :return: the concatenated elements of the source list
     """
     result: str = ""
     for item in source:
@@ -48,16 +49,16 @@ def list_flatten(source: list[str]) -> str:
 
 def list_unflatten(source: str) -> list[str]:
     """
-    Transforma uma *str* contendo elementos concatenados por "." em uma lista de *str*.
+    Build and return a *list*, by splitting *source* into its components separated by ".".
 
-    Essa lista contem os sub_elementos extraídos. Exemplos:
+    This *list* will contain the extracted components. Exemples:
         - '1.2.'  -> ['1', '2', '']
         - '.a.b'  -> ['', 'a', 'b']
         - 'x...y' -> ['x', '', '', 'y']
         - 'z'     -> ['z']
 
-    :param source: string com elementos concatenados por "."
-    :return: a lista de strings contendo os elementos da concatenação
+    :param source: string with components concatenated by "."
+    :return: the list of strings containing the concatenated components
     """
     # import the needed function
     from .str_pomes import str_split_on_mark
@@ -65,70 +66,73 @@ def list_unflatten(source: str) -> list[str]:
     return str_split_on_mark(source, ".")
 
 
-def list_find_coupled(coupled_elements: list[tuple[str, str]], primary_element: str) -> str:
+def list_find_coupled(coupled_elements: list[tuple[str, str]],
+                      primary_element: str) -> str:
     """
-    Localiza em *coupled_elements* o elemento acoplado ao *primary_element* dado.
+    Locate in *coupled_elements*, and return, the element coupled to *primary_element*.
 
-    Se *primary_element* contiver indicação de índice (denotado por *[<pos>]*), essa indicação é removida.
-    Essa função é utilizada na transformação de *dicts* (*dict_transform*) e *lists* (*list_transform*),
-    a partir de sequências de pares de chaves.
+    If *primary_element* contains an index indication (denoted by *[<pos>]*), this indication is removed.
+    This function is used in the transformation of *dicts* (*dict_transform*) and *lists* (*list_transform*),
+    from sequences of key pairs.
 
-    :param coupled_elements: a lista de tuplas contendo os pares de elementos.
-    :param primary_element: o elemento primário
-    :return: o elemento acoplado, ou None se não for encontrado
+    :param coupled_elements: list of tupl4s containing the pairs of elements
+    :param primary_element: the primary element
+    :return: the couple element, or 'None' if it is not foundo
     """
-    # remove a indicação de elemento de lista
+    # initialize the return variable
+    result: str | None = None
+
+    # remove the list element indication
     pos1: int = primary_element.find("[")
     while pos1 > 0:
         pos2: int = primary_element.find("]", pos1)
         primary_element = primary_element[:pos1] + primary_element[pos2+1:]
         pos1 = primary_element.find("[")
 
-    # inicializa a variável de retorno
-    result: str | None = None
-
-    # percorre a list de elementos acoplados
+    # traverse the list of coupled elements
     for primary, coupled in coupled_elements:
-        # o elemento primário foi encontrado ?
+        # has the primary element been found ?
         if primary == primary_element:
-            # sim, retorne o elemento acoplado correspondente
+            # yes, return the corresponding coupled element
             result = coupled
             break
 
     return result
 
 
-def list_transform(source: list[any], from_to_keys: list[tuple[str, str]],
-                   prefix_from: str = None, prefix_to: str = None) -> list[any]:
+def list_transform(source: list[any],
+                   from_to_keys: list[tuple[str, str]],
+                   prefix_from: str = None,
+                   prefix_to: str = None) -> list[any]:
     """
-    Constrói uma nova *list*, transformando elementos do tipo *list* e *dict* encontrados em *source*.
+    Construct a new *list*, transforming elements of type *list* and *dict* found in *source*.
 
-    A conversão dos elementos tipo *dict* está documentada na função *dict_transform*.
+    The conversion of *dict* type elements is documented in the *dict_transform* function.
 
-    Os prefixos para as chaves de origem e de destino, se definidos, tem tratamentos distintos.
-    São acrescentados na busca de valores em *Source*, e removidos na atribuição de valores
-    ao *dict* de retorno.
+    The prefixes for the source and destination keys, if defined, have different treatments.
+    They are added when searching for values in *Source*, and removed when assigning values
+    to the return *dict*.
 
-    :param source: o dict de origem dos valores
-    :param from_to_keys: a lista de tuplas contendo as sequências de chaves de origem e destino
-    :param prefix_from: prefixo a ser acrescentado às chaves de origem
-    :param prefix_to: prefixo a ser removido das chaves de destino
-    :return: a nova lista
+    :param source: the source 'dict' of the values
+    :param from_to_keys: the list of tuples containing the source and destination key sequences
+    :param prefix_from: prefix to be added to the source keys
+    :param prefix_to: prefix to be removed from the target keys
+    :return: the new list
     """
     # import the needed function
     from .dict_pomes import dict_transform
 
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: list[any] = []
 
-    # percorre a lista de origem
+    # traverse the source list
     for inx, value in enumerate(source):
         if prefix_from is None:
             from_keys: None = None
         else:
             from_keys: str = f"{prefix_from}[{inx}]"
 
-        # obtem o valor de destino
+        # obtain the target value
         if isinstance(value, dict):
             to_value: dict = dict_transform(value, from_to_keys, from_keys, prefix_to)
         elif isinstance(value, list):
@@ -136,28 +140,29 @@ def list_transform(source: list[any], from_to_keys: list[tuple[str, str]],
         else:
             to_value: any = value
 
-        # acrescenta o valor transformado ao resultado
+        # added the value transformed to 'result'
         result.append(to_value)
 
     return result
 
 
 def list_elem_starting_with(source: list[str | bytes],
-                            prefix: str | bytes, keep_prefix: bool = True) -> str | bytes:
+                            prefix: str | bytes,
+                            keep_prefix: bool = True) -> str | bytes:
     """
-    Localiza e retorna o primeiro elemento em *source* prefixado por *prefix*.
+    Locate and return the first element in *source* prefixed by *prefix*.
 
     Retorna *None* se esse elemento não for encontrado.
 
-    :param source: a lista a ser inspecionada
-    :param prefix: o dado prefixando o elemento a ser retornado
-    :param keep_prefix: define se o elemento encontrado deve ou não ser retornado com o prefixo
-    :return: o elemento prefixado, com ou sem o prefixo
+    :param source: the list to be inspected
+    :param prefix: the data prefixing the element to be returned
+    :param keep_prefix: defines whether or not the found element should be returned with the prefix
+    :return: the prefixed element, with or without the prefix, or 'None' if not found
     """
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: str | bytes | None = None
 
-    # percorre a lista de origem
+    # traverse the source list
     for elem in source:
         if elem.startswith(prefix):
             if keep_prefix:

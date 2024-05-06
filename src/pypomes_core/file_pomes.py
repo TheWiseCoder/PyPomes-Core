@@ -3,12 +3,15 @@ from pathlib import Path
 from tempfile import gettempdir
 from typing import Final
 from werkzeug.datastructures import FileStorage
+
 from .env_pomes import APP_PREFIX, env_get_path
 
 TEMP_DIR: Final[Path] = env_get_path(f"{APP_PREFIX}_TEMP_DIR", Path(gettempdir()))
 
 
-def file_from_request(request: Request, file_name: str = None, file_seq: int = 0) -> bytes:
+def file_from_request(request: Request,
+                      file_name: str = None,
+                      file_seq: int = 0) -> bytes:
     """
     Retrieve and return the contents of the file returned in the response to a request.
 
@@ -17,7 +20,7 @@ def file_from_request(request: Request, file_name: str = None, file_seq: int = 0
 
     :param request: the request
     :param file_name: optional name for the file
-    :param file_seq:  sequence number for the file, defaults to the first file
+    :param file_seq: sequence number for the file, defaults to the first file
     :return: the contents retrieved from the file
     """
     # inicialize the return variable
@@ -40,26 +43,26 @@ def file_from_request(request: Request, file_name: str = None, file_seq: int = 0
     return result
 
 
-def file_get_data(file_data: str | bytes) -> bytes:
+def file_get_data(file_data: Path | str | bytes) -> bytes:
     """
-    Retrieve and return the data in *file_data* (typeipo *bytes*), or in a file in path *file_data* (tipo *str*).
+    Retrieve and return the data in *file_data* (type *bytes*), or in a file in path *file_data* (type *Path* or *str*).
 
     :param file_data: file data, or the path to locate the file
-    :return: the data
+    :return: the data, or None if the file data could not be obtained
     """
-    # declare the return variable
-    result: bytes
+    # initialize the return variable
+    result: bytes | None = None
 
     # what is the argument type ?
     if isinstance(file_data, bytes):
         # argument is type 'bytes'
         result = file_data
 
-    else:  # isinstance(file_data, str)
-        # argumento is a file path
+    elif isinstance(file_data, Path | str):
+        # argument is a file path
         buf_size: int = 128 * 1024
-        file: Path = Path(file_data)
-        with file.open("rb") as f:
+        file_path: Path = file_data if isinstance(file_data, Path) else Path(file_data)
+        with file_path.open("rb") as f:
             file_bytes: bytearray = bytearray()
             while True:
                 in_bytes: bytes = f.read(buf_size)

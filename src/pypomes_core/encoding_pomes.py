@@ -1,18 +1,18 @@
 def encode_ascii_hex(source: bytes) -> bytes:
     r"""
-    Codifica o conteúdo binário em texto.
+    Encode binary content in *source* into text.
 
-    Essa codificação é feita com caracteres para bytes no intervalo ASCII,
-    com a representação *backslash-escaped* para os caracteres especiais LF, HT, CR, VT, FF e BS,
-    e com a representação *\\xNN* para os demais (onde *N* é um dígito hexadecimal [0-9] e [a-f]).
+    This encoding is done with characters for bytes in the ASCII range, with the
+    *backslash-escaped* representation for the special characters *LF*, *HT*, *CR*, *VT*, *FF* and *BS*,
+    and with the representation *\\xNN* for the others (where *N* is a hexadecimal digit in *[0-9a-f]*).
 
-    :param source: o conteúdo binário a ser codificado
-    :return: o conteúdo texto codificado
+    :param source: the binary content to be encoded
+    :return: the encoded text content
     """
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: bytes = b""
 
-    # percorre source, codificando os bytes não-ASCII
+    # traverse 'source', encoding the non-ASCII bytes
     pos: int = 0
     while pos < len(source):
         char: bytes = source[pos:pos+1]
@@ -48,19 +48,22 @@ def encode_ascii_hex(source: bytes) -> bytes:
 
 def decode_ascii_hex(source: bytes) -> bytes:
     r"""
-    Decodifica em binário o conteúdo texto.
+    Decode text content in *source* into binary.
 
     Essa decodificação é feita para texto codificado com caracteres para bytes no intervalo ASCII,
     com a representação *backslash-escaped* para os caracteres especiais LF, HT, CR, VT, FF e BS,
     e com a representação *\\xNN* para os demais (onde *N* é um dígito hexadecimal [0-9] e [a-f]).
+    This decoding is done for text encoded with characters for bytes in the ASCII range, with the
+    *backslash-escaped* representation for the special characters *LF*, *HT*, *CR*, *VT*, *FF* and *BS*,
+    and with the representation *\\xNN* for the others (where *N* is a hexadecimal digit in *[0-9a-f]*).
 
-    :param source: o conteúdo texto a ser decodificado
-    :return: o conteúdo binário decodificado
+    :param source: the text content to be decoded
+    :return: the decoded binary content
     """
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: bytes = b""
 
-    # percorre source, decodificando as ocorrências de "\"
+    # traverse 'source', dencoding the occurences of '\'
     byte_val: bytes
     pos1: int = 0
     # localiza o primeiro "\"
@@ -71,8 +74,8 @@ def decode_ascii_hex(source: bytes) -> bytes:
         shift: int = 2
         match next_byte:
             case b"x":
-                # "\x" prefixa um character denotado por string hexadecimal ("\x00" a "\xff")
-                # HAZARD: chars intermediários necessários - int(byte) quebra para byte > b"\x09"
+                # "\x" prefixes a character denoted by a hexadecimal string ('\x00' through '\xff')
+                # HAZARD: intermediate chars are necessary - 'int(byte)' breaks for byte > b'\x09'
                 upper_char: str = source[pos2+2:pos2+3].decode()
                 lower_char: str = source[pos2+3:pos2+4].decode()
                 int_val: int = 16 * int(upper_char, base=16) + int(lower_char, base=16)
@@ -94,7 +97,7 @@ def decode_ascii_hex(source: bytes) -> bytes:
                 byte_val = source[pos2+1:pos2+2]    # o byte seguinte ao "\"
         pos1 = pos2 + shift
         result += byte_val
-        # localiza o próximo "\"
+        # locate the next '\'
         pos2 = source.find(b"\\", pos1)
     result += source[pos1:]
 

@@ -1,3 +1,26 @@
+from typing import Any
+
+
+def str_as_list(source: str | Any,
+                separator: str = ",") -> list[any]:
+    """
+    Return *source* as a *list*, by splitting its comma-separated contents.
+
+    If *source* is not a *str*, then it is itself returned.
+
+    :param source: the source value to be worked on
+    :param separator: the separator (defaults to ",")
+    :return: a list built from the contents of the source parameter, or that parameter itself, if is not string
+    """
+    result: str | list[Any]
+    if isinstance(source, str):
+        result = str.split(separator)
+    else:
+        result = source
+
+    return result
+
+
 def str_sanitize(target_str: str) -> str:
     """
     Clean the given *target_str* string.
@@ -18,15 +41,16 @@ def str_sanitize(target_str: str) -> str:
     return " ".join(cleaned.split())
 
 
-def str_split_on_mark(source: str, mark: str) -> list[str]:
+def str_split_on_mark(source: str,
+                      mark: str) -> list[str]:
     """
-    Extrai, de *source*, os segmentos de texto separados por *mark*, e os retorna em uma lista.
+    Extract from *source* the text segments separated by *mark*, and return them in a *list*.
 
-    Os segmentos retornados não contem o separador.
+    The separator itself will not be in the returned list.
 
-    :param source: o texto de referência
-    :param mark: o separador
-    :return: a lista de segmentos de texto obtidos
+    :param source: the string to be inspected
+    :param mark: the separator
+    :return: the list of text segments extracted
     """
     # inicializa a variável de retorno
     result: list[str] = []
@@ -46,18 +70,37 @@ def str_split_on_mark(source: str, mark: str) -> list[str]:
     return result
 
 
-def str_between(source: str, from_str: str, to_str: str) -> str:
+def str_find_whitespace(source: str) -> int:
     """
-    Extrai e retorna a *substring* em *source* localizada entre os delimitadores *from_st* e *to_str*.
+    Locate and return the position of the first occurence of a *whitespace* character in *source*.
 
-    Retorna *None* se essa extração não for possível.
-
-    :param source: a string a ser pesquisada
-    :param from_str: o delimitador inicial
-    :param to_str: o delimitador final
-    :return: a substring procurada
+    :param source: the string to be inspected
+    :return: the position of the first whitespace character, or -1 if none was found
     """
-    # inicializa a variável de retorno
+    # initialize the return variable
+    result: int = -1
+
+    # search for whitespace
+    for inx, char in enumerate(source):
+        if char.isspace():
+            result = inx
+            break
+
+    return result
+
+
+def str_get_between(source: str,
+                    from_str: str,
+                    to_str: str) -> str:
+    """
+    Extract and return the *substring* in *source* located between the delimiters *from_str* and *to_str*.
+
+    :param source: the string to be inspected
+    :param from_str: the initial delimiter
+    :param to_str: the final delimiter
+    :return: the extracted substring, or None if no substring was obtained
+    """
+    # initialize the return variable
     result: str | None = None
 
     pos1: int = source.find(from_str)
@@ -70,22 +113,26 @@ def str_between(source: str, from_str: str, to_str: str) -> str:
     return result
 
 
-def str_find_whitespace(source: str) -> int:
+def str_get_positional(source: str,
+                       list_origin: list[str],
+                       list_dest: list[str]) -> str:
     """
-    Localiza e retorna a posição da primeira ocorrência de *whitespace* em *source*.
+    Locate the position of *source* within *list_origin*, and return the element in the same position in *list_dest*.
 
-    Retorna *-1* se nenhum *whitespace* for encontrado.
-
-    :param source: a string a ser pesquisada
-    :return: a posição do primeiro whitespace encontrado
+    :param source: the source string
+    :param list_origin: the list to be inspected
+    :param list_dest: the list containing the positionally corresponding values
+    :return: the value positionally corresponding to the source string, or None if not found
     """
-    # inicializa a variável de retorno
-    result: int = -1
+    # declare the return variable
+    result: str | None
 
-    # busca por whitespace
-    for inx, char in enumerate(source):
-        if char.isspace():
-            result = inx
-            break
+    try:
+        pos: int = list_origin.index(source)
+        result = list_dest[pos]
+    except (ValueError, IndexError):
+        result = None
 
     return result
+
+

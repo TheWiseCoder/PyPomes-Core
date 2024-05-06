@@ -17,7 +17,9 @@ TIMEZONE_LOCAL: pytz.BaseTzInfo = pytz.timezone(env_get_str(f"{APP_PREFIX}_TIMEZ
 TIMEZONE_UTC: pytz.BaseTzInfo = pytz.UTC
 
 
-def date_reformat(dt_str: str, to_format: str, **kwargs: any) -> str:
+def date_reformat(dt_str: str,
+                  to_format: str,
+                  **kwargs: any) -> str:
     """
     Convert the date in *dt_str* to the format especified in *to_format*.
 
@@ -41,7 +43,8 @@ def date_reformat(dt_str: str, to_format: str, **kwargs: any) -> str:
     return result
 
 
-def date_parse(dt_str: str, **kwargs: any) -> date:
+def date_parse(dt_str: str,
+               **kwargs: any) -> date:
     """
     Obtain and return the *date* object corresponding to *dt_str*.
 
@@ -61,12 +64,13 @@ def date_parse(dt_str: str, **kwargs: any) -> date:
     return result
 
 
-def datetime_parse(dt_str: str, **kwargs: any) -> datetime:
+def datetime_parse(dt_str: str,
+                   **kwargs: any) -> datetime:
     """
     Obtain and return the *datetime* object corresponding to *dt_str*.
 
     In *kwargs*, it may optionally be specified:
-        -   *dayfirst*, to signal that *day* comes before *month* in *dt_str*
+        -   *dayfirst=True*, to signal that *day* comes before *month* in *dt_str*
         -   *fmt=<format>*, to force use of a specific format
    Return *None* se *dt_str* does not contain a valid date.
 

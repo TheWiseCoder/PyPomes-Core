@@ -1,4 +1,4 @@
-from typing import Final
+from typing import Final, Literal
 
 __ERR_MSGS: Final[dict] = {
     101: {
@@ -6,110 +6,115 @@ __ERR_MSGS: Final[dict] = {
         "pt": "Erro na interação com o BD {} em {}: {}",
     },
     102: {
+        "en": "No record found on DB {}, in {} for {}",
+        "pt": "Nenhum registro encontrado no BD {}, em {} para {}",
+    },
+    103: {
         "en": "Error accessing the object store: {}",
         "pt": "Erro na interação com o armazenador de objetos: {}",
     },
-    103: {
-        "en": "No {} found",
-        "pt": "Nenhum(a) {} encontrado(a)",
-    },
     104: {
-        "en": "Unknown parameter: {}",
-        "pt": "Parâmetro desconhecido: {}",
+        "en": "Unexpected error: {}",
+        "pt": "Error não previsto: {}",
     },
     105: {
-        "en": "Mandatory parameter: {}",
-        "pt": "Parâmetro obrigatório: {}",
+        "en": "Invalid operation {}",
+        "pt": "Operação {} inválida",
     },
     106: {
-        "en": "Invalid value {} for parameter {}",
-        "pt": "Valor {} inválido para o parâmetro {}",
-    },
-    107: {
-        "en": "Invalid value {}: length shorter than {}",
-        "pt": "Valor {} inválido: comprimento menor que {}",
-    },
-    108: {
-        "en": "Invalid value {} for parameter {}: length longer than {}",
-        "pt": "Valor {} inválido para o parâmetro {}: comprimento maior que {}",
-    },
-    109: {
-        "en": "Invalid value {} for parameter {}: length must be {}",
-        "pt": "Valor {} inválido para o parâmetro {}: comprimento deve ser igual a {}",
-    },
-    110: {
-        "en": "Invalid value {} for parameter {}: date is later than the current date",
-        "pt": "Valor {} inválido para o parâmetro {}: data posterior à data atual",
-    },
-    111: {
-        "en": "Invalid value {} for parameter {}: wrong date format",
-        "pt": "Valor {} inválido para o parâmetro {}: formato de data inválido",
-    },
-    112: {
-        "en": "Error executing operation {}: {}",
-        "pt": "Erro ao executar a operação {}: {}",
-    },
-    113: {
         "en": "The operation {} returned the error {}",
         "pt": "A operação {} retornou o erro {}",
     },
-    114: {
-        "en": "Unexpected error: {}",
-        "pt": "Erro não previsto: {}",
-    },
-    115: {
-        "en": "No file found at URL {}",
-        "pt": "Nenhum arquivo encontrado na URL {}",
-    },
-    116: {
-        "en": "The format for file {} is not type {}",
-        "pt": "O formato do arquivo {} não é do tipo {}",
-    },
-    117: {
-        "en": "Register for {} already exists",
-        "pt": "Registro de {} já existe",
-    },
-    118: {
-        "en": "Authentication token required",
-        "pt": "Token de autenticação requerido",
-    },
-    119: {
-        "en": "Invalid authentication token",
-        "pt": "Token de autenticação inválido",
-    },
-    120: {
-        "en": "More than one {} found",
-        "pt": "Mais de um(a) {} encontrado(a)",
-    },
-    121: {
-        "en": "Invalid operation: {}",
-        "pt": "Operação inválida: {}",
-    },
-    122: {
-        "en": "Invalid value {} for parameter {}: must be one of {}",
-        "pt": "Valor {} inválido para o parâmetro {}: deve ser um de {}",
-    },
-    123: {
-        "en": "Invalid value {} for parameter {}: must be in the range {}",
-        "pt": "Valor {} inválido para o parâmetro {}: deve estar no intervalo {}",
-    },
-    124: {
-        "en": "Invalid value {} for parameter {}: must be type {}",
-        "pt": "Valor {} inválido para o parâmetro {}: deve ser do tipo {}",
-    },
-    125: {
-        "en": "The values provided {} for parameter {} do not constitute a valid set of values",
-        "pt": "Os valores fornecidos {} para o parâmetro {} não formam um conjunto válido de valores",
-    },
-    140: {
-        "en": "Error retrieving environment variable {}: {}",
-        "pt": "Erro na recuperação da variável de ambiente {}: {}",
-    },
-    141: {
+    107: {
         "en": "Error invoking service {}: {}",
         "pt": "Erro na invocação do serviço {}: {}",
     },
+    108: {
+        "en": "Authentication token required",
+        "pt": "Token de autenticação deve ser fornecido",
+    },
+    109: {
+        "en": "Invalid authentication token",
+        "pt": "Token de autenticação inválido",
+    },
+    111: {
+        "en": "Unknown attribute",
+        "pt": "Atributo desconhecido",
+    },
+    112: {
+        "en": "Required attribute",
+        "pt": "Atributo obrigatório",
+    },
+    113: {
+        "en": "Attribute not applicable for {}",
+        "pt": "Atributo não se aplica a {}",
+    },
+    114: {
+        "en": "Attribute applicable only for {}",
+        "pt": "Atributo se aplica apenas a {}",
+    },
+    115: {
+        "en": "A value has not yet been assigned",
+        "pt": "Valor ainda não foi atribuído",
+    },
+    116: {
+        "en": "Value {} cannot be assigned for attributes {} at the same time",
+        "pt": "Valor {} não pode ser atribuído aos atributos {} ao mesmo tempo",
+    },
+    117: {
+        "en": "Invalid value {}: must be less than {}",
+        "pt": "Valor {} inválido: deve ser menor que {}",
+    },
+    118: {
+        "en": "Invalid value {}: must be greater than {}",
+        "pt": "Valor {} inválido: deve ser maior que {}",
+    },
+    119: {
+        "en": "Invalid value {}: {}",
+        "pt": "Valor {} inválido: {}",
+    },
+    120: {
+        "en": "Invalid, inconsistent, or missing arguments",
+        "pt": "Argumento(s) inválido(s), inconsistente(s) ou não fornecido(s)",
+    },
+    121: {
+        "en": "Invalid value {}",
+        "pt": "Valor {} inválido",
+    },
+    122: {
+        "en": "Invalid value {}: length shorter than {}",
+        "pt": "Valor {} inválido: comprimento menor que {}",
+    },
+    123: {
+        "en": "Invalid value {}: length longer than {}",
+        "pt": "Valor {} inválido: comprimento maior que {}",
+    },
+    124: {
+        "en": "Invalid value {}: length must be {}",
+        "pt": "Valor {} inválido: comprimento deve ser {}",
+    },
+    125: {
+        "en": "Invalid value {}: must be {}",
+        "pt": "Valor {} inválido: deve ser {}",
+    },
+    126: {
+        "en": "Invalid value {}: must be one of {}",
+        "pt": "Valor {} inválido: deve ser um de {}",
+    },
+    127: {
+        "en": "Invalid value {}: must be in the range {}",
+        "pt": "Valor {} inválido: deve estar no intervalo {}",
+    },
+    128: {
+        "en": "Invalid value {}: must be type {}",
+        "pt": "Valor {} inválido: deve ser do tipo {}",
+    },
+    129: {
+        "en": "Invalid value {}: date is later than the current date",
+        "pt": "Valor {} inválido: data posterior à data atual",
+    },
 }
+
 _ERR_MSGS_EN: dict = {}
 for key, value in __ERR_MSGS.items():
     _ERR_MSGS_EN[key] = value["en"]
@@ -119,9 +124,13 @@ for key, value in __ERR_MSGS.items():
     _ERR_MSGS_PT[key] = value["pt"]
 
 
-def validation_add_msgs(msgs: dict, lang: str = "en") -> None:
+def validate_add_msgs(msgs: dict,
+                      lang: Literal["en", "pt"] = "en") -> None:
     """
     Add the messages in *msgs* to the standard validation messages list for language *lang".
+
+    If applicable, this operation should be performed at the start of the application importing this module,
+    before any attempt to read from *_ERR_MSGS_EN* or *_ERR_MSGS_PT*.
 
     :param msgs: list of messages to be added
     :param lang: the reference language
@@ -133,9 +142,13 @@ def validation_add_msgs(msgs: dict, lang: str = "en") -> None:
             _ERR_MSGS_PT.update(msgs)
 
 
-def validation_set_msgs(msgs: dict, lang: str = "en") -> None:
+def validate_set_msgs(msgs: dict,
+                      lang: Literal["en", "pt"] = "en") -> None:
     """
     Set  the standard validation messages list for language *lang* to the messages in *msgs*.
+
+    If applicable, this operation should be performed at the start of the application importing this module,
+    before any attempt to read from *_ERR_MSGS_EN* or *_ERR_MSGS_PT*.
 
     :param msgs: list of messages to set the standard validation messages to
     :param lang: the reference language

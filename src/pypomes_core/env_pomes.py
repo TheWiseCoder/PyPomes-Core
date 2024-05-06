@@ -1,8 +1,13 @@
 import os
 from pathlib import Path
+from typing import Final
+
+# the prefix for the names of the environment variables
+APP_PREFIX: Final[str] = os.environ["PYPOMES_APP_PREFIX"]
 
 
-def env_get_str(key: str, def_value: str = None) -> str:
+def env_get_str(key: str,
+                def_value: str = None) -> str:
     """
     Retrieve and return the string value defined for *key* in the current operating environment.
 
@@ -19,7 +24,8 @@ def env_get_str(key: str, def_value: str = None) -> str:
     return result
 
 
-def env_get_bool(key: str, def_value: bool = None) -> bool:
+def env_get_bool(key: str,
+                 def_value: bool = None) -> bool:
     """
     Retrieve and return the boolean value defined for *key* in the current operating environment.
 
@@ -36,7 +42,8 @@ def env_get_bool(key: str, def_value: bool = None) -> bool:
     return result
 
 
-def env_get_int(key: str, def_value: int = None) -> int:
+def env_get_int(key: str,
+                def_value: int = None) -> int:
     """
     Retrieve and return the int value defined for *key* in the current operating environment.
 
@@ -53,7 +60,8 @@ def env_get_int(key: str, def_value: int = None) -> int:
     return result
 
 
-def env_get_float(key: str, def_value: float = None) -> float:
+def env_get_float(key: str,
+                  def_value: float = None) -> float:
     """
     Retrieve and return the float value defined for *key* in the current operating environment.
 
@@ -70,7 +78,8 @@ def env_get_float(key: str, def_value: float = None) -> float:
     return result
 
 
-def env_get_path(key: str, def_value: Path = None) -> Path:
+def env_get_path(key: str,
+                 def_value: Path = None) -> Path:
     """
     Retrieve and return the path value defined for *key* in the current operating environment.
 
@@ -85,7 +94,3 @@ def env_get_path(key: str, def_value: Path = None) -> Path:
         result = def_value
 
     return result
-
-
-# the prefix to the names of the environment variables
-APP_PREFIX = env_get_str("PYPOMES_APP_PREFIX", "PYPOMES")

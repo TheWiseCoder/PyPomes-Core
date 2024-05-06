@@ -11,10 +11,13 @@ EMAIL_PORT: Final[int] = env_get_int(f"{APP_PREFIX}_EMAIL_PORT")
 EMAIL_SERVER: Final[str] = env_get_str(f"{APP_PREFIX}_EMAIL_SERVER")
 
 
-def email_send(errors: list[str] | None, user_email: str,
-               subject: str, content: str, logger: Logger = None) -> None:
+def email_send(errors: list[str] | None,
+               user_email: str,
+               subject: str,
+               content: str,
+               logger: Logger = None) -> None:
     """
-    Send email, to *user_email", with *subject* as the email subject, and *content* as the email message.
+    Send email to *user_email", with *subject* as the email subject, and *content* as the email message.
 
     :param errors: incidental error messages
     :param user_email: the address to send the email to

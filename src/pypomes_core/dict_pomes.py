@@ -2,7 +2,8 @@ import inspect
 import types
 
 
-def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
+def dict_has_key_chain(source: dict,
+                       key_chain: list[str]) -> bool:
     """
     Indicate the existence of an element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
@@ -51,7 +52,8 @@ def dict_has_key_chain(source: dict, key_chain: list[str]) -> bool:
     return result
 
 
-def dict_get_value(source: dict, key_chain: list[str]) -> any:
+def dict_get_value(source: dict,
+                   key_chain: list[str]) -> any:
     """
     Obtain the value of the element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
@@ -101,7 +103,9 @@ def dict_get_value(source: dict, key_chain: list[str]) -> any:
     return result
 
 
-def dict_set_value(target: dict, key_chain: list[str], value: any) -> None:
+def dict_set_value(target: dict,
+                   key_chain: list[str],
+                   value: any) -> None:
     """
     Assign to an element of *source* the value *value*.
 
@@ -163,7 +167,8 @@ def dict_set_value(target: dict, key_chain: list[str], value: any) -> None:
             dict_item[key] = value
 
 
-def dict_pop_value(target: dict, key_chain: list[str]) -> any:
+def dict_pop_value(target: dict,
+                   key_chain: list[str]) -> any:
     """
     Obtain the value of the element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
@@ -220,9 +225,11 @@ def dict_pop_value(target: dict, key_chain: list[str]) -> any:
     return result
 
 
-def dict_replace_value(target: dict, old_value: any, new_value: any) -> None:
+def dict_replace_value(target: dict,
+                       old_value: any,
+                       new_value: any) -> None:
     """
-    Replace in *target* all occurrences of *old_value* with *new_value*.
+    Replace, in *target*, all occurrences of *old_value* with *new_value*.
 
     :param target: the reference dict
     :param old_value: the value to be replaced
@@ -261,7 +268,8 @@ def dict_replace_value(target: dict, old_value: any, new_value: any) -> None:
             list_replace_value(curr_value, old_value, new_value)
 
 
-def dict_get_key(source: dict, value: any) -> any:
+def dict_get_key(source: dict,
+                 value: any) -> any:
     """
     Return the key in *source*, mapping the first occurrence of *value* found.
 
@@ -281,7 +289,8 @@ def dict_get_key(source: dict, value: any) -> any:
     return result
 
 
-def dict_get_keys(source: dict, value: any) -> list[str]:
+def dict_get_keys(source: dict,
+                  value: any) -> list[str]:
     """
     Return all keys in *source*, mapping the value *value*.
 
@@ -294,7 +303,8 @@ def dict_get_keys(source: dict, value: any) -> list[str]:
     return [key for key, val in source.items() if val == value]
 
 
-def dict_merge(target: dict, source: dict) -> None:
+def dict_merge(target: dict,
+               source: dict) -> None:
     """
     Traverse the elements in *source* to update *target*, according to the criteria presented herein.
 
@@ -304,7 +314,7 @@ def dict_merge(target: dict, source: dict) -> None:
 
         - recursively process both elements, if both are type *dict*
         - add the missing items, if both are type *list*
-        - replace the element in *target* se it is a different type, ou if both elements are not the same type
+        - replace the element in *target* if it is a different type, ou if both elements are not of the same type
 
     :param target: the dictionary to be updated
     :param source: the dictionary with the new elements
@@ -336,112 +346,109 @@ def dict_merge(target: dict, source: dict) -> None:
             target[skey] = svalue
 
 
-def dict_coalesce(target: dict, key_chain: list[str]) -> None:
+def dict_coalesce(target: dict,
+                  key_chain: list[str]) -> None:
     """
-    Coalesce o elemento do tipo *list* em *target* no nível *n*, com a lista no nível imediatamente anterior.
+    Coalesce the element of type *list* in *target* at the level *n* with the list at the level immediately above.
 
-    Esse elemento é apontado pela cadeia de chaves aninhadas *[keys[0]: ... :keys[n]*, e é processado
-    como uma sequência de multiplos elementos. Para tanto, as duas últimas chaves da cadeia
-    *key_chain* devem estar associadas a valores do tipo *list*.
+    This element is pointed to by the key chain *[keys[0]: ... :keys[n]*, and is processed as a sequence
+    of multiple elements. The two last keys in *key_chain* must be associated with values of type *list*.
 
-    :param target: o dicionário a ser coalescido
-    :param key_chain: a cadeia de chaves
+    :param target: the dictionary to be coalesced
+    :param key_chain: the chain of nested keys
     """
-    # a cadeia de chaves contem mais de 2 chaves ?
-    if len(key_chain) > 2:
-        # sim, prossiga
+    # traverse the kay chain up to its penultimate element
+    curr_dict: dict | None = target
+    for inx, key in enumerate(key_chain[:-2]):  # 'key_chain[:-2]' returns an empy list if it has less the 3 elements
 
-        curr_dict: dict | None = target
-        # percorre a cadeia até a antepenúltima chave
-        for inx, key in enumerate(key_chain[:-2]):
+        # is 'curr_dict' a dictionary ?
+        if not isinstance(curr_dict, dict):
+            # no, abort the operation
+            break
 
-            # é possível prosseguir ?
-            if not isinstance(curr_dict, dict):
-                # não, aborte a operação
-                break
+        # is 'key' associated to a list ?
+        in_list: list[any] = curr_dict.get(key)
+        if isinstance(in_list, list):
+            # yes, recursively invoke the coalescing of the dictionaries in the list
+            for in_dict in in_list:
+                # is 'in_dict' a dictionary ?
+                if isinstance(in_dict, dict):
+                    # yes, recursively coaslesce it
+                    dict_coalesce(in_dict, key_chain[inx + 1:])
+            # finalize the operation
+            curr_dict = None
+            break
 
-            # key está associado a uma lista ?
-            in_list: list[any] = curr_dict.get(key)
-            if isinstance(in_list, list):
-                # sim, invoque recursivamente o coalescimento dos dicionários da lista
-                for in_dict in in_list:
-                    # o item da lista é um dicionário ?
-                    if isinstance(in_dict, dict):
-                        # sim, coalesça-o recursivamente
-                        dict_coalesce(in_dict, key_chain[inx + 1:])
-                # termina a operação
-                curr_dict = None
-                break
+        # proceed, with the value associated to 'key'
+        curr_dict = curr_dict.get(key)
 
-            # prossiga com o valor associado a key
-            curr_dict = curr_dict.get(key)
+    # is 'curr_dict' a dictionary containing the penultimate key ?
+    if isinstance(curr_dict, dict) and \
+       isinstance(curr_dict.get(key_chain[-2]), list):
+        # yes, proceed with the operation
+        penultimate_elem: list[dict] = curr_dict.pop(key_chain[-2])
+        penultimate_list: list[dict] = []
 
-        # curr_dict é um dicionário contendo a penúltima chave ?
-        if isinstance(curr_dict, dict) and \
-           isinstance(curr_dict.get(key_chain[-2]), list):
-            # sim, prossiga com o coalescimento
-            penultimate_elem: list[dict] = curr_dict.pop(key_chain[-2])
-            penultimate_list: list[dict] = []
+        # traverse the penultimate element
+        for last_elem in penultimate_elem:
 
-            # percorre os items do penúltimo elemento
-            for last_elem in penultimate_elem:
+            # is 'last_elem' a dictionary ?
+            if isinstance(last_elem, dict):
+                # yes, proceed
+                outer_dict: dict = {}
+                last_list: list[dict] = []
 
-                # last_elem é um dicionário ?
-                if isinstance(last_elem, dict):
-                    # sim, prossiga
-                    outer_dict: dict = {}
-                    last_list: list[dict] = []
-
-                    # percorre os itens de last_elem
-                    for k1, v1 in last_elem.items():
-                        # a chave é a última chave e está associada a uma lista ?
-                        if k1 == key_chain[-1] and isinstance(v1, list):
-                            # sim, obtenha seus itens para coalescimento posterior
-                            for in_dict in v1:
-                                # in_dict é um dicionário ?
-                                if isinstance(in_dict, dict):
-                                    # sim, salve-o coalescido
-                                    inner_dict: dict = {}
-                                    for k2, v2 in in_dict.items():
-                                        inner_dict[k2] = v2
-                                    last_list.append(inner_dict)
-                                else:
-                                    # não, salve-o como está
-                                    last_list.append(in_dict)
-                        else:
-                            # não, coalesça esse item
-                            outer_dict[k1] = v1
-
-                    # há itens para coalescimento ?
-                    if len(last_list) > 0:
-                        # sim, coalesça-os
-                        for in_dict in last_list:
-                            # in_dict é um dicionário ?
+                # traverse the last element
+                for k1, v1 in last_elem.items():
+                    # if 'k1' the last key, and is it a list ?
+                    if k1 == key_chain[-1] and isinstance(v1, list):
+                        # yes, obtain its items for further coalescing
+                        for in_dict in v1:
+                            # is 'in_dict' a dictionary ?
                             if isinstance(in_dict, dict):
-                                # sim, acrescente a ele os dados já salvos
-                                in_dict.update(outer_dict)
-                            # salva o item
-                            penultimate_list.append(in_dict)
+                                # yes, coalesce and save it
+                                inner_dict: dict = {}
+                                for k2, v2 in in_dict.items():
+                                    inner_dict[k2] = v2
+                                last_list.append(inner_dict)
+                            else:
+                                # no, save it as is
+                                last_list.append(in_dict)
                     else:
-                        # não, salve os itens já coalescidos
-                        penultimate_list.append(outer_dict)
+                        # no, coalesce it
+                        outer_dict[k1] = v1
+
+                # are there items to be coalesced ?
+                if len(last_list) > 0:
+                    # yes, do it
+                    for in_dict in last_list:
+                        # is 'in_dict' a dictionary ?
+                        if isinstance(in_dict, dict):
+                            # yes, add the saved data to it
+                            in_dict.update(outer_dict)
+                        # save the item
+                        penultimate_list.append(in_dict)
                 else:
-                    # não, salve-o
-                    penultimate_list.append(last_elem)
+                    # no, save the already coalesced items
+                    penultimate_list.append(outer_dict)
+            else:
+                # no, save it
+                penultimate_list.append(last_elem)
 
-            # substitue a lista original associada à penúltima chave com a nova lista coalescida
-            curr_dict[key_chain[-2]] = penultimate_list
+        # replace the original list with the coalesced new list
+        curr_dict[key_chain[-2]] = penultimate_list
 
 
-def dict_reduce(target: dict, key_chain: list[str]) -> None:
+def dict_reduce(target: dict,
+                key_chain: list[str]) -> None:
     """
-    Realoca os elementos de *target* no nível *n*, para o nível imediatamente acima.
+    Relocate the elements from *target* at level *n*, to the level immediately above.
 
-    Esses elementos são apontados pela cadeia de chaves aninhadas *[keys[0]: ... :keys[n]*.
-    O elemento no nivel *n* é removido, ao final.
+    These elements are pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
+    The element at level *n* is removed at the end.
 
-    :param target: o dicionário a ser reduzido
-    :param key_chain: a cadeia de chaves
+    :param target: the 'dict' to be reduced
+    :param key_chain: the key chain
     """
     # a cadeia de chaves contem pelo menos 1 chave ?
     if len(key_chain) > 0:
@@ -482,18 +489,18 @@ def dict_reduce(target: dict, key_chain: list[str]) -> None:
                 curr_dict[key] = value
 
 
-def dict_from_list(source: list[dict], key_chain: list[str], value: any) -> dict:
+def dict_from_list(source: list[dict],
+                   key_chain: list[str],
+                   value: any) -> dict:
     """
-    Localiza em *source*, e retorna, o elemento do tipo *dict* com o valor *value* na cadeia de chaves *key_chain*.
+    Locate in *source*, and return, the element of type *dict* with value *value* in the key chain *key_chain*.
 
-    Retorna *None* se esse *dict* não for encontrado.
-
-    :param source: a lista a ser inspecionada
-    :param key_chain: a cadeia de chaves usada na busca
-    :param value: o valor associado à cadeia de chaves
-    :return: o dict procurado
+    :param source: the list to be inspected
+    :param key_chain: the key chain used in the search process
+    :param value: the value of the element pointed to by the key chain
+    :return: the 'dict' wanted, or 'None' if not found
     """
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: dict | None = None
 
     for item in source:
@@ -507,67 +514,72 @@ def dict_from_list(source: list[dict], key_chain: list[str], value: any) -> dict
 
 def dict_from_object(source: object) -> dict:
     """
-    Percorre *source* e cria um *dict* com seus atributos contendo valores não nulos.
+    Create a *dict* and populate it with the attributes in *source* containing non-None values.
 
-    *source* pode ser qualquer objeto, especialmente aqueles que tenham sido decorados com *@dataclass*.
+    The input *source* might be any *object*, specially those decorated with *@dataclass*.
 
-    :param source: o objeto de referência
-    :return: dicionário com estrutura equivalente ao objeto de referência
+    :param source: the reference object
+    :return: 'dict' structurally similar to the reference object
     """
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: dict = {}
 
+    # obtain the object's source module
     source_module: types.ModuleType = inspect.getmodule(source)
+    # obtain the source module's dictionary
     source_dict: dict = source.__dict__
+    # traverse it
     for key, value in source_dict.items():
-        # value é nulo ou lista vazia ?
+        # is 'value' None or an empty list ?
         if not (value is None or (isinstance(value, list) and len(value) == 0)):
-            # não, prossiga
+            # no, proceed
             name: str = key
 
-            # value é uma lista ?
+            # is 'value' a list ?
             if isinstance(value, list):
-                # sim, percorra-a
+                # es, traverse it
                 result[name] = []
                 for list_item in value:
-                    # list_item é um objeto do mesmo módulo ?
+                    # is 'list_item' an object of the same module ?
                     if source_module == inspect.getmodule(list_item):
-                        # sim, prossiga recursivamente
+                        # yes, proceed recursively
                         result[name].append(dict_from_object(list_item))
                     else:
-                        # não, prossiga linearmente
+                        # no, proceed linearly
                         result[name].append(list_item)
 
-            # value é um objeto do mesmo módulo ?
+            # is 'value' an object of the same module ?
             elif source_module == inspect.getmodule(value):
-                # sim, prossiga recursivamente
+                # yes, proceed recursively
                 result[name] = dict_from_object(value)
             else:
-                # não, prossiga linearmente
+                # no, proceed linearly
                 result[name] = value
 
     return result
 
 
-def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
-                   prefix_from: str = None, prefix_to: str = None) -> dict:
+def dict_transform(source: dict,
+                   from_to_keys: list[tuple[str, str]],
+                   prefix_from: str = None,
+                   prefix_to: str = None) -> dict:
     """
-    Constrói um novo *dict*, segundo as regras seguintes.
+    Build a new *dict*, according to the rules presented herein.
 
-    Esse dicionário é construído criando-se, para cada elemento da lista de tuplas em
-    *from_to_keys*, o elemento indicado pelo segundo termo da tupla, atribuindo-se a ele
-    o valor do elemento de *source* indicado pelo primeiro termo da tupla. Ambos os termos
-    das tuplas são representados por uma cadeia de chaves aninhadas.
+    This dictionary is constructed by creating, for each element of the list of tuples in
+    *from_to_keys*, the element indicated by the second term of the tuple, assigning to it
+    the value of the *source* element indicated by the first term of the tuple. Both terms
+    of the tuples are represented by a chain of nested keys.
 
-    Os prefixos para as chaves de origem e de destino, se definidos, tem tratamentos distintos.
-    São acrescentados na busca de valores em *Source*, e removidos na atribuição de valores
-    ao *dict* de retorno.
+    The prefixes for the source and destination keys, if defined, have fferent treatments.
+    They are added when searching for values in *Source*, and removed when assigning values
+    to the return *dict*.
 
-    :param source: o dict de origem dos valores
-    :param from_to_keys: a lista de tuplas contendo as sequências de chaves de origem e destino
-    :param prefix_from: prefixo a ser acrescentado às chaves de origem
-    :param prefix_to: prefixo a ser removido das chaves de destino
-    :return: o novo dicionário
+    :param source: the source 'dict' of the values
+    :param from_to_keys: the list of tuples containing the source and destination key sequences
+    :param prefix_from: prefix to be added to source keys
+    :param prefix_to: prefix to be removed from target keys
+    :return: the new 'dict'
     """
     # import the neeeded functions
     from .list_pomes import list_find_coupled, list_transform, list_unflatten
@@ -612,13 +624,14 @@ def dict_transform(source: dict, from_to_keys: list[tuple[str, str]],
     return result
 
 
-def dict_clone(source: dict, from_to_keys: list) -> dict:
+def dict_clone(source: dict,
+               from_to_keys: list) -> dict:
     """
     Build a new *dict*, according to the rules presented herein.
 
     This dictionary is constructed by creating a new element for each element in the list
     *from_to_keys*. When the element of this list is a tuple, the name indicated by its
-    second term is used, and the value of the *source* element indicated by the tuple´s
+    second term is used, and the value of the *source* element indicated by the tuple's
     first term is assigned. This first term can be represented by a chain of  nested keys.
     The name of the element to be created can be omitted, in which case the name of the term
     indicative of the value to be assigned is used. If the corresponding value is not found
@@ -643,7 +656,8 @@ def dict_clone(source: dict, from_to_keys: list) -> dict:
     return result
 
 
-def dict_listify(target: dict, key_chain: list[str]) -> None:
+def dict_listify(target: dict,
+                 key_chain: list[str]) -> None:
     """
     Insert the value of the item pointed to by the key chain *[keys[0]: ... :keys[n]* in a list.
 
@@ -653,7 +667,8 @@ def dict_listify(target: dict, key_chain: list[str]) -> None:
     :param target: the dictionary to be modified
     :param key_chain: the chain of nested keys pointing to the item in question
     """
-    def items_listify(in_targets: list, in_keys: list[str]) -> None:
+    def items_listify(in_targets: list,
+                      in_keys: list[str]) -> None:
 
         # traverse the list
         for in_target in in_targets:
