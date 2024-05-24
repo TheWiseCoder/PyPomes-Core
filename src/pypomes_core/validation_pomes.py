@@ -1,19 +1,19 @@
 from datetime import date, datetime
 from logging import Logger
-from typing import Final
+from typing import Any, Final
 from .datetime_pomes import TIMEZONE_LOCAL
 from .env_pomes import APP_PREFIX, env_get_str
 from .str_pomes import str_sanitize, str_find_whitespace
 
-VALIDATE_MSG_LANGUAGE: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_LANGUAGE", "en")
-VALIDATE_MSG_PREFIX: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_PREFIX", APP_PREFIX)
+VALIDATION_MSG_LANGUAGE: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_LANGUAGE", "en")
+VALIDATION_MSG_PREFIX: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_PREFIX", APP_PREFIX)
 
 
 def validate_value(attr: str,
                    val: str | int | float,
                    min_val: int = None,
                    max_val: int = None,
-                   default: bool | list[any] = None) -> str:
+                   default: bool | list[Any] = None) -> str:
     """
     Validate *val* according to value, range, or membership in values list, as specified.
 
@@ -30,7 +30,7 @@ def validate_value(attr: str,
     # 'val' can be None, and None can be in 'default'
     if isinstance(default, list):
         if val not in default:
-            if val is None:
+            if not val:
                 # 112: Required attribute
                 result = validate_format_error(112, f"@{attr}")
             else:
@@ -39,13 +39,17 @@ def validate_value(attr: str,
                     # 125: Invalid value {}: must be {}
                     result = validate_format_error(125, val, default[0], f"@{attr}")
                 else:
-                    # is 'None' the last element in list ?
-                    if default[-1] is None:
+                    # is 'None' or '' the last element in list ?
+                    if default[-1] in ("", None):
+                        # yes, omit it from the message
+                        length -= 1
+                    # again, is 'None' or '' the last element in list ?
+                    if default[-1] in ("", None):
                         # yes, omit it from the message
                         length -= 1
                     # 126: Invalid value {}: must be one of {}
                     result = validate_format_error(126, val, default[:length], f"@{attr}")
-    elif val is None:
+    elif not val:
         if isinstance(default, bool) and default:
             # 112: Required attribute
             result = validate_format_error(112, f"@{attr}")
@@ -94,28 +98,28 @@ def validate_bool(errors: list[str] | None,
     :param logger: optional logger
     :return: the validated value, or None if validation failed
     """
-    # initialize the return variable
-    result: bool | None = None
-
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
-    try:
-        result = scheme[suffix]
-        if isinstance(result, str):
-            if result.lower() in ["t", "true"]:
-                result = True
-            elif result.lower() in ["f", "false"]:
-                result = False
-        if not isinstance(result, bool):
-            # 128: Invalid value {}: must be type {}
-            stat = validate_format_error(128, result, "bool", f"@{attr}")
-    except (KeyError, TypeError):
+
+    # retrieve the value
+    result = scheme.get(suffix)
+
+    # validate it
+    if result is None or result == "":
         if default is not None:
             result = default
         elif mandatory:
             # 112: Required attribute
             stat = validate_format_error(112, f"@{attr}")
+    elif isinstance(result, str):
+        if result.lower() in ["t", "true"]:
+            result = True
+        elif result.lower() in ["f", "false"]:
+            result = False
+    elif not isinstance(result, bool):
+        # 128: Invalid value {}: must be type {}
+        stat = validate_format_error(128, result, "bool", f"@{attr}")
 
     if stat:
         __validate_log(errors, stat, logger)
@@ -152,6 +156,10 @@ def validate_int(errors: list[str] | None,
 
     # retrieve the value
     result: int | None = scheme.get(suffix)
+
+    # handle the empty string
+    if result == "":
+        result = None
 
     # validate it
     if isinstance(result, str) and result.isnumeric():
@@ -207,6 +215,10 @@ def validate_float(errors: list[str] | None,
 
     # retrieve the value
     result: float | None = scheme.get(suffix)
+
+    # handle the empty string
+    if result == "":
+        result = None
 
     # validate it
     if isinstance(result, str) and result.replace(".", "", 1).isnumeric():
@@ -264,7 +276,7 @@ def validate_str(errors: list[str] | None,
 
     # obtain and validate the value
     result: str | None = scheme.get(suffix)
-    if result is not None and not isinstance(result, str):
+    if result and not isinstance(result, str):
         # 128: Invalid value {}: must be type {}
         stat = validate_format_error(128, result, "str", f"@{attr}")
     elif isinstance(default, str):
@@ -313,21 +325,20 @@ def validate_date(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # obtain and validate the value
-    try:
-        date_str: str = scheme[suffix]
+    date_str: str = scheme.get(suffix)
+    if date_str:
         result = date_parse(date_str, dayfirst=day_first)
-        if result is None:
+        if not result:
             # 121: Invalid value {}
             stat = validate_format_error(121, date_str, f"@{attr}")
         elif result > datetime.now(TIMEZONE_LOCAL).date():
             # 129: Invalid value {}: date is later than the current date
             stat = validate_format_error(129, date_str, f"@{attr}")
-    except KeyError:
-        if isinstance(default, bool) and default:
-            # 112: Required attribute
-            stat = validate_format_error(112, f"@{attr}")
-        elif isinstance(default, date):
-            result = default
+    elif isinstance(default, bool) and default:
+        # 112: Required attribute
+        stat = validate_format_error(112, f"@{attr}")
+    elif isinstance(default, date):
+        result = default
 
     if stat:
         __validate_log(errors, stat, logger)
@@ -366,20 +377,19 @@ def validate_datetime(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # obtain and validate the value
-    try:
-        date_str: str = scheme[suffix]
+    date_str: str = scheme[suffix]
+    if date_str:
         result = datetime_parse(date_str, dayfirst=day_first)
-        if result is None:
+        if not result:
             # 121: Invalid value {}
             stat = validate_format_error(121, date_str, f"@{attr}")
         elif result > datetime.now(TIMEZONE_LOCAL):
             # 129: Invalid value {}: date is later than the current date
             stat = validate_format_error(129, date_str, f"@{attr}")
-    except KeyError:
-        if isinstance(default, bool) and default:
-            # 112: Required attribute
-            stat = validate_format_error(112, f"@{attr}")
-        elif isinstance(default, datetime):
+    elif isinstance(default, bool) and default:
+        # 112: Required attribute
+        stat = validate_format_error(112, f"@{attr}")
+    elif isinstance(default, datetime):
             result = default
 
     if stat:
@@ -410,13 +420,13 @@ def validate_ints(errors: list[str] | None,
     :return: the list of validated values, or None if validation failed
     """
     # initialize the return variable
-    result: list[any] | None = None
+    result: list[Any] | None = None
 
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
     try:
-        values: list[any] = scheme[suffix]
+        values: list[Any] = scheme[suffix]
         if isinstance(values, list):
             result = []
             if len(values) > 0:
@@ -466,13 +476,13 @@ def validate_strs(errors: list[str] | None,
     :return: the list of validated values, or None if validation failed
     """
     # initialize the return variable
-    result: list[any] | None = None
+    result: list[Any] | None = None
 
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
     try:
-        values: list[any] = scheme[suffix]
+        values: list[Any] = scheme[suffix]
         if isinstance(values, list):
             result = []
             if len(values) > 0:
@@ -501,7 +511,7 @@ def validate_strs(errors: list[str] | None,
 
 
 def validate_format_error(error_id: int,
-                          *args: any) -> str:
+                          *args: Any) -> str:
     """
     Format and return the error message identified by *err_id* in the standard messages list.
 
@@ -513,7 +523,7 @@ def validate_format_error(error_id: int,
     :return: the formatted error message
     """
     # retrieve the standard validation messages list
-    match VALIDATE_MSG_LANGUAGE:
+    match VALIDATION_MSG_LANGUAGE:
         case "en":
             from .validation_msgs import _ERR_MSGS_EN
             err_msgs = _ERR_MSGS_EN
@@ -524,13 +534,16 @@ def validate_format_error(error_id: int,
             err_msgs = {}
 
     # initialize the return variable
-    result: str = VALIDATE_MSG_PREFIX + str(error_id) + ": " + err_msgs.get(error_id)
+    result: str = ""
+    if VALIDATION_MSG_PREFIX:
+        result += VALIDATION_MSG_PREFIX + str(error_id) + ": "
+    result += err_msgs.get(error_id) or ""
 
     # apply the provided arguments
     for arg in args:
         if arg is None:
             result = result.replace(" {}", "", 1)
-        elif isinstance(arg, str) and arg.startswith("@"):
+        elif not result or (isinstance(arg, str) and arg.startswith("@")):
             result += " " + arg
         elif isinstance(arg, str) and arg.find(" ") > 0:
             result = result.replace("{}", arg, 1)
@@ -561,7 +574,7 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
 
         # is there a whitespace in the attribute's name ?
         if pos > 0 and str_find_whitespace(error[pos:]) > 0:
-            # yes, disregard it
+            # yes, disregard the attribute
             pos = -1
 
         # was the attribute's name found ?
@@ -571,19 +584,19 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
             desc: str = error
         else:
             # yes
-            term: str = "attribute" if VALIDATE_MSG_LANGUAGE == "en" else "atributo"
+            term: str = "attribute" if VALIDATION_MSG_LANGUAGE == "en" else "atributo"
             out_error: dict = {term: error[pos + 1:]}
             desc: str = error[:pos - 1]
 
         # does the text contain an error code ?
-        if desc.startswith(VALIDATE_MSG_PREFIX):
+        if VALIDATION_MSG_PREFIX and desc.startswith(VALIDATION_MSG_PREFIX):
             # yes
-            term: str = "code" if VALIDATE_MSG_LANGUAGE == "en" else "codigo"
+            term: str = "code" if VALIDATION_MSG_LANGUAGE == "en" else "codigo"
             pos: int = desc.find(":")
             out_error[term] = desc[0:pos]
             desc = desc[pos+2:]
 
-        term: str = "description" if VALIDATE_MSG_LANGUAGE == "en" else "descricao"
+        term: str = "description" if VALIDATION_MSG_LANGUAGE == "en" else "descricao"
         out_error[term] = desc
         result.append(out_error)
 
@@ -601,13 +614,14 @@ def validate_unformat_errors(errors: list[dict | str]) -> list[str]:
     result: list[str] = []
 
     # define the dictionary keys
-    name: str = "code" if VALIDATE_MSG_LANGUAGE == "en" else "codigo"
-    desc: str = "description" if VALIDATE_MSG_LANGUAGE == "en" else "descricao"
+    name: str = "code" if VALIDATION_MSG_LANGUAGE == "en" else "codigo"
+    desc: str = "description" if VALIDATION_MSG_LANGUAGE == "en" else "descricao"
 
     # traverse the list of dicts
     for error in errors:
         if isinstance(error, dict):
-            result.append(f"{error.get(name)}: {str_sanitize(error.get(desc))}")
+            desc: str = str_sanitize(error.get(desc) or "''")
+            result.append(f"{error.get(name)}: {desc}")
         else:
             result.append(error)
 

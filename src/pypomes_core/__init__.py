@@ -24,7 +24,7 @@ from .exception_pomes import (
     exc_format,
 )
 from .file_pomes import (
-    TEMP_DIR,
+    TEMP_FOLDER,
     file_from_request, file_get_data
 )
 from .json_pomes import (
@@ -36,13 +36,13 @@ from .list_pomes import (
 )
 from .str_pomes import (
     str_as_list, str_sanitize, str_split_on_mark,
-    str_find_whitespace, str_get_between, str_get_positional,
+    str_find_whitespace, str_get_between, str_get_positional, str_rreplace,
 )
 from .validation_msgs import (
     validate_add_msgs, validate_set_msgs
 )
 from .validation_pomes import (
-    VALIDATE_MSG_LANGUAGE, VALIDATE_MSG_PREFIX,
+    VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
     validate_value, validate_bool, validate_int, validate_float, validate_str,
     validate_date, validate_datetime, validate_ints, validate_strs,
     validate_format_error, validate_format_errors, validate_unformat_errors,
@@ -74,7 +74,7 @@ __all__ = [
     # exception_pomes
     "exc_format",
     # file_pomes
-    "TEMP_DIR",
+    "TEMP_FOLDER",
     "file_from_request", "file_get_data",
     # json_pomes
     "json_normalize_dict", "json_normalize_iterable",
@@ -83,11 +83,11 @@ __all__ = [
     "list_find_coupled", "list_elem_starting_with", "list_transform",
     # str_pomes
     "str_as_list", "str_sanitize", "str_split_on_mark",
-    "str_find_whitespace", "str_get_between", "str_get_positional",
+    "str_find_whitespace", "str_get_between", "str_get_positional", "str_rreplace",
     # validation_msgs
     "validate_add_msgs", "validate_set_msgs",
     # validation_pomes
-    "VALIDATE_MSG_LANGUAGE", "VALIDATE_MSG_PREFIX",
+    "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX",
     "validate_value", "validate_bool", "validate_int", "validate_float", "validate_str",
     "validate_date", "validate_datetime", "validate_ints", "validate_strs",
     "validate_format_error", "validate_format_errors", "validate_unformat_errors",

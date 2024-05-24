@@ -6,7 +6,7 @@ from werkzeug.datastructures import FileStorage
 
 from .env_pomes import APP_PREFIX, env_get_path
 
-TEMP_DIR: Final[Path] = env_get_path(f"{APP_PREFIX}_TEMP_DIR", Path(gettempdir()))
+TEMP_FOLDER: Final[Path] = env_get_path(f"{APP_PREFIX}_TEMP_FOLDER", Path(gettempdir()))
 
 
 def file_from_request(request: Request,

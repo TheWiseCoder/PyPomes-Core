@@ -136,3 +136,16 @@ def str_get_positional(source: str,
     return result
 
 
+def str_rreplace(source: str, old: str, new: str, count: int = 1) -> str:
+    """
+    Replace at most *count* occurrences of substring *old* with string *new* in *source*, in reverse order.
+
+    :param source: the string to have a substring replaced
+    :param old: the substring to replace
+    :param new: the string replacement
+    :param count: the maximum number of replacements (defaults to 1)
+    :return: the modified string
+    """
+    return source[::-1].replace(old[::-1], new[::-1], count)[::-1]
+
+

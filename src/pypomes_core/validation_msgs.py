@@ -37,6 +37,10 @@ __ERR_MSGS: Final[dict] = {
         "en": "Invalid authentication token",
         "pt": "Token de autenticação inválido",
     },
+    110: {
+        "en": "{}",
+        "pt": "{}",
+    },
     111: {
         "en": "Unknown attribute",
         "pt": "Atributo desconhecido",
@@ -112,6 +116,10 @@ __ERR_MSGS: Final[dict] = {
     129: {
         "en": "Invalid value {}: date is later than the current date",
         "pt": "Valor {} inválido: data posterior à data atual",
+    },
+    130: {
+        "en": "No records matching the provided criteria found",
+        "pt": "Não foram encontrados registros para os critérios fornecidos",
     },
 }
 

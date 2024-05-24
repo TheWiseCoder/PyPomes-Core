@@ -35,8 +35,8 @@ def env_get_bool(key: str,
     """
     result: bool
     try:
-        result = bool(int(os.environ[key]))
-    except (KeyError, TypeError):
+        result = os.environ[key].lower() in ["1", "t", "true"]
+    except (AttributeError, KeyError, TypeError):
         result = def_value
 
     return result
