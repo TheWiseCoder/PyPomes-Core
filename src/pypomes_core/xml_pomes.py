@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Final
 from xmltodict3 import XmlTextToDict
 
@@ -50,23 +51,23 @@ def xml_normalize_keys(source: dict) -> dict:
     return result
 
 
-def xml_to_dict(file_data: bytes | str) -> dict:
+def xml_to_dict(file_data: Path | str | bytes) -> dict:
     """
     Convert the XML into a *dict*, by removing namespaces, and keys prefixed with "@" e "#".
 
     O XML de entrada deve estar em *file_data* (tipo *bytes*),
-    ou em arquivo do sistema com o caminho especificado por *file_data* (tipo *str*).
+    ou em arquivo do sistema com o caminho especificado por *file_data* (tipo *Path* ou *str*).
 
     :param file_data: XML a ser convertido
     :return: dict normalizado
     """
     # obtain the file data
-    file_bytes: bytes = file_get_data(file_data)
+    file_bytes: bytes = file_get_data(file_data=file_data)
 
-    # converte o XML em dict
+    # convert XML to dict
     xml_data = XmlTextToDict(xml_text=file_bytes.decode(),
                              ignore_namespace=True)
     result: dict = xml_data.get_dict()
 
-    # normalize the dict, removing namespaces, and prefixos '@' e '#' from the key names
-    return xml_normalize_keys(result)
+    # normalize the dict, removing namespaces and prefixes '@' e '#' from the key names
+    return xml_normalize_keys(source=result)

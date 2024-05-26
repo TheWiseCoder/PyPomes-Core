@@ -4,7 +4,7 @@ from typing import Any
 def str_as_list(source: str | Any,
                 separator: str = ",") -> list[any]:
     """
-    Return *source* as a *list*, by splitting its comma-separated contents.
+    Return *source* as a *list*, by splitting its contents separated by *separator*.
 
     If *source* is not a *str*, then it is itself returned.
 
@@ -14,7 +14,7 @@ def str_as_list(source: str | Any,
     """
     result: str | list[Any]
     if isinstance(source, str):
-        result = str.split(separator)
+        result = source.split(sep=separator)
     else:
         result = source
 
@@ -136,7 +136,10 @@ def str_get_positional(source: str,
     return result
 
 
-def str_rreplace(source: str, old: str, new: str, count: int = 1) -> str:
+def str_rreplace(source: str,
+                 old: str,
+                 new: str,
+                 count: int = 1) -> str:
     """
     Replace at most *count* occurrences of substring *old* with string *new* in *source*, in reverse order.
 

@@ -6,8 +6,8 @@ __ERR_MSGS: Final[dict] = {
         "pt": "Erro na interação com o BD {} em {}: {}",
     },
     102: {
-        "en": "No record found on DB {}, in {} for {}",
-        "pt": "Nenhum registro encontrado no BD {}, em {} para {}",
+        "en": "No record found on DB in {}, for {}",
+        "pt": "Nenhum registro encontrado no BD, em {} para {}",
     },
     103: {
         "en": "Error accessing the object store: {}",

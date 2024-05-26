@@ -36,13 +36,15 @@ def email_send(errors: list[str] | None,
     email_msg["To"] = user_email
 
     # instanciate the email server
-    server = SMTP(host=EMAIL_SERVER, port=EMAIL_PORT)
+    server = SMTP(host=EMAIL_SERVER,
+                  port=EMAIL_PORT)
     server.starttls()
-    server.login(user=EMAIL_ACCOUNT, password=EMAIL_PWD)
+    server.login(user=EMAIL_ACCOUNT,
+                 password=EMAIL_PWD)
 
     # send the message
     try:
-        server.send_message(email_msg)
+        server.send_message(msg=email_msg)
         server.quit()
         if logger:
             logger.debug(f"Sent email {subject} to {user_email}")

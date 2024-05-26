@@ -16,11 +16,11 @@ def json_normalize_dict(source: dict) -> None:
     """
     for key, value in source.items():
         if isinstance(value, dict):
-            json_normalize_dict(value)
+            json_normalize_dict(source=value)
         elif isinstance(value, bytes | bytearray):
             source[key] = base64.b64encode(value).decode()
         elif isinstance(value, Iterable) and not isinstance(value, str):
-            source[key] = json_normalize_iterable(value)
+            source[key] = json_normalize_iterable(source=value)
 
 
 def json_normalize_iterable(source: Iterable) -> list[any]:
@@ -44,7 +44,7 @@ def json_normalize_iterable(source: Iterable) -> list[any]:
         elif isinstance(value, bytes | bytearray):
             result.append(base64.b64encode(value).decode())
         elif isinstance(value, Iterable) and not isinstance(value, str):
-            result.append(json_normalize_iterable(value))
+            result.append(json_normalize_iterable(source=value))
         else:
             result.append(value)
 

@@ -28,7 +28,8 @@ def dict_has_key_chain(source: dict,
     # does the key chain contain more than 1 element ?
     elif len(key_chain) > 1:
         # yes, obtain the parent element of the last key in the chain
-        parent = dict_get_value(source, key_chain[:-1])
+        parent = dict_get_value(source=source,
+                                key_chain=key_chain[:-1])
 
     # is the parent element a dict ?
     if isinstance(parent, dict):
@@ -197,7 +198,8 @@ def dict_pop_value(target: dict,
     # does the key chain contain more than 1 element ?
     elif len(key_chain) > 1:
         # yes, retrieve the parent element of the last key in the chain
-        parent = dict_get_value(target, key_chain[:-1])
+        parent = dict_get_value(source=target,
+                                key_chain=key_chain[:-1])
 
     # is the parent element a dict ?
     if isinstance(parent, dict):
@@ -235,19 +237,25 @@ def dict_replace_value(target: dict,
     :param old_value: the value to be replaced
     :param new_value: the new value
     """
-    def list_replace_value(items: list[any], old_val: any, new_val: any) -> None:
+    def list_replace_value(items: list[any],
+                           old_val: any,
+                           new_val: any) -> None:
         # traverse the list
         for item in items:
 
             # is 'item' a dict ?
             if isinstance(item, dict):
                 # yes, process it recursively
-                dict_replace_value(item, old_val, new_val)
+                dict_replace_value(target=item,
+                                   old_value=old_val,
+                                   new_value=new_val)
 
             # is 'item' a list ?
             elif isinstance(item, list):
                 # yes, process it recursively
-                list_replace_value(item, old_val, new_val)
+                list_replace_value(items=item,
+                                   old_val=old_val,
+                                   new_val=new_val)
 
     # traverse the dict
     for curr_key, curr_value in target.items():
@@ -260,12 +268,16 @@ def dict_replace_value(target: dict,
         # is 'curr_value' a dict ?
         elif isinstance(curr_value, dict):
             # yes, process it recursively
-            dict_replace_value(curr_value, old_value, new_value)
+            dict_replace_value(target=curr_value,
+                               old_value=old_value,
+                               new_value=new_value)
 
         # is 'curr_value' a list ?
         elif isinstance(curr_value, list):
             # yes, process it recursively
-            list_replace_value(curr_value, old_value, new_value)
+            list_replace_value(items=curr_value,
+                               old_val=old_value,
+                               new_val=new_value)
 
 
 def dict_get_key(source: dict,
@@ -330,7 +342,8 @@ def dict_merge(target: dict,
             # are both elements dictionaries  ?
             if isinstance(svalue, dict) and isinstance(tvalue, dict):
                 # yes, recursively process them
-                dict_merge(tvalue, svalue)
+                dict_merge(target=tvalue,
+                           source=svalue)
 
             # are both elements lists ?
             elif isinstance(svalue, list) and isinstance(tvalue, list):
@@ -374,7 +387,8 @@ def dict_coalesce(target: dict,
                 # is 'in_dict' a dictionary ?
                 if isinstance(in_dict, dict):
                     # yes, recursively coaslesce it
-                    dict_coalesce(in_dict, key_chain[inx + 1:])
+                    dict_coalesce(target=in_dict,
+                                  key_chain=key_chain[inx + 1:])
             # finalize the operation
             curr_dict = None
             break
@@ -471,7 +485,8 @@ def dict_reduce(target: dict,
                     # o item da lista é um dicionário ?
                     if isinstance(in_dict, dict):
                         # sim, reduza-o recursivamente
-                        dict_reduce(in_dict, key_chain[inx + 1:])
+                        dict_reduce(target=in_dict,
+                                    key_chain=key_chain[inx + 1:])
                 # termine a operação
                 curr_dict = None
                 break
@@ -505,7 +520,8 @@ def dict_from_list(source: list[dict],
 
     for item in source:
         if isinstance(item, dict) and \
-           value == dict_get_value(item, key_chain):
+           value == dict_get_value(source=item,
+                                   key_chain=key_chain):
             result = item
             break
 
@@ -525,7 +541,7 @@ def dict_from_object(source: object) -> dict:
     result: dict = {}
 
     # obtain the object's source module
-    source_module: types.ModuleType = inspect.getmodule(source)
+    source_module: types.ModuleType = inspect.getmodule(object=source)
     # obtain the source module's dictionary
     source_dict: dict = source.__dict__
     # traverse it
@@ -541,17 +557,17 @@ def dict_from_object(source: object) -> dict:
                 result[name] = []
                 for list_item in value:
                     # is 'list_item' an object of the same module ?
-                    if source_module == inspect.getmodule(list_item):
+                    if source_module == inspect.getmodule(object=list_item):
                         # yes, proceed recursively
-                        result[name].append(dict_from_object(list_item))
+                        result[name].append(dict_from_object(source=list_item))
                     else:
                         # no, proceed linearly
                         result[name].append(list_item)
 
             # is 'value' an object of the same module ?
-            elif source_module == inspect.getmodule(value):
+            elif source_module == inspect.getmodule(object=value):
                 # yes, proceed recursively
-                result[name] = dict_from_object(value)
+                result[name] = dict_from_object(source=value)
             else:
                 # no, proceed linearly
                 result[name] = value
@@ -597,17 +613,24 @@ def dict_transform(source: dict,
             from_keys: str = key
 
         # obtem a cadeia de chaves de destino
-        to_keys: str = list_find_coupled(from_to_keys, from_keys)
+        to_keys: str = list_find_coupled(coupled_elements=from_to_keys,
+                                         primary_element=from_keys)
 
         # o destino foi definido ?
         if to_keys:
             # sim, obtenha o valor de destino
             if isinstance(value, dict):
                 # valor é um dicionário, transforme-o
-                to_value: dict = dict_transform(value, from_to_keys, from_keys, to_keys)
+                to_value: dict = dict_transform(source=value,
+                                                from_to_keys=from_to_keys,
+                                                prefix_from=from_keys,
+                                                prefix_to=to_keys)
             elif isinstance(value, list):
                 # valor é uma lista, transforme-a
-                to_value: list = list_transform(value, from_to_keys, from_keys, to_keys)
+                to_value: list = list_transform(source=value,
+                                                from_to_keys=from_to_keys,
+                                                prefix_from=from_keys,
+                                                prefix_to=to_keys)
             else:
                 # valor não é dicionário ou lista
                 to_value: any = value
@@ -616,10 +639,12 @@ def dict_transform(source: dict,
             if prefix_to and to_keys.startswith(prefix_to):
                 # sim, remova o prefixo
                 to_keys = to_keys[len(prefix_to)+1:]
-            to_keys_deep: list[str] = list_unflatten(to_keys)
+            to_keys_deep: list[str] = list_unflatten(source=to_keys)
 
             # atribui o valor transformado ao resultado
-            dict_set_value(result, to_keys_deep, to_value)
+            dict_set_value(target=result,
+                           key_chain=to_keys_deep,
+                           value=to_value)
 
     return result
 
@@ -651,7 +676,8 @@ def dict_clone(source: dict,
     for elem in from_to_keys:
         from_key: str = elem[0] if isinstance(elem, tuple) else elem
         to_key: str = (elem[1] if isinstance(elem, tuple) and len(elem) > 1 else None) or from_key
-        result[to_key] = dict_get_value(source, list_unflatten(from_key))
+        result[to_key] = dict_get_value(source=source,
+                                        key_chain=list_unflatten(from_key))
 
     return result
 
@@ -675,12 +701,14 @@ def dict_listify(target: dict,
             # is the element a dictionary ?
             if isinstance(in_target, dict):
                 # yes, process it
-                dict_listify(in_target, in_keys)
+                dict_listify(target=in_target,
+                             key_chain=in_keys)
             # is the element a list ?
             elif isinstance(in_target, list):
                 # yes, recursively process it
                 # (key chain is also applicable to lists directly nested in lists)
-                items_listify(in_target, in_keys)
+                items_listify(in_targets=in_target,
+                              in_keys=in_keys)
 
     parent: any = target
     # traverse the chain up to its penultimate key
@@ -689,7 +717,8 @@ def dict_listify(target: dict,
         # is the item a list ?
         if isinstance(parent, list):
             # yess, process it and close the operation
-            items_listify(parent, key_chain[inx+1:])
+            items_listify(in_targets=parent,
+                          in_keys=key_chain[inx+1:])
             parent = None
 
         # is it possible to proceed ?

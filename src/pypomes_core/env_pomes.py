@@ -15,10 +15,8 @@ def env_get_str(key: str,
     :param def_value: The default value to return, if the key has not been defined
     :return: The str value associated with the key
     """
-    result: str
-    try:
-        result = os.environ[key]
-    except (KeyError, TypeError):
+    result: str = os.environ.get(key)
+    if result is None:
         result = def_value
 
     return result
@@ -71,7 +69,7 @@ def env_get_float(key: str,
     """
     result: float
     try:
-        result = int(os.environ[key])
+        result = float(os.environ[key])
     except (KeyError, TypeError):
         result = def_value
 

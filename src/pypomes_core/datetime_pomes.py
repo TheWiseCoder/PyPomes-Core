@@ -36,9 +36,10 @@ def date_reformat(dt_str: str,
     :return:  the converted date
     """
     result: str | None = None
-    ts: datetime = parser.parse(dt_str, **kwargs)
+    ts: datetime = parser.parse(timestr=dt_str,
+                                **kwargs)
     if ts:
-        result = datetime.strftime(ts, to_format)
+        result = ts.strftime(format=to_format)
 
     return result
 
@@ -59,7 +60,8 @@ def date_parse(dt_str: str,
     """
     result: date | None = None
     if dt_str:
-        result = parser.parse(dt_str, **kwargs).date()
+        result = parser.parse(timestr=dt_str,
+                              **kwargs).date()
 
     return result
 
@@ -80,6 +82,7 @@ def datetime_parse(dt_str: str,
     """
     result: datetime | None = None
     if dt_str:
-        result = parser.parse(dt_str, **kwargs)
+        result = parser.parse(timestr=dt_str,
+                              **kwargs)
 
     return result
