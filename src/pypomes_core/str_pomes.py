@@ -6,15 +6,16 @@ def str_as_list(source: str | Any,
     """
     Return *source* as a *list*, by splitting its contents separated by *separator*.
 
+    The returned substrings are fully whitespace-trimmed.
     If *source* is not a *str*, then it is itself returned.
 
-    :param source: the source value to be worked on
+    :param source: the string value to be worked on
     :param separator: the separator (defaults to ",")
-    :return: a list built from the contents of the source parameter, or that parameter itself, if is not string
+    :return: a list built from the contents of the source parameter, or that parameter itself, if is not a string
     """
-    result: str | list[Any]
+    result: list[Any]
     if isinstance(source, str):
-        result = source.split(sep=separator)
+        result = [s.strip() for s in source.split(sep=separator)]
     else:
         result = source
 
@@ -150,5 +151,4 @@ def str_rreplace(source: str,
     :return: the modified string
     """
     return source[::-1].replace(old[::-1], new[::-1], count)[::-1]
-
 

@@ -42,8 +42,8 @@ __ERR_MSGS: Final[dict] = {
         "pt": "{}",
     },
     111: {
-        "en": "Unknown attribute",
-        "pt": "Atributo desconhecido",
+        "en": "Attribute is unknown or invalid in this context",
+        "pt": "Atributo desconhecido ou inválido para o contexto",
     },
     112: {
         "en": "Required attribute",
