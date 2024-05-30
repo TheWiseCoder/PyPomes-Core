@@ -5,10 +5,10 @@ from smtplib import SMTP
 from typing import Final
 from .env_pomes import APP_PREFIX, env_get_str, env_get_int
 
-EMAIL_ACCOUNT: Final[str] = env_get_str(f"{APP_PREFIX}_EMAIL_ACCOUNT")
-EMAIL_PWD: Final[str] = env_get_str(f"{APP_PREFIX}_EMAIL_PWD")
-EMAIL_PORT: Final[int] = env_get_int(f"{APP_PREFIX}_EMAIL_PORT")
-EMAIL_SERVER: Final[str] = env_get_str(f"{APP_PREFIX}_EMAIL_SERVER")
+EMAIL_ACCOUNT: Final[str] = env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT")
+EMAIL_PWD: Final[str] = env_get_str(key=f"{APP_PREFIX}_EMAIL_PWD")
+EMAIL_PORT: Final[int] = env_get_int(key=f"{APP_PREFIX}_EMAIL_PORT")
+EMAIL_SERVER: Final[str] = env_get_str(key=f"{APP_PREFIX}_EMAIL_SERVER")
 
 
 def email_send(errors: list[str] | None,
@@ -47,11 +47,13 @@ def email_send(errors: list[str] | None,
         server.send_message(msg=email_msg)
         server.quit()
         if logger:
-            logger.debug(f"Sent email {subject} to {user_email}")
+            logger.debug(msg=f"Sent email {subject} to {user_email}")
     except Exception as e:
         # the operatin raised an exception
-        err_msg: str = f"Error sending the email: {exc_format(e, sys.exc_info())}"
+        exc_err: str = exc_format(exc=e,
+                                  exc_info=sys.exc_info())
+        err_msg: str = f"Error sending the email: {exc_err}"
         if logger:
-            logger.error(err_msg)
-        if errors is not None:
+            logger.error(msg=err_msg)
+        if isinstance(errors, list):
             errors.append(err_msg)

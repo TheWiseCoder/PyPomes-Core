@@ -39,7 +39,7 @@ def str_sanitize(target_str: str) -> str:
                              .replace('"', "'") \
                              .replace("\n", " ") \
                              .replace("\t", " ")
-    return " ".join(cleaned.split())
+    return "".join(cleaned.split())
 
 
 def str_split_on_mark(source: str,
@@ -131,7 +131,7 @@ def str_get_positional(source: str,
     try:
         pos: int = list_origin.index(source)
         result = list_dest[pos]
-    except (ValueError, IndexError):
+    except (TypeError, ValueError, IndexError):
         result = None
 
     return result

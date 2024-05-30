@@ -6,7 +6,8 @@ from werkzeug.datastructures import FileStorage
 
 from .env_pomes import APP_PREFIX, env_get_path
 
-TEMP_FOLDER: Final[Path] = env_get_path(f"{APP_PREFIX}_TEMP_FOLDER", Path(gettempdir()))
+TEMP_FOLDER: Final[Path] = env_get_path(key=f"{APP_PREFIX}_TEMP_FOLDER",
+                                        def_value=Path(gettempdir()))
 
 
 def file_from_request(request: Request,
@@ -61,7 +62,7 @@ def file_get_data(file_data: Path | str | bytes) -> bytes:
     elif isinstance(file_data, Path | str):
         # argument is a file path
         buf_size: int = 128 * 1024
-        file_path: Path = file_data if isinstance(file_data, Path) else Path(file_data)
+        file_path: Path = Path(file_data)
         with file_path.open("rb") as f:
             file_bytes: bytearray = bytearray()
             while True:

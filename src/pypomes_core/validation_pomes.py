@@ -13,7 +13,8 @@ def validate_value(attr: str,
                    val: str | int | float,
                    min_val: int = None,
                    max_val: int = None,
-                   default: bool | list[Any] = None) -> str:
+                   values: list[Any] = None,
+                   required: bool = False) -> str:
     """
     Validate *val* according to value, range, or membership in values list, as specified.
 
@@ -21,60 +22,48 @@ def validate_value(attr: str,
     :param val: the value to be validated
     :param min_val: if val is a string, specifies its minimum length; otherwise, specifies its minimum value
     :param max_val: if val is a string, specifies its maximum length; otherwise, specifies its maximum value
-    :param default: if boolean, requires val to be specified; if list, requires val to be in it
+    :param values: if provided, requires 'val' to be in it
+    :param required:  requires 'val' to be specified;
     :return: None if val passes validation, or the corresponding error message otherwise
     """
     # initialize the return variable
     result: str | None = None
 
-    # 'val' can be None, and None can be in 'default'
-    if isinstance(default, list):
-        if val not in default:
-            if not val:
-                # 112: Required attribute
-                result = validate_format_error(112, f"@{attr}")
+    if val is None or val == "":
+        if isinstance(required, bool) and required:
+            # 121: Required attribute
+            result = validate_format_error(121, f"@{attr}")
+    elif isinstance(values, list):
+        if val not in values:
+            length: int = len(values)
+            if length == 1:
+                # 149: Invalid value {}: must be {}
+                result = validate_format_error(149, val, values[0], f"@{attr}")
             else:
-                length: int = len(default)
-                if length == 1:
-                    # 125: Invalid value {}: must be {}
-                    result = validate_format_error(125, val, default[0], f"@{attr}")
-                else:
-                    # is 'None' or '' the last element in list ?
-                    if default[-1] in ("", None):
-                        # yes, omit it from the message
-                        length -= 1
-                    # again, is 'None' or '' the last element in list ?
-                    if default[-1] in ("", None):
-                        # yes, omit it from the message
-                        length -= 1
-                    # 126: Invalid value {}: must be one of {}
-                    result = validate_format_error(126, val, default[:length], f"@{attr}")
-    elif not val:
-        if isinstance(default, bool) and default:
-            # 112: Required attribute
-            result = validate_format_error(112, f"@{attr}")
+                # 150: Invalid value {}: must be one of {}
+                result = validate_format_error(150, val, values[:length], f"@{attr}")
     elif isinstance(val, str):
         length: int = len(val)
         if min_val is not None and max_val == min_val and length != min_val:
-            # 124: Invalid value {}: length must be {}
-            result = validate_format_error(124, val, min_val, f"@{attr}")
+            # 146: Invalid value {}: length must be {}
+            result = validate_format_error(156, val, min_val, f"@{attr}")
         elif max_val is not None and max_val < length:
-            # 123: Invalid value {}: length longer than {}
-            result = validate_format_error(123, val, max_val, f"@{attr}")
+            # 148: Invalid value {}: length longer than {}
+            result = validate_format_error(148, val, max_val, f"@{attr}")
         elif min_val is not None and length < min_val:
-            # 122: Invalid value {}: length shorter than {}
-            result = validate_format_error(122, val, min_val, f"@{attr}")
+            # 147: Invalid value {}: length shorter than {}
+            result = validate_format_error(147, val, min_val, f"@{attr}")
     elif (min_val is not None and val < min_val) or \
          (max_val is not None and val > max_val):
         if min_val is not None and max_val is not None:
-            # 127: Invalid value {}: must be in the range {}
-            result = validate_format_error(127, val, [min_val, max_val], f"@{attr}")
+            # 151: Invalid value {}: must be in the range {}
+            result = validate_format_error(151, val, [min_val, max_val], f"@{attr}")
         elif min_val is not None:
-            # 118: Invalid value {}: must be greater than {}
-            result = validate_format_error(118, val, min_val, f"@{attr}")
+            # 144: Invalid value {}: must be greater than {}
+            result = validate_format_error(144, val, min_val, f"@{attr}")
         else:
-            # 117: Invalid value {}: must be less than {}
-            result = validate_format_error(117, val, max_val, f"@{attr}")
+            # 143: Invalid value {}: must be less than {}
+            result = validate_format_error(143, val, max_val, f"@{attr}")
 
     return result
 
@@ -83,46 +72,67 @@ def validate_bool(errors: list[str] | None,
                   scheme: dict,
                   attr: str,
                   default: bool = None,
-                  mandatory: bool = False,
+                  required: bool = False,
                   logger: Logger = None) -> bool:
     """
     Validate the boolean value associated with *attr* in *scheme*.
 
-    If provided, this value must be a *bool*, or the string *t*, *true*, *f*, or *false*.
+    If provided, this value must be on of:
+        - a *bool*
+        - the string *1*, *t*, or *true*
+        - the string *0*, *f*, or *false*
+        - the integer *1* or *0*
 
     :param errors: incidental error messages
     :param scheme: dictionary containing the value to be validated
     :param attr: the name of the attribute whose value is being validated
-    :param default: default value, if not found
-    :param mandatory: specifies whether the value must be provided
+    :param default: default value, overiding 'required'
+    :param required: specifies whether a value must be provided
     :param logger: optional logger
     :return: the validated value, or None if validation failed
     """
+    # initialize the return variable
+    result: bool | None = None
+
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
 
     # retrieve the value
-    result = scheme.get(suffix)
+    value = scheme.get(suffix)
 
     # validate it
-    if result is None or result == "":
+    if value is None or value == "":
         if default is not None:
-            result = default
-        elif mandatory:
-            # 112: Required attribute
-            stat = validate_format_error(112, f"@{attr}")
-    elif isinstance(result, str):
-        if result.lower() in ["t", "true"]:
-            result = True
-        elif result.lower() in ["f", "false"]:
-            result = False
-    elif not isinstance(result, bool):
-        # 128: Invalid value {}: must be type {}
-        stat = validate_format_error(128, result, "bool", f"@{attr}")
+            value = default
+        elif required:
+            # 121: Required attribute
+            stat = validate_format_error(121, f"@{attr}")
+    elif isinstance(value, str):
+        if value.lower() in ["1", "t", "true"]:
+            value = True
+        elif value.lower() in ["0", "f", "false"]:
+            value = False
+        else:
+            # 152: Invalid value {}: must be type {}
+            stat = validate_format_error(152, value, "bool", f"@{attr}")
+    # bool is subtype of int
+    elif isinstance(value, int) and not isinstance(value, bool):
+        if value == 1:
+            value = True
+        elif value == 0:
+            value = False
+        else:
+            # 152: Invalid value {}: must be type {}
+            stat = validate_format_error(152, value, "bool", f"@{attr}")
+    elif not isinstance(value, bool):
+        # 152: Invalid value {}: must be type {}
+        stat = validate_format_error(152, value, "bool", f"@{attr}")
 
     if stat:
         __validate_log(errors, stat, logger)
+    else:
+        result = value
 
     return result
 
@@ -132,7 +142,8 @@ def validate_int(errors: list[str] | None,
                  attr: str,
                  min_val: int = None,
                  max_val: int = None,
-                 default: bool | int | list[int] = None,
+                 default: int | list[int] = None,
+                 required: bool = False,
                  logger: Logger = None) -> int:
     """
     Validate the *int* value associated with *attr* in *scheme*.
@@ -144,44 +155,47 @@ def validate_int(errors: list[str] | None,
     :param attr: the attribute associated with the value to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
-    :param default: if int, specifies the default value;
-                    if bool, requires the value to be specified;
-                    if list, requires the value to be in it
+    :param default: if 'int', specifies the default value, overriding the other constraints
+                    if 'list', requires the value, if provided, to be in it
+    :param required: specifies whether a value must be provided
     :param logger: optional logger
     :return: the validated value, or None if validation failed
     """
+    # initialize the return variable
+    result: int | None = None
+
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
 
     # retrieve the value
-    result: int | None = scheme.get(suffix)
-
-    # handle the empty string
-    if result == "":
-        result = None
+    value: int = scheme.get(suffix)
 
     # validate it
-    if isinstance(result, str) and result.isnumeric():
-        result = int(result)
-    # bool is subtype of int
-    elif result is not None and \
-            (isinstance(result, bool) or not isinstance(result, int)):
-        # 128: Invalid value {}: must be type {}
-        stat = validate_format_error(128, result, "int", f"@{attr}")
-    elif isinstance(default, int) and not isinstance(default, bool):
-        if result is None:
-            result = default
-        else:
-            stat = validate_value(attr, result, min_val, max_val)
+    if value is None and isinstance(default, int):
+        value = default
+    # 'bool' is subtype of 'int'
+    elif value is not None and \
+         (isinstance(value, bool) or not isinstance(value, int)):
+        # 152: Invalid value {}: must be type {}
+        stat = validate_format_error(152, value, "int", f"@{attr}")
     else:
-        stat = validate_value(attr, result, min_val, max_val, default)
-
-    if not stat:
-        stat = validate_value(attr, result, min_val, max_val, default)
+        if isinstance(value, str) and value.isnumeric():
+            value = int(value)
+        values = default if isinstance(default, list) else None
+        stat = validate_value(attr=attr,
+                              val=value,
+                              min_val=min_val,
+                              max_val=max_val,
+                              values=values,
+                              required=required)
 
     if stat:
-        __validate_log(errors, stat, logger)
+        __validate_log(errors=errors,
+                       err_msg=stat,
+                       logger=logger)
+    else:
+        result = value
 
     return result
 
@@ -191,7 +205,8 @@ def validate_float(errors: list[str] | None,
                    attr: str,
                    min_val: float = None,
                    max_val: float = None,
-                   default: bool | int | float | list[float | int] = None,
+                   required: bool = False,
+                   default: int | float | list[float | int] = None,
                    logger: Logger = None) -> float:
     """
     Validate the *float* value associated with *attr* in *scheme*.
@@ -203,46 +218,47 @@ def validate_float(errors: list[str] | None,
     :param attr: the attribute associated with the value to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
-    :param default: if float, specifies the default value;
-                    if bool, requires the value to be specified;
-                    if list, requires the value to be in it
+    :param default: if 'float' or 'int', specifies the default value, overriding the other constraints
+                    if 'list', requires the value, if provided, to be in it
+    :param required: specifies whether a value must be provided
     :param logger: optional logger
     :return: the validated value, or None if validation failed
     """
+    # initialize the return variable
+    result: float | None = None
+
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
 
     # retrieve the value
-    result: float | None = scheme.get(suffix)
-
-    # handle the empty string
-    if result == "":
-        result = None
+    value: float = scheme.get(suffix)
 
     # validate it
-    if isinstance(result, str) and result.replace(".", "", 1).isnumeric():
-        result = float(result)
-    elif result is not None and not isinstance(result, int) and not isinstance(result, float):
-        # 128: Invalid value {}: must be type {}
-        stat = validate_format_error(128, result, "float", f"@{attr}")
+    if value is None and isinstance(default, int | float):
+        value = float(default)
+    elif isinstance(value, bool) or \
+         value is not None and not isinstance(value, int | float):
+        # 152: Invalid value {}: must be type {}
+        stat = validate_format_error(152, value, "float", f"@{attr}")
     else:
-        # bool é subtipo de int
-        if isinstance(result, int) and not isinstance(result, bool):
-            result = float(result)
-        if isinstance(default, float):
-            if result is None:
-                result = default
-            else:
-                stat = validate_value(attr, result, min_val, max_val)
-        else:
-            stat = validate_value(attr, result, min_val, max_val, default)
-
-    if not stat:
-        stat = validate_value(attr, result, min_val, max_val, default)
+        if (isinstance(value, int) and not isinstance(value, bool)) or \
+           (isinstance(value, str) and value.replace(".", "", 1).isnumeric()):
+            value = float(value)
+        values = default if isinstance(default, list) else None
+        stat = validate_value(attr=attr,
+                              val=value,
+                              min_val=min_val,
+                              max_val=max_val,
+                              values=values,
+                              required=required)
 
     if stat:
-        __validate_log(errors, stat, logger)
+        __validate_log(errors=errors,
+                       err_msg=stat,
+                       logger=logger)
+    else:
+        result = value
 
     return result
 
@@ -252,7 +268,8 @@ def validate_str(errors: list[str] | None,
                  attr: str,
                  min_length: int = None,
                  max_length: int = None,
-                 default: bool | str | list[str] = None,
+                 default: str | list[str] = None,
+                 required: bool = False,
                  logger: Logger = None) -> str:
     """
     Validate the *str* value associated with *attr* in *scheme*.
@@ -264,32 +281,42 @@ def validate_str(errors: list[str] | None,
     :param attr: the attribute associated with the value to be validated
     :param min_length: the minimum length accepted
     :param max_length:  the maximum length accepted
-    :param default: if str, specifies the default value;
-                    if bool, requires the value to be specified;
-                    if list, requires the value to be in it
+    :param default: if 'str', specifies the default value, overrinding the other constraints
+                    if 'list', requires the value, if provided, to be in it
+    :param required: specifies whether a value must be provided
     :param logger: optional logger
     :return: the validated value, or None if validation failed
     """
+    # initialize the return variable
+    result: str | None = None
+
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
 
-    # obtain and validate the value
-    result: str | None = scheme.get(suffix)
-    if result and not isinstance(result, str):
-        # 128: Invalid value {}: must be type {}
-        stat = validate_format_error(128, result, "str", f"@{attr}")
-    elif isinstance(default, str):
-        if result is None:
-            result = default
-        else:
-            stat = validate_value(attr, result, min_length, max_length)
+    # obtain the value
+    value: str | None = scheme.get(suffix)
+
+    # validate it
+    if value is None and isinstance(default, str):
+        value = default
+    elif value is not None and not isinstance(value, str):
+        # 152: Invalid value {}: must be type {}
+        stat = validate_format_error(152, value, "str", f"@{attr}")
     else:
-        stat = validate_value(attr, result, min_length, max_length, default)
+        values = default if isinstance(default, list) else None
+        stat = validate_value(attr=attr,
+                              val=value,
+                              max_val=min_length,
+                              min_val=max_length,
+                              values=values,required= required)
 
     if stat:
-        result = None
-        __validate_log(errors, stat, logger)
+        __validate_log(errors=errors,
+                       err_msg=stat,
+                       logger=logger)
+    else:
+        result = value
 
     return result
 
@@ -298,7 +325,8 @@ def validate_date(errors: list[str] | None,
                   scheme: dict,
                   attr: str,
                   day_first: bool = False,
-                  default: bool | date = None,
+                  default: date = None,
+                  required: bool = False,
                   logger: Logger = None) -> date:
     """
     Validate the *date* value associated with *attr* in *scheme*.
@@ -309,8 +337,8 @@ def validate_date(errors: list[str] | None,
     :param scheme: dictionary containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param day_first: indicates that the day precedes the month in the string representing the date
-    :param default: if date, specifies the default value;
-                    if bool, requires the value to be specified
+    :param default: optional default value, overrides 'required'
+    :param required: specifies whether a value must be provided
     :param logger: optional logger
     :return: the validated value, or None if validation failed
     """
@@ -324,24 +352,30 @@ def validate_date(errors: list[str] | None,
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
 
-    # obtain and validate the value
-    date_str: str = scheme.get(suffix)
-    if date_str:
-        result = date_parse(date_str, dayfirst=day_first)
+    # obtain the value
+    value: str = scheme.get(suffix)
+
+    # validate it
+    if value:
+        result = date_parse(dt_str=value,
+                            dayfirst=day_first)
         if not result:
-            # 121: Invalid value {}
-            stat = validate_format_error(121, date_str, f"@{attr}")
-        elif result > datetime.now(TIMEZONE_LOCAL).date():
-            # 129: Invalid value {}: date is later than the current date
-            stat = validate_format_error(129, date_str, f"@{attr}")
-    elif isinstance(default, bool) and default:
-        # 112: Required attribute
-        stat = validate_format_error(112, f"@{attr}")
+            # 141: Invalid value {}
+            stat = validate_format_error(141, value, f"@{attr}")
+        elif result > datetime.now(tz=TIMEZONE_LOCAL).date():
+            # 153: Invalid value {}: date is later than the current date
+            stat = validate_format_error(153, value, f"@{attr}")
     elif isinstance(default, date):
         result = default
+    elif isinstance(required, bool) and required:
+        # 121: Required attribute
+        stat = validate_format_error(121, f"@{attr}")
 
     if stat:
-        __validate_log(errors, stat, logger)
+        result = None
+        __validate_log(errors=errors,
+                       err_msg=stat,
+                       logger=logger)
 
     return result
 
@@ -350,7 +384,8 @@ def validate_datetime(errors: list[str] | None,
                       scheme: dict,
                       attr: str,
                       day_first: bool = True,
-                      default: bool | datetime = None,
+                      default: datetime = None,
+                      required: bool = False,
                       logger: Logger = None) -> datetime:
     """
     Validate the *datetime* value associated with *attr* in *scheme*.
@@ -361,8 +396,8 @@ def validate_datetime(errors: list[str] | None,
     :param scheme: dictionary containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param day_first: indicates that the day precedes the month in the string representing the date
-    :param default: if datetime, specifies the default value;
-                    if bool, requires the value to be specified
+    :param default: optional default value, overrides 'required'
+    :param required: specifies whether a value must be provided
     :param logger: optional logger
     :return: the validated value, or None if validation failed
     """
@@ -377,23 +412,26 @@ def validate_datetime(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # obtain and validate the value
-    date_str: str = scheme[suffix]
-    if date_str:
-        result = datetime_parse(date_str, dayfirst=day_first)
+    value: str = scheme[suffix]
+    if value:
+        result = datetime_parse(dt_str=value,
+                                dayfirst=day_first)
         if not result:
-            # 121: Invalid value {}
-            stat = validate_format_error(121, date_str, f"@{attr}")
-        elif result > datetime.now(TIMEZONE_LOCAL):
-            # 129: Invalid value {}: date is later than the current date
-            stat = validate_format_error(129, date_str, f"@{attr}")
-    elif isinstance(default, bool) and default:
-        # 112: Required attribute
-        stat = validate_format_error(112, f"@{attr}")
+            # 141: Invalid value {}
+            stat = validate_format_error(141, value, f"@{attr}")
+        elif result > datetime.now(tz=TIMEZONE_LOCAL):
+            # 153: Invalid value {}: date is later than the current date
+            stat = validate_format_error(153, value, f"@{attr}")
     elif isinstance(default, datetime):
-            result = default
+        result = default
+    elif isinstance(required, bool) and required:
+        # 121: Required attribute
+        stat = validate_format_error(121, f"@{attr}")
 
     if stat:
-        __validate_log(errors, stat, logger)
+        __validate_log(errors=errors,
+                       err_msg=stat,
+                       logger=logger)
 
     return result
 
@@ -403,7 +441,7 @@ def validate_ints(errors: list[str] | None,
                   attr: str,
                   min_val: int = None,
                   max_val: int = None,
-                  mandatory: bool = False,
+                  required: bool = False,
                   logger: Logger = None) -> list[int]:
     """
     Validate the list of *int* values associated with *attr* in *scheme*.
@@ -415,7 +453,7 @@ def validate_ints(errors: list[str] | None,
     :param attr: the attribute associated with the list of values to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
-    :param mandatory: whether the list of values must be provided
+    :param required: whether the list of values must be provided
     :param logger: optional logger
     :return: the list of validated values, or None if validation failed
     """
@@ -433,23 +471,28 @@ def validate_ints(errors: list[str] | None,
                 for inx, value in enumerate(values):
                     result.append(value)
                     if isinstance(value, int):
-                        stat = validate_value(f"@{attr}[{inx+1}]", value, min_val, max_val)
+                        stat = validate_value(attr=f"@{attr}[{inx+1}]",
+                                              val=value,
+                                              min_val=min_val,
+                                              max_val=max_val)
                     else:
-                        # 128: Invalid value {}: must be type {}
-                        stat = validate_format_error(128, value, "int", f"@{attr}[{inx+1}]")
-            elif mandatory:
-                # 112: Required attribute
-                stat = validate_format_error(112, f"@{attr}")
+                        # 152: Invalid value {}: must be type {}
+                        stat = validate_format_error(152, value, "int", f"@{attr}[{inx+1}]")
+            elif required:
+                # 121: Required attribute
+                stat = validate_format_error(121, f"@{attr}")
         else:
-            # 128: Invalid value {}: must be type {}
-            stat = validate_format_error(128, result, "list", f"@{attr}")
+            # 152: Invalid value {}: must be type {}
+            stat = validate_format_error(152, result, "list", f"@{attr}")
     except (KeyError, TypeError):
-        if mandatory:
-            # 112: Required attribute
-            stat = validate_format_error(112, f"@{attr}")
+        if required:
+            # 121: Required attribute
+            stat = validate_format_error(121, f"@{attr}")
 
     if stat:
-        __validate_log(errors, stat, logger)
+        __validate_log(errors=errors,
+                       err_msg=stat,
+                       logger=logger)
 
     return result
 
@@ -459,7 +502,7 @@ def validate_strs(errors: list[str] | None,
                   attr: str,
                   min_length: int,
                   max_length: int,
-                  mandatory: bool = False,
+                  required: bool = False,
                   logger: Logger = None) -> list[str]:
     """
     Validate the list of *str* values associated with *attr* in *scheme*.
@@ -471,7 +514,7 @@ def validate_strs(errors: list[str] | None,
     :param attr: the attribute associated with the list of values to be validated
     :param min_length: the minimum length accepted
     :param max_length:  the maximum length accepted
-    :param mandatory: whether the list of values must be provided
+    :param required: whether the list of values must be provided
     :param logger: optional logger
     :return: the list of validated values, or None if validation failed
     """
@@ -489,23 +532,28 @@ def validate_strs(errors: list[str] | None,
                 for inx, value in enumerate(values):
                     result.append(value)
                     if isinstance(value, str):
-                        stat = validate_value(f"@{attr}[{inx+1}]", value, min_length, max_length)
+                        stat = validate_value(attr=f"@{attr}[{inx+1}]",
+                                              val=value,
+                                              min_val=min_length,
+                                              max_val=max_length)
                     else:
-                        # 128: Invalid value {}: must be type {}
-                        stat = validate_format_error(128, value, "str", f"@{attr}[{inx+1}]")
-            elif mandatory:
-                # 112: Required attribute
-                stat = validate_format_error(112, f"@{attr}")
+                        # 152: Invalid value {}: must be type {}
+                        stat = validate_format_error(152, value, "str", f"@{attr}[{inx+1}]")
+            elif required:
+                # 121: Required attribute
+                stat = validate_format_error(121, f"@{attr}")
         else:
-            # 128: Invalid value {}: must be type {}
-            stat = validate_format_error(128, result, "list", f"@{attr}")
+            # 152: Invalid value {}: must be type {}
+            stat = validate_format_error(152, result, "list", f"@{attr}")
     except (KeyError, TypeError):
-        if mandatory:
-            # 112: Required attribute
-            stat = validate_format_error(112, f"@{attr}")
+        if required:
+            # 121: Required attribute
+            stat = validate_format_error(121, f"@{attr}")
 
     if stat:
-        __validate_log(errors, stat, logger)
+        __validate_log(errors=errors,
+                       err_msg=stat,
+                       logger=logger)
 
     return result
 
@@ -542,7 +590,12 @@ def validate_format_error(error_id: int,
     # apply the provided arguments
     for arg in args:
         if arg is None:
-            result = result.replace(" {}", "", 1)
+            pos1: int = result.find(": {}")
+            pos2: int = result.find(" {}")
+            if pos1 < 0 or pos2 < pos1:
+                result = result.replace(" {}", "", 1)
+            else:
+                result = result.replace(": {}", "", 1)
         elif not result or (isinstance(arg, str) and arg.startswith("@")):
             result += " " + arg
         elif isinstance(arg, str) and arg.find(" ") > 0:

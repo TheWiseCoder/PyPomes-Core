@@ -1,7 +1,8 @@
-import pytz
 from datetime import date, datetime
 from dateutil import parser
+from dateutil.parser import ParserError
 from typing import Final
+from pytz import UTC, BaseTzInfo, timezone
 
 from .env_pomes import APP_PREFIX, env_get_str
 
@@ -13,8 +14,9 @@ DATETIME_FORMAT_STD: Final[str] = "%m/%d/%Y %H:%M:%S"
 DATETIME_FORMAT_COMPACT: Final[str] = "%Y%m%d%H%M%S"
 DATETIME_FORMAT_INV: Final[str] = "%Y-%m-%d %H:%M:%S"
 
-TIMEZONE_LOCAL: pytz.BaseTzInfo = pytz.timezone(env_get_str(f"{APP_PREFIX}_TIMEZONE_LOCAL", "America/Sao_Paulo"))
-TIMEZONE_UTC: pytz.BaseTzInfo = pytz.UTC
+TIMEZONE_LOCAL: Final[BaseTzInfo] = timezone(zone=env_get_str(key=f"{APP_PREFIX}_TIMEZONE_LOCAL",
+                                                              def_value="America/Sao_Paulo"))
+TIMEZONE_UTC: Final[BaseTzInfo] = UTC
 
 
 def date_reformat(dt_str: str,
@@ -58,10 +60,14 @@ def date_parse(dt_str: str,
     :param kwargs: optional arguments for the parser in python-dateutil
     :return: the corresponding date object, or None
     """
-    result: date | None = None
-    if dt_str:
+    # declare the return variable
+    result: date | None
+
+    try:
         result = parser.parse(timestr=dt_str,
                               **kwargs).date()
+    except (TypeError, ParserError, OverflowError):
+        result = None
 
     return result
 
@@ -72,17 +78,26 @@ def datetime_parse(dt_str: str,
     Obtain and return the *datetime* object corresponding to *dt_str*.
 
     In *kwargs*, it may optionally be specified:
-        -   *dayfirst=True*, to signal that *day* comes before *month* in *dt_str*
+        -   *dayfirst=True*
+                - to signal that *day* comes before *month* in an ambiguous 3-integer date
+                  (e.g. '01/05/09') - defaults to *False*
+        -   *yearfirst=True*
+                - to signal that *year* comes before *month* in an ambiguous 3-integer date
+                  (e.g. '01/05/09') - defaults to *False*
         -   *fmt=<format>*, to force use of a specific format
-   Return *None* se *dt_str* does not contain a valid date.
+   Return *None* if *dt_str* does not contain a valid date.
 
     :param dt_str: the date, in a supported format
     :param kwargs: optional arguments for the parser in python-dateutil
     :return: the corresponding datetime object, or None
     """
-    result: datetime | None = None
-    if dt_str:
+    # declare the return variable
+    result: datetime | None
+
+    try:
         result = parser.parse(timestr=dt_str,
                               **kwargs)
+    except (TypeError, ParserError, OverflowError):
+        result = None
 
     return result

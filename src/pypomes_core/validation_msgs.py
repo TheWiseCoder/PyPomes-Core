@@ -2,124 +2,192 @@ from typing import Final, Literal
 
 __ERR_MSGS: Final[dict] = {
     101: {
-        "en": "Error accessing the DB {} in {}: {}",
-        "pt": "Erro na interação com o BD {} em {}: {}",
-    },
-    102: {
-        "en": "No record found on DB in {}, for {}",
-        "pt": "Nenhum registro encontrado no BD, em {} para {}",
-    },
-    103: {
-        "en": "Error accessing the object store: {}",
-        "pt": "Erro na interação com o armazenador de objetos: {}",
-    },
-    104: {
-        "en": "Unexpected error: {}",
-        "pt": "Error não previsto: {}",
-    },
-    105: {
-        "en": "Invalid operation {}",
-        "pt": "Operação {} inválida",
-    },
-    106: {
-        "en": "The operation {} returned the error {}",
-        "pt": "A operação {} retornou o erro {}",
-    },
-    107: {
-        "en": "Error invoking service {}: {}",
-        "pt": "Erro na invocação do serviço {}: {}",
-    },
-    108: {
-        "en": "Authentication token required",
-        "pt": "Token de autenticação deve ser fornecido",
-    },
-    109: {
-        "en": "Invalid authentication token",
-        "pt": "Token de autenticação inválido",
-    },
-    110: {
         "en": "{}",
         "pt": "{}",
     },
-    111: {
-        "en": "Attribute is unknown or invalid in this context",
-        "pt": "Atributo desconhecido ou inválido para o contexto",
+    102: {
+        "en": "Unexpected error: {}",
+        "pt": "Error não previsto: {}",
     },
-    112: {
+    103: {
+        "en": "Invalid operation {}",
+        "pt": "Operação {} inválida",
+    },
+    104: {
+        "en": "The operation {} returned the error {}",
+        "pt": "A operação {} retornou o erro {}",
+    },
+    105: {
+        "en": "Error invoking service {}: {}",
+        "pt": "Erro na invocação do serviço {}: {}",
+    },
+    106: {
+        "en": "No records matching the provided criteria found",
+        "pt": "Não foram encontrados registros para os critérios fornecidos",
+    },
+    121: {
         "en": "Required attribute",
         "pt": "Atributo obrigatório",
     },
-    113: {
+    122: {
+        "en": "Attribute is unknown or invalid in this context",
+        "pt": "Atributo desconhecido ou inválido para o contexto",
+    },
+    123: {
         "en": "Attribute not applicable for {}",
         "pt": "Atributo não se aplica a {}",
     },
-    114: {
+    124: {
         "en": "Attribute applicable only for {}",
         "pt": "Atributo se aplica apenas a {}",
     },
-    115: {
+    125: {
         "en": "A value has not yet been assigned",
         "pt": "Valor ainda não foi atribuído",
     },
-    116: {
+    126: {
         "en": "Value {} cannot be assigned for attributes {} at the same time",
         "pt": "Valor {} não pode ser atribuído aos atributos {} ao mesmo tempo",
     },
-    117: {
-        "en": "Invalid value {}: must be less than {}",
-        "pt": "Valor {} inválido: deve ser menor que {}",
-    },
-    118: {
-        "en": "Invalid value {}: must be greater than {}",
-        "pt": "Valor {} inválido: deve ser maior que {}",
-    },
-    119: {
-        "en": "Invalid value {}: {}",
-        "pt": "Valor {} inválido: {}",
-    },
-    120: {
-        "en": "Invalid, inconsistent, or missing arguments",
-        "pt": "Argumento(s) inválido(s), inconsistente(s) ou não fornecido(s)",
-    },
-    121: {
+    141: {
         "en": "Invalid value {}",
         "pt": "Valor {} inválido",
     },
-    122: {
-        "en": "Invalid value {}: length shorter than {}",
-        "pt": "Valor {} inválido: comprimento menor que {}",
+    142: {
+        "en": "Invalid value {}: {}",
+        "pt": "Valor {} inválido: {}",
     },
-    123: {
-        "en": "Invalid value {}: length longer than {}",
-        "pt": "Valor {} inválido: comprimento maior que {}",
+    143: {
+        "en": "Invalid value {}: must be less than {}",
+        "pt": "Valor {} inválido: deve ser menor que {}",
     },
-    124: {
+    144: {
+        "en": "Invalid value {}: must be greater than {}",
+        "pt": "Valor {} inválido: deve ser maior que {}",
+    },
+    145: {
+        "en": "Invalid, inconsistent, or missing arguments",
+        "pt": "Argumento(s) inválido(s), inconsistente(s) ou não fornecido(s)",
+    },
+    146: {
         "en": "Invalid value {}: length must be {}",
         "pt": "Valor {} inválido: comprimento deve ser {}",
     },
-    125: {
+    147: {
+        "en": "Invalid value {}: length shorter than {}",
+        "pt": "Valor {} inválido: comprimento menor que {}",
+    },
+    148: {
+        "en": "Invalid value {}: length longer than {}",
+        "pt": "Valor {} inválido: comprimento maior que {}",
+    },
+    149: {
         "en": "Invalid value {}: must be {}",
         "pt": "Valor {} inválido: deve ser {}",
     },
-    126: {
+    150: {
         "en": "Invalid value {}: must be one of {}",
         "pt": "Valor {} inválido: deve ser um de {}",
     },
-    127: {
+    151: {
         "en": "Invalid value {}: must be in the range {}",
         "pt": "Valor {} inválido: deve estar no intervalo {}",
     },
-    128: {
+    152: {
         "en": "Invalid value {}: must be type {}",
         "pt": "Valor {} inválido: deve ser do tipo {}",
     },
-    129: {
+    153: {
         "en": "Invalid value {}: date is later than the current date",
         "pt": "Valor {} inválido: data posterior à data atual",
     },
-    130: {
-        "en": "No records matching the provided criteria found",
-        "pt": "Não foram encontrados registros para os critérios fornecidos",
+    171: {
+        "en": "Error receiving attachment: {}",
+        "pt": "Erro no recebimento de documento anexado: {}",
+    },
+    172: {
+        "en": "Invalid attachment type {}: {}",
+        "pt": "Tipo de documento anexado {} inválido: {}",
+    },
+    173: {
+        "en": "Unable to receive attachment {}",
+        "pt": "Não foi possível receber o documento anexado {}",
+    },
+    201: {
+        "en": "Error accessing the DB in {}: {}",
+        "pt": "Erro na interação com o BD em {}: {}",
+    },
+    202: {
+        "en": "No record found on DB in {}, for {}",
+        "pt": "Nenhum registro encontrado no BD, em {} para {}",
+    },
+    203: {
+        "en": "Error accessing the object store: {}",
+        "pt": "Erro na interação com o armazenador de objetos: {}",
+    },
+    204: {
+        "en": "Unable to retrieve document {} from the object store",
+        "pt": "Não foi possível recuperar o documento {} no armazenador de objetos",
+    },
+    205: {
+        "en": "Error accessing the message queue manager: {}",
+        "pt": "Erro na interação com o gerenciador de mensagens: {}",
+    },
+    211: {
+        "en": "Error accessing the job scheduler: {}",
+        "pt": "Erro na interação com o gerenciador de tarefas: {}",
+    },
+    212: {
+        "en": "Unable to access the entry point {} for the job {}: {}",
+        "pt": "Não foi possível acesso ao ponto de entrada {} para a tarefa {}: {}",
+    },
+    213: {
+        "en": "Invalid CRON expression {}",
+        "pt": "Expressão CRON {} inválida",
+    },
+    221: {
+        "en": "Error accessing the SOAP service: {}",
+        "pt": "Erro na interação com o serviço SOAP: {}",
+    },
+    222: {
+        "en": "SOAP envelope {} has invalid content: {}",
+        "pt": "Envelope SOAP {} com conteúdo inválido: {}",
+    },
+    231: {
+        "en": "Authentication token required",
+        "pt": "Token de autenticação deve ser fornecido",
+    },
+    232: {
+        "en": "Invalid authentication token",
+        "pt": "Token de autenticação inválido",
+    },
+    241: {
+        "en": "Error accessing the digital signing service at {}: {}",
+        "pt": "Erro no acesso ao serviço de assinaturas em {}: {}",
+    },
+    242: {
+        "en": "Failed to verify the digital signature of document {}: {}",
+        "pt": "Erro na verificação da assinatura digital do documento {}:{}",
+    },
+    243: {
+        "en": "Failed to verify the digest for document {}: {}",
+        "pt": "Erro na verificação do digesto do documento {}: {}",
+    },
+    244: {
+        "en": "Document {} is not digitally signed",
+        "pt": "Documento {} não contem assinatura digital",
+    },
+    245: {
+        "en": "Invalid digital signature in document {}: {}",
+        "pt": "A assinatura digital no documento {} é inválida: {}",
+    },
+    246: {
+        "en": "Document {} was modified after being digitally signed",
+        "pt": "Documento {} modificado após assinatura digital",
+    },
+    247: {
+        "en": "Document {} has invalid digest",
+        "pt": "Digesto do documento {} inválido",
     },
 }
 
@@ -132,33 +200,15 @@ for key, value in __ERR_MSGS.items():
     _ERR_MSGS_PT[key] = value["pt"]
 
 
-def validate_add_msgs(msgs: dict,
-                      lang: Literal["en", "pt"] = "en") -> None:
-    """
-    Add the messages in *msgs* to the standard validation messages list for language *lang".
-
-    If applicable, this operation should be performed at the start of the application importing this module,
-    before any attempt to read from *_ERR_MSGS_EN* or *_ERR_MSGS_PT*.
-
-    :param msgs: list of messages to be added
-    :param lang: the reference language
-    """
-    match lang:
-        case "en":
-            _ERR_MSGS_EN.update(msgs)
-        case "pt":
-            _ERR_MSGS_PT.update(msgs)
-
-
 def validate_set_msgs(msgs: dict,
                       lang: Literal["en", "pt"] = "en") -> None:
     """
-    Set  the standard validation messages list for language *lang* to the messages in *msgs*.
+    Set  the standard validation messages list for language *lang* to the coded messages in *msgs*.
 
     If applicable, this operation should be performed at the start of the application importing this module,
     before any attempt to read from *_ERR_MSGS_EN* or *_ERR_MSGS_PT*.
 
-    :param msgs: list of messages to set the standard validation messages to
+    :param msgs: list of coded messages to set the standard validation messages to
     :param lang: the reference language
     """
     global _ERR_MSGS_EN, _ERR_MSGS_PT
@@ -168,3 +218,21 @@ def validate_set_msgs(msgs: dict,
             _ERR_MSGS_EN = msgs
         case "pt":
             _ERR_MSGS_PT = msgs
+
+
+def validate_update_msgs(msgs: dict,
+                         lang: Literal["en", "pt"] = "en") -> None:
+    """
+    Update the messages in the standard validation messages list with *msgs*, for language *lang*.
+
+    If applicable, this operation should be performed at the start of the application importing this module,
+    before any attempt to read from *_ERR_MSGS_EN* or *_ERR_MSGS_PT*.
+
+    :param msgs: list of coded messages to update the standard validation messages with
+    :param lang: the reference language
+    """
+    match lang:
+        case "en":
+            _ERR_MSGS_EN.update(msgs)
+        case "pt":
+            _ERR_MSGS_PT.update(msgs)

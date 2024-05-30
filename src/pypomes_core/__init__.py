@@ -39,7 +39,7 @@ from .str_pomes import (
     str_find_whitespace, str_get_between, str_get_positional, str_rreplace,
 )
 from .validation_msgs import (
-    validate_add_msgs, validate_set_msgs
+    validate_set_msgs, validate_update_msgs,
 )
 from .validation_pomes import (
     VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
@@ -85,7 +85,7 @@ __all__ = [
     "str_as_list", "str_sanitize", "str_split_on_mark",
     "str_find_whitespace", "str_get_between", "str_get_positional", "str_rreplace",
     # validation_msgs
-    "validate_add_msgs", "validate_set_msgs",
+    "validate_set_msgs", "validate_update_msgs",
     # validation_pomes
     "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX",
     "validate_value", "validate_bool", "validate_int", "validate_float", "validate_str",

@@ -52,7 +52,7 @@ def env_get_int(key: str,
     result: int
     try:
         result = int(os.environ[key])
-    except (KeyError, TypeError):
+    except (AttributeError, KeyError, TypeError):
         result = def_value
 
     return result
@@ -70,7 +70,7 @@ def env_get_float(key: str,
     result: float
     try:
         result = float(os.environ[key])
-    except (KeyError, TypeError):
+    except (AttributeError, KeyError, TypeError):
         result = def_value
 
     return result
@@ -88,7 +88,7 @@ def env_get_path(key: str,
     result: Path
     try:
         result = Path(os.environ[key])
-    except (KeyError, TypeError):
+    except (AttributeError, KeyError, TypeError):
         result = def_value
 
     return result

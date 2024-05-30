@@ -18,7 +18,7 @@ def json_normalize_dict(source: dict) -> None:
         if isinstance(value, dict):
             json_normalize_dict(source=value)
         elif isinstance(value, bytes | bytearray):
-            source[key] = base64.b64encode(value).decode()
+            source[key] = base64.b64encode(s=value).decode()
         elif isinstance(value, Iterable) and not isinstance(value, str):
             source[key] = json_normalize_iterable(source=value)
 
@@ -39,7 +39,7 @@ def json_normalize_iterable(source: Iterable) -> list[any]:
     result: list[any] = []
     for value in source:
         if isinstance(value, dict):
-            json_normalize_dict(value)
+            json_normalize_dict(source=value)
             result.append(value)
         elif isinstance(value, bytes | bytearray):
             result.append(base64.b64encode(value).decode())

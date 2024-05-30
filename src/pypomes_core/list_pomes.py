@@ -1,5 +1,7 @@
-def list_compare(list1: list[any],
-                 list2: list[any]) -> bool:
+from typing import Any
+
+def list_compare(list1: list[Any],
+                 list2: list[Any]) -> bool:
     """
     Compare the contents of the two lists *list1* e *list2*.
 
@@ -100,10 +102,10 @@ def list_find_coupled(coupled_elements: list[tuple[str, str]],
     return result
 
 
-def list_transform(source: list[any],
+def list_transform(source: list[Any],
                    from_to_keys: list[tuple[str, str]],
                    prefix_from: str = None,
-                   prefix_to: str = None) -> list[any]:
+                   prefix_to: str = None) -> list[Any]:
     """
     Construct a new *list*, transforming elements of type *list* and *dict* found in *source*.
 
@@ -123,7 +125,7 @@ def list_transform(source: list[any],
     from .dict_pomes import dict_transform
 
     # initialize the return variable
-    result: list[any] = []
+    result: list[Any] = []
 
     # traverse the source list
     for inx, value in enumerate(source):
@@ -144,7 +146,7 @@ def list_transform(source: list[any],
                                             prefix_from=from_keys,
                                             prefix_to=prefix_to)
         else:
-            to_value: any = value
+            to_value: Any = value
 
         # added the value transformed to 'result'
         result.append(to_value)
