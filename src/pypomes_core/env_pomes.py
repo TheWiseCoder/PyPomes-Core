@@ -15,7 +15,7 @@ def env_get_str(key: str,
     :param def_value: The default value to return, if the key has not been defined
     :return: The str value associated with the key
     """
-    result: str = os.environ.get(key)
+    result: str = os.getenv(key)
     if result is None:
         result = def_value
 

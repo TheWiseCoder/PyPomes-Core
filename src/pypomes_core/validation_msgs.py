@@ -7,7 +7,7 @@ __ERR_MSGS: Final[dict] = {
     },
     102: {
         "en": "Unexpected error: {}",
-        "pt": "Error não previsto: {}",
+        "pt": "Error inesperado: {}",
     },
     103: {
         "en": "Invalid operation {}",
@@ -24,6 +24,18 @@ __ERR_MSGS: Final[dict] = {
     106: {
         "en": "No records matching the provided criteria found",
         "pt": "Não foram encontrados registros para os critérios fornecidos",
+    },
+    107: {
+        "en": "No files matching the provided criteria found",
+        "pt": "Não foram encontrados arquivos para os critérios fornecidos",
+    },
+    111: {
+        "en": "File {} not found",
+        "pt": "Arquivo {} não encontrado",
+    },
+    112: {
+        "en": "Environment variable {} not defined",
+        "pt": "Variável de ambiente {} não definida",
     },
     121: {
         "en": "Required attribute",
@@ -42,8 +54,8 @@ __ERR_MSGS: Final[dict] = {
         "pt": "Atributo se aplica apenas a {}",
     },
     125: {
-        "en": "A value has not yet been assigned",
-        "pt": "Valor ainda não foi atribuído",
+        "en": "A value has not been assigned",
+        "pt": "Valor não foi atribuído",
     },
     126: {
         "en": "Value {} cannot be assigned for attributes {} at the same time",

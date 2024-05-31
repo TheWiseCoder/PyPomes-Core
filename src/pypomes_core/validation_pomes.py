@@ -309,7 +309,8 @@ def validate_str(errors: list[str] | None,
                               val=value,
                               max_val=min_length,
                               min_val=max_length,
-                              values=values,required= required)
+                              values=values,
+                              required= required)
 
     if stat:
         __validate_log(errors=errors,
