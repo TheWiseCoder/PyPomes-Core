@@ -650,7 +650,7 @@ def dict_transform(source: dict,
 
 
 def dict_clone(source: dict,
-               from_to_keys: list) -> dict:
+               from_to_keys: list[str | tuple[str, str]]) -> dict:
     """
     Build a new *dict*, according to the rules presented herein.
 

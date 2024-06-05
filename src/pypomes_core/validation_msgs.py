@@ -7,7 +7,7 @@ __ERR_MSGS: Final[dict] = {
     },
     102: {
         "en": "Unexpected error: {}",
-        "pt": "Error inesperado: {}",
+        "pt": "Erro inesperado: {}",
     },
     103: {
         "en": "Invalid operation {}",
@@ -59,7 +59,11 @@ __ERR_MSGS: Final[dict] = {
     },
     126: {
         "en": "Value {} cannot be assigned for attributes {} at the same time",
-        "pt": "Valor {} não pode ser atribuído aos atributos {} ao mesmo tempo",
+        "pt": "Valor {} não pode ser especficado aos atributos {} ao mesmo tempo",
+    },
+    127: {
+        "en": "Attributes {} cannot be assigned values at the same time",
+        "pt": "Atributos {} não podem ter valores especificados ao mesmo tempo",
     },
     141: {
         "en": "Invalid value {}",

@@ -53,6 +53,8 @@ from .xml_pomes import (
 )
 
 __all__ = [
+    # __init__
+    "get_versions",
     # datetime_pomes
     "DATE_FORMAT_STD", "DATE_FORMAT_COMPACT", "DATE_FORMAT_INV",
     "DATETIME_FORMAT_STD", "DATETIME_FORMAT_COMPACT", "DATETIME_FORMAT_INV",
@@ -99,3 +101,51 @@ __all__ = [
 from importlib.metadata import version
 __version__ = version("pypomes_core")
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
+
+
+from contextlib import suppress
+from importlib import import_module
+def get_versions() -> dict:
+    """
+    Retrieve and return the versions of the *Pypomes* packages in use.
+
+    :return: the versions of the Pypomes packages in use
+    """
+    result: dict = {
+        "PyPomes-Core": __version__
+    }
+
+    with suppress(Exception):
+        result["PyPomes-Cloud"] =  import_module(name="pypomes_cloud").__version__
+
+    with suppress(Exception):
+        result["PyPomes-Crypto"] =  import_module(name="pypomes_crypto").__version__
+
+    with suppress(Exception):
+        result["PyPomes-DB"] =  import_module(name="pypomes_db").__version__
+
+    with suppress(Exception):
+        result["PyPomes-HTTP"] =  import_module(name="pypomes_http").__version__
+
+    with suppress(Exception):
+        result["PyPomes-LDAP"] =  import_module(name="pypomes_ldap").__version__
+
+    with suppress(Exception):
+        result["PyPomes-Logging"] =  import_module(name="pypomes_logging").__version__
+
+    with suppress(Exception):
+        result["PyPomes-Messaging"] =  import_module(name="pypomes_messaging").__version__
+
+    with suppress(Exception):
+        result["PyPomes-S3"] =  import_module(name="pypomes_s3").__version__
+
+    with suppress(Exception):
+        result["PyPomes-Scheduling"] =  import_module(name="pypomes_scheduling").__version__
+
+    with suppress(Exception):
+        result["PyPomes-Security"] =  import_module(name="pypomes_security").__version__
+
+    with suppress(Exception):
+        result["PyPomes-SOAP"] =  import_module(name="pypomes_soap").__version__
+
+    return result

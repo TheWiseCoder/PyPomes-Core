@@ -307,8 +307,8 @@ def validate_str(errors: list[str] | None,
         values = default if isinstance(default, list) else None
         stat = validate_value(attr=attr,
                               val=value,
-                              max_val=min_length,
-                              min_val=max_length,
+                              min_val=min_length,
+                              max_val=max_length,
                               values=values,
                               required= required)
 

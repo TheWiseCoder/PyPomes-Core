@@ -39,7 +39,7 @@ def str_sanitize(target_str: str) -> str:
                              .replace('"', "'") \
                              .replace("\n", " ") \
                              .replace("\t", " ")
-    return "".join(cleaned.split())
+    return " ".join(cleaned.split())
 
 
 def str_split_on_mark(source: str,
