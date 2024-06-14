@@ -24,7 +24,7 @@ def validate_value(attr: str,
     :param max_val: if val is a string, specifies its maximum length; otherwise, specifies its maximum value
     :param values: if provided, requires 'val' to be in it
     :param required:  requires 'val' to be specified;
-    :return: None if val passes validation, or the corresponding error message otherwise
+    :return: 'None' if val passes validation, or the corresponding error message otherwise
     """
     # initialize the return variable
     result: str | None = None
@@ -89,7 +89,7 @@ def validate_bool(errors: list[str] | None,
     :param default: default value, overiding 'required'
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or None if validation failed
+    :return: the validated value, or 'None' if validation failed
     """
     # initialize the return variable
     result: bool | None = None
@@ -159,7 +159,7 @@ def validate_int(errors: list[str] | None,
                     if 'list', requires the value, if provided, to be in it
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or None if validation failed
+    :return: the validated value, or 'None' if validation failed
     """
     # initialize the return variable
     result: int | None = None
@@ -222,7 +222,7 @@ def validate_float(errors: list[str] | None,
                     if 'list', requires the value, if provided, to be in it
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or None if validation failed
+    :return: the validated value, or 'None' if validation failed
     """
     # initialize the return variable
     result: float | None = None
@@ -341,7 +341,7 @@ def validate_date(errors: list[str] | None,
     :param default: optional default value, overrides 'required'
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or None if validation failed
+    :return: the validated value, or 'None' if validation failed
     """
     # import needed module
     from .datetime_pomes import date_parse
@@ -400,7 +400,7 @@ def validate_datetime(errors: list[str] | None,
     :param default: optional default value, overrides 'required'
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or None if validation failed
+    :return: the validated value, or 'None' if validation failed
     """
     # import needed module
     from .datetime_pomes import datetime_parse
@@ -413,7 +413,7 @@ def validate_datetime(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # obtain and validate the value
-    value: str = scheme[suffix]
+    value: str = scheme.get(suffix)
     if value:
         result = datetime_parse(dt_str=value,
                                 dayfirst=day_first)
@@ -456,16 +456,18 @@ def validate_ints(errors: list[str] | None,
     :param max_val:  the maximum value accepted
     :param required: whether the list of values must be provided
     :param logger: optional logger
-    :return: the list of validated values, or None if validation failed
+    :return: the list of validated values, '[]' if not required and no values found, or 'None' if validation failed
     """
     # initialize the return variable
-    result: list[Any] | None = None
+    result: list[Any] | None = []
 
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
-    try:
-        values: list[Any] = scheme[suffix]
+
+    # obtain the values
+    values: list[Any] = scheme.get(suffix)
+    if values:
         if isinstance(values, list):
             result = []
             if len(values) > 0:
@@ -485,15 +487,15 @@ def validate_ints(errors: list[str] | None,
         else:
             # 152: Invalid value {}: must be type {}
             stat = validate_format_error(152, result, "list", f"@{attr}")
-    except (KeyError, TypeError):
-        if required:
-            # 121: Required attribute
-            stat = validate_format_error(121, f"@{attr}")
+    elif required:
+        # 121: Required attribute
+        stat = validate_format_error(121, f"@{attr}")
 
     if stat:
         __validate_log(errors=errors,
                        err_msg=stat,
                        logger=logger)
+        result = None
 
     return result
 
@@ -517,16 +519,18 @@ def validate_strs(errors: list[str] | None,
     :param max_length:  optional maximum length accepted
     :param required: whether the list of values must be provided
     :param logger: optional logger
-    :return: the list of validated values, or None if validation failed
+    :return: the list of validated values, '[]' if not required and no values found, or 'None' if validation failed
     """
     # initialize the return variable
-    result: list[Any] | None = None
+    result: list[Any] | None = []
 
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
-    try:
-        values: list[Any] = scheme[suffix]
+
+    # obtain the values
+    values: list[Any] = scheme[suffix]
+    if values:
         if isinstance(values, list):
             result = []
             if len(values) > 0:
@@ -546,15 +550,15 @@ def validate_strs(errors: list[str] | None,
         else:
             # 152: Invalid value {}: must be type {}
             stat = validate_format_error(152, result, "list", f"@{attr}")
-    except (KeyError, TypeError):
-        if required:
-            # 121: Required attribute
-            stat = validate_format_error(121, f"@{attr}")
+    elif required:
+        # 121: Required attribute
+        stat = validate_format_error(121, f"@{attr}")
 
     if stat:
         __validate_log(errors=errors,
                        err_msg=stat,
                        logger=logger)
+        result = None
 
     return result
 
