@@ -15,10 +15,12 @@ def list_compare(list1: list[Any],
     result: bool = True
 
     # are the input parameters lists containing the same number of elements ?
-    if isinstance(list1, list) and isinstance(list2, list) and len(list1) == len(list2):
+    if (isinstance(list1, list) and
+        isinstance(list2, list) and
+        len(list1) == len(list2)):
         # yes, verify whether all elements in 'list1' are also in 'list2', in the same quantity
         for elem in list1:
-            # is 'elem' in both lists, in thew same quantity ?
+            # is 'elem' in both lists, in the same quantity ?
             if list1.count(elem) != list2.count(elem):
                 # no, the lists are not equal
                 result = False
@@ -180,3 +182,29 @@ def list_elem_starting_with(source: list[str | bytes],
             break
 
     return result
+
+
+def list_prune_in(target: list[Any], ref: list[Any]) -> None:
+    """
+    Remove from *target* all its elements that are also in *ref*.
+
+    :param target: the target list
+    :param ref: the reference list
+    :return: the target list without the elements also in the reference list
+    """
+    removals: list[Any] = [item for item in target if item in ref]
+    for item in removals:
+        target.remove(item)
+
+
+def list_prune_not_in(target: list[Any], ref: list[Any]) -> None:
+    """
+    Remove from *target* all its elements that are not also in *ref*.
+
+    :param target: the target list
+    :param ref: the reference list
+    :return: the target list without the elements not in the reference list
+    """
+    removals: list[Any] = [item for item in target if item not in ref]
+    for item in removals:
+        target.remove(item)

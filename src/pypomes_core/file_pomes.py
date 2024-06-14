@@ -63,7 +63,7 @@ def file_get_data(file_data: Path | str | bytes) -> bytes:
         # argument is a file path
         buf_size: int = 128 * 1024
         file_path: Path = Path(file_data)
-        with file_path.open("rb") as f:
+        with file_path.open(mode="rb") as f:
             file_bytes: bytearray = bytearray()
             while True:
                 in_bytes: bytes = f.read(buf_size)

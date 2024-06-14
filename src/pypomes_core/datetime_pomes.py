@@ -29,13 +29,19 @@ def date_reformat(dt_str: str,
     The argument *to_format* must be a valid format for *date* ou *datetime*.
 
     In *kwargs*, it may optionally be specified:
-        -   *dayfirst*, to signal that *day* comes before *month* in *dt_str*
+        -   *dayfirst=True*
+                - to signal that *day* comes before *month* in an ambiguous 3-integer date
+                  (e.g. '01/05/09') - defaults to *False*
+        -   *yearfirst=True*
+                - to signal that *year* comes before *month* in an ambiguous 3-integer date
+                  (e.g. '01/05/09') - defaults to *False*
         -   *fmt=<format>*, to force use of a specific format
+    Return *None* se *dt_str* does not contain a valid date.
 
     :param dt_str: the date to convert
     :param to_format: the format for the conversion
     :param kwargs: optional arguments for the parser in python-dateutil
-    :return:  the converted date
+    :return: the converted date
     """
     result: str | None = None
     ts: datetime = parser.parse(timestr=dt_str,
@@ -52,7 +58,12 @@ def date_parse(dt_str: str,
     Obtain and return the *date* object corresponding to *dt_str*.
 
     In *kwargs*, it may optionally be specified:
-        -   *dayfirst*, to signal that *day* comes before *month* in *dt_str*
+        -   *dayfirst=True*
+                - to signal that *day* comes before *month* in an ambiguous 3-integer date
+                  (e.g. '01/05/09') - defaults to *False*
+        -   *yearfirst=True*
+                - to signal that *year* comes before *month* in an ambiguous 3-integer date
+                  (e.g. '01/05/09') - defaults to *False*
         -   *fmt=<format>*, to force use of a specific format
     Return *None* se *dt_str* does not contain a valid date.
 
@@ -85,7 +96,7 @@ def datetime_parse(dt_str: str,
                 - to signal that *year* comes before *month* in an ambiguous 3-integer date
                   (e.g. '01/05/09') - defaults to *False*
         -   *fmt=<format>*, to force use of a specific format
-   Return *None* if *dt_str* does not contain a valid date.
+    Return *None* if *dt_str* does not contain a valid date.
 
     :param dt_str: the date, in a supported format
     :param kwargs: optional arguments for the parser in python-dateutil

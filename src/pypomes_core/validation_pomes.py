@@ -279,8 +279,8 @@ def validate_str(errors: list[str] | None,
     :param errors: incidental error messages
     :param scheme: dictionary containing the value to be validated
     :param attr: the attribute associated with the value to be validated
-    :param min_length: the minimum length accepted
-    :param max_length:  the maximum length accepted
+    :param min_length: optional minimum length accepted
+    :param max_length:  optional maximum length accepted
     :param default: if 'str', specifies the default value, overrinding the other constraints
                     if 'list', requires the value, if provided, to be in it
     :param required: specifies whether a value must be provided
@@ -501,8 +501,8 @@ def validate_ints(errors: list[str] | None,
 def validate_strs(errors: list[str] | None,
                   scheme: dict,
                   attr: str,
-                  min_length: int,
-                  max_length: int,
+                  min_length: int = None,
+                  max_length: int = None,
                   required: bool = False,
                   logger: Logger = None) -> list[str]:
     """
@@ -513,8 +513,8 @@ def validate_strs(errors: list[str] | None,
     :param errors: incidental error messages
     :param scheme: dictionary containing the list of values to be validated
     :param attr: the attribute associated with the list of values to be validated
-    :param min_length: the minimum length accepted
-    :param max_length:  the maximum length accepted
+    :param min_length: optional minimum length accepted
+    :param max_length:  optional maximum length accepted
     :param required: whether the list of values must be provided
     :param logger: optional logger
     :return: the list of validated values, or None if validation failed

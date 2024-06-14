@@ -50,12 +50,9 @@ def decode_ascii_hex(source: bytes) -> bytes:
     r"""
     Decode text content in *source* into binary.
 
-    Essa decodificação é feita para texto codificado com caracteres para bytes no intervalo ASCII,
-    com a representação *backslash-escaped* para os caracteres especiais LF, HT, CR, VT, FF e BS,
-    e com a representação *\\xNN* para os demais (onde *N* é um dígito hexadecimal [0-9] e [a-f]).
-    This decoding is done for text encoded with characters for bytes in the ASCII range, with the
-    *backslash-escaped* representation for the special characters *LF*, *HT*, *CR*, *VT*, *FF* and *BS*,
-    and with the representation *\\xNN* for the others (where *N* is a hexadecimal digit in *[0-9a-f]*).
+    This decoding is done for character-encoding text to bytes in the ASCII range, with the
+    *backslash-escaped* representation for the special characters LF, HT, CR, VT, FF and BS,
+    and with the representation *\\xNN* for the others (where *N* is a hexadecimal digit [0-9a-f]).
 
     :param source: the text content to be decoded
     :return: the decoded binary content
@@ -63,10 +60,10 @@ def decode_ascii_hex(source: bytes) -> bytes:
     # initialize the return variable
     result: bytes = b""
 
-    # traverse 'source', dencoding the occurences of '\'
+    # traverse 'source', decoding the occurences of '\'
     byte_val: bytes
     pos1: int = 0
-    # localiza o primeiro "\"
+    # locate the first '\'
     pos2: int = source.find(b"\\")
     while pos2 >= 0:
         result += source[pos1:pos2]
@@ -74,7 +71,7 @@ def decode_ascii_hex(source: bytes) -> bytes:
         shift: int = 2
         match next_byte:
             case b"x":
-                # "\x" prefixes a character denoted by a hexadecimal string ('\x00' through '\xff')
+                # '\x' prefixes a character denoted by a hexadecimal string ('\x00' through '\xff')
                 # HAZARD: intermediate chars are necessary - 'int(byte)' breaks for byte > b'\x09'
                 upper_char: str = source[pos2+2:pos2+3].decode()
                 lower_char: str = source[pos2+3:pos2+4].decode()
@@ -94,7 +91,7 @@ def decode_ascii_hex(source: bytes) -> bytes:
             case b"b":
                 byte_val = b"\x08"                  # BS, \b  - backspace
             case _:
-                byte_val = source[pos2+1:pos2+2]    # o byte seguinte ao "\"
+                byte_val = source[pos2+1:pos2+2]    # byte following '\'
         pos1 = pos2 + shift
         result += byte_val
         # locate the next '\'

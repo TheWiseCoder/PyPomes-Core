@@ -55,11 +55,11 @@ def xml_to_dict(file_data: Path | str | bytes) -> dict:
     """
     Convert the XML into a *dict*, by removing namespaces, and keys prefixed with "@" e "#".
 
-    O XML de entrada deve estar em *file_data* (tipo *bytes*),
-    ou em arquivo do sistema com o caminho especificado por *file_data* (tipo *Path* ou *str*).
+   The input XML must be in *file_data* (type *bytes*),  or in a
+   system file with the path specified by *file_data* (type *Path* or *str*).
 
-    :param file_data: XML a ser convertido
-    :return: dict normalizado
+    :param file_data: XML to be converted
+    :return: normalized dict
     """
     # obtain the file data
     file_bytes: bytes = file_get_data(file_data=file_data)

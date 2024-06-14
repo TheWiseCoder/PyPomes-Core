@@ -24,7 +24,7 @@ def exc_format(exc: Exception,
 
     # retrieve the module name and the line number within the module
     try:
-        fname: str = os.path.split(tlast.tb_frame.f_code.co_filename)[1]
+        fname: str = os.path.split(p=tlast.tb_frame.f_code.co_filename)[1]
     except Exception:
         fname: str = "<unknow module>"
     fline: int = tlast.tb_lineno

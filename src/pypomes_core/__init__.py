@@ -7,7 +7,8 @@ from .datetime_pomes import (
 from .dict_pomes import (
     dict_has_key_chain, dict_get_value, dict_set_value, dict_reduce,
     dict_listify, dict_transform, dict_merge, dict_coalesce, dict_clone,
-    dict_get_key, dict_get_keys, dict_from_object, dict_from_list, dict_replace_value, dict_pop_value,
+    dict_get_key, dict_get_keys, dict_from_object, dict_from_list,
+    dict_replace_value, dict_pop_value,
 )
 from .email_pomes import (
     EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SERVER,
@@ -32,7 +33,8 @@ from .json_pomes import (
 )
 from .list_pomes import (
     list_compare, list_flatten, list_unflatten,
-    list_find_coupled, list_elem_starting_with, list_transform,
+    list_find_coupled, list_elem_starting_with,
+    list_transform, list_prune_in, list_prune_not_in
 )
 from .str_pomes import (
     str_as_list, str_sanitize, str_split_on_mark,
@@ -82,7 +84,8 @@ __all__ = [
     "json_normalize_dict", "json_normalize_iterable",
     # list_pomes
     "list_compare", "list_flatten", "list_unflatten",
-    "list_find_coupled", "list_elem_starting_with", "list_transform",
+    "list_find_coupled", "list_elem_starting_with",
+    "list_transform", "list_prune_in", "list_prune_not_in",
     # str_pomes
     "str_as_list", "str_sanitize", "str_split_on_mark",
     "str_find_whitespace", "str_get_between", "str_get_positional", "str_rreplace",

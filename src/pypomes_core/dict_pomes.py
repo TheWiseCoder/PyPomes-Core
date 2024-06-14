@@ -145,7 +145,7 @@ def dict_set_value(target: dict,
         else:
             # no, does 'dict_item' have 'key' as one of its elements ?
             if key not in dict_item:
-                # não, assign to 'dict_item' the element 'key' with an empty dict as value
+                # não, assign to 'dict_item' the element 'key', with an empty dict as value
                 dict_item[key] = {}
             dict_item = dict_item.get(key)
 
@@ -372,7 +372,8 @@ def dict_coalesce(target: dict,
     """
     # traverse the kay chain up to its penultimate element
     curr_dict: dict | None = target
-    for inx, key in enumerate(key_chain[:-2]):  # 'key_chain[:-2]' returns an empy list if it has less the 3 elements
+    # 'key_chain[:-2]' returns an empy list if it has less the 3 elements
+    for inx, key in enumerate(key_chain[:-2]):
 
         # is 'curr_dict' a dictionary ?
         if not isinstance(curr_dict, dict):
@@ -464,41 +465,41 @@ def dict_reduce(target: dict,
     :param target: the 'dict' to be reduced
     :param key_chain: the key chain
     """
-    # a cadeia de chaves contem pelo menos 1 chave ?
+    # does the key chain contain at least 1 key ?
     if len(key_chain) > 0:
-        # sim, prossiga
+        # yes, proceed
 
         curr_dict: dict | None = target
-        # percorre a cadeia até a penúltima chave
+        # traverse the chain up to its penultimate key
         for inx, key in enumerate(key_chain[:-1]):
 
-            # é possível prosseguir ?
+            # is it possible to proceed?
             if not isinstance(curr_dict, dict):
-                # não, aborte a operação
+                # no, abort the operation
                 break
 
-            # key está associado a uma lista ?
+            # is 'key' associated with a list ?
             in_list: list[any] = curr_dict.get(key)
             if isinstance(in_list, list):
-                # sim, invoque recursivamente a redução dos dicionários da lista
+                # yes, recursively invoke reduction of the dictionaries in 'in_list'
                 for in_dict in in_list:
-                    # o item da lista é um dicionário ?
+                    # Is the list item a dictionary ?
                     if isinstance(in_dict, dict):
-                        # sim, reduza-o recursivamente
+                        # sim, recursively reduce it
                         dict_reduce(target=in_dict,
                                     key_chain=key_chain[inx + 1:])
-                # termine a operação
+                # terminate the operation
                 curr_dict = None
                 break
 
-            # prossiga com o valor associado a key
+            # proceed with the value associated with 'key'
             curr_dict = curr_dict.get(key)
 
         last_key: str = key_chain[-1]
-        # curr_dict contem um dicionário associado a last_key ?
+        # does 'curr_dict' contain a dictionary associated with 'last_key' ?
         if isinstance(curr_dict, dict) and \
            isinstance(curr_dict.get(last_key), dict):
-            # sim, prossiga com a redução
+            # yes, proceed with the reduction
             last: dict = curr_dict.pop(last_key)
             for key, value in last.items():
                 curr_dict[key] = value
@@ -597,51 +598,51 @@ def dict_transform(source: dict,
     :param prefix_to: prefix to be removed from target keys
     :return: the new 'dict'
     """
-    # import the neeeded functions
+    # import the needed functions
     from .list_pomes import list_find_coupled, list_transform, list_unflatten
 
-    # inicializa a variável de retorno
+    # initialize the return variable
     result: dict = {}
 
-    # percorre o dicionário de origem
+    # traverse the source dictionary
     for key, value in source.items():
 
-        # define a cadeia de chaves de origem
+        # define the source key chain
         if prefix_from:
             from_keys: str = f"{prefix_from}.{key}"
         else:
             from_keys: str = key
 
-        # obtem a cadeia de chaves de destino
+        # get the target key chain
         to_keys: str = list_find_coupled(coupled_elements=from_to_keys,
                                          primary_element=from_keys)
 
-        # o destino foi definido ?
+        # has the destination been defined ?
         if to_keys:
-            # sim, obtenha o valor de destino
+            # yes, get the target value
             if isinstance(value, dict):
-                # valor é um dicionário, transforme-o
+                # 'value' is a dictionary, transform it
                 to_value: dict = dict_transform(source=value,
                                                 from_to_keys=from_to_keys,
                                                 prefix_from=from_keys,
                                                 prefix_to=to_keys)
             elif isinstance(value, list):
-                # valor é uma lista, transforme-a
+                # 'value' is a list, transform it
                 to_value: list = list_transform(source=value,
                                                 from_to_keys=from_to_keys,
                                                 prefix_from=from_keys,
                                                 prefix_to=to_keys)
             else:
-                # valor não é dicionário ou lista
+                # 'value' is neither a dictionary nor a list
                 to_value: any = value
 
-            # o prefixo de destino foi definido e ocorre na cadeia de destino ?
+            # has the target prefix been defined and does it occur in the target string ?
             if prefix_to and to_keys.startswith(prefix_to):
-                # sim, remova o prefixo
+                # yes, remove the prefix
                 to_keys = to_keys[len(prefix_to)+1:]
             to_keys_deep: list[str] = list_unflatten(source=to_keys)
 
-            # atribui o valor transformado ao resultado
+            # assign the transformed value to the result
             dict_set_value(target=result,
                            key_chain=to_keys_deep,
                            value=to_value)
@@ -666,7 +667,7 @@ def dict_clone(source: dict,
     :param from_to_keys: list of elements indicative of the source and target keys
     :return: the new dict
     """
-    # import the neeeded function
+    # import the needed function
     from .list_pomes import list_unflatten
 
     # inicialize the return variable
