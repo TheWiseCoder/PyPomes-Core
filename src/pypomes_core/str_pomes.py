@@ -11,7 +11,7 @@ def str_as_list(source: str | Any,
 
     :param source: the string value to be worked on
     :param separator: the separator (defaults to ",")
-    :return: a list built from the contents of the source parameter, or that parameter itself, if is not a string
+    :return: a list built from the contents of 'source', or 'source' itself, if is not a string
     """
     result: list[Any]
     if isinstance(source, str):
@@ -157,21 +157,21 @@ def str_lower(source: str) -> str:
     """
     Safely convert *source* to lower-case.
 
-    If *source* is not a string, *None* is returned.
+    If *source* is not a *str*, then it is itself returned.
 
     :param source: the string to convert to lower-case
-    :return: 'source' in lower-case, or 'None' if 'source' is not a string
+    :return: 'source' in lower-case, or 'source' itself, if is not a string
     """
-    return source.lower() if isinstance(source, str) else None
+    return source.lower() if isinstance(source, str) else source
 
 
 def str_upper(source: str) -> str:
     """
     Safely convert *source* to upper-case.
 
-    If *source* is not a string, *None* is returned.
+    If *source* is not a *str*, then it is itself returned.
 
     :param source: the string to convert to upper-case
-    :return: 'source' in upper-case, or 'None' if 'source' is not a string
+    :return: 'source' in upper-case, or 'source' itself, if it is not a string
     """
-    return source.upper() if isinstance(source, str) else None
+    return source.upper() if isinstance(source, str) else source
