@@ -152,3 +152,26 @@ def str_rreplace(source: str,
     """
     return source[::-1].replace(old[::-1], new[::-1], count)[::-1]
 
+
+def str_lower(source: str) -> str:
+    """
+    Safely convert *source* to lower-case.
+
+    If *source* is not a string, the empty string is returned.
+
+    :param source: the string to converto to lower-case
+    :return: the source string in lower-case, or the empty string if source is not a string
+    """
+    return source.lower() if isinstance(source, str) else ""
+
+
+def str_upper(source: str) -> str:
+    """
+    Safely convert *source* to upper-case.
+
+    If *source* is not a string, the empty string is returned.
+
+    :param source: the string to converto to upper-case
+    :return: the source string in upper-case, or the empty string if source is not a string
+    """
+    return source.upper() if isinstance(source, str) else ""
