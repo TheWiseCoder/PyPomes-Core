@@ -79,9 +79,9 @@ def validate_bool(errors: list[str] | None,
 
     If provided, this value must be on of:
         - a *bool*
-        - the string *1*, *t*, or *true*
-        - the string *0*, *f*, or *false*
         - the integer *1* or *0*
+        - the string *1*, *t*, or *true*, case disregarded
+        - the string *0*, *f*, or *false*, case disregarded
 
     :param errors: incidental error messages
     :param scheme: dictionary containing the value to be validated
@@ -174,14 +174,15 @@ def validate_int(errors: list[str] | None,
     # validate it
     if value is None and isinstance(default, int):
         value = default
+    elif isinstance(value, str) and value.isnumeric():
+        value = int(value)
     # 'bool' is subtype of 'int'
     elif value is not None and \
          (isinstance(value, bool) or not isinstance(value, int)):
         # 152: Invalid value {}: must be type {}
         stat = validate_format_error(152, value, "int", f"@{attr}")
-    else:
-        if isinstance(value, str) and value.isnumeric():
-            value = int(value)
+
+    if not stat:
         values = default if isinstance(default, list) else None
         stat = validate_value(attr=attr,
                               val=value,
@@ -189,7 +190,6 @@ def validate_int(errors: list[str] | None,
                               max_val=max_val,
                               values=values,
                               required=required)
-
     if stat:
         __validate_log(errors=errors,
                        err_msg=stat,
@@ -237,14 +237,15 @@ def validate_float(errors: list[str] | None,
     # validate it
     if value is None and isinstance(default, int | float):
         value = float(default)
+    elif (isinstance(value, int) and not isinstance(value, bool)) or \
+          (isinstance(value, str) and value.replace(".", "", 1).isnumeric()):
+        value = float(value)
     elif isinstance(value, bool) or \
-         value is not None and not isinstance(value, int | float):
+         (value is not None and not isinstance(value, int | float)):
         # 152: Invalid value {}: must be type {}
         stat = validate_format_error(152, value, "float", f"@{attr}")
-    else:
-        if (isinstance(value, int) and not isinstance(value, bool)) or \
-           (isinstance(value, str) and value.replace(".", "", 1).isnumeric()):
-            value = float(value)
+
+    if not stat:
         values = default if isinstance(default, list) else None
         stat = validate_value(attr=attr,
                               val=value,
@@ -252,7 +253,6 @@ def validate_float(errors: list[str] | None,
                               max_val=max_val,
                               values=values,
                               required=required)
-
     if stat:
         __validate_log(errors=errors,
                        err_msg=stat,
