@@ -529,7 +529,7 @@ def validate_strs(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # obtain the values
-    values: list[Any] = scheme[suffix]
+    values: list[Any] = scheme.get(suffix)
     if values:
         if isinstance(values, list):
             result = []
