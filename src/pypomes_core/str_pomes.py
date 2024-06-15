@@ -157,21 +157,21 @@ def str_lower(source: str) -> str:
     """
     Safely convert *source* to lower-case.
 
-    If *source* is not a string, the empty string is returned.
+    If *source* is not a string, *None* is returned.
 
     :param source: the string to convert to lower-case
-    :return: 'source' in lower-case, or the empty string if 'source' is not a string
+    :return: 'source' in lower-case, or 'None' if 'source' is not a string
     """
-    return source.lower() if isinstance(source, str) else ""
+    return source.lower() if isinstance(source, str) else None
 
 
 def str_upper(source: str) -> str:
     """
     Safely convert *source* to upper-case.
 
-    If *source* is not a string, the empty string is returned.
+    If *source* is not a string, *None* is returned.
 
     :param source: the string to convert to upper-case
-    :return: 'source' in upper-case, or the empty string if 'source' is not a string
+    :return: 'source' in upper-case, or 'None' if 'source' is not a string
     """
-    return source.upper() if isinstance(source, str) else ""
+    return source.upper() if isinstance(source, str) else None
