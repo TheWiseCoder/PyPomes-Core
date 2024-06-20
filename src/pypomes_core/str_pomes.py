@@ -116,7 +116,7 @@ def str_get_between(source: str,
 
 def str_get_positional(source: str,
                        list_origin: list[str],
-                       list_dest: list[str]) -> str:
+                       list_dest: list[Any]) -> Any:
     """
     Locate the position of *source* within *list_origin*, and return the element in the same position in *list_dest*.
 
@@ -126,7 +126,7 @@ def str_get_positional(source: str,
     :return: the value positionally corresponding to the source string, or None if not found
     """
     # declare the return variable
-    result: str | None
+    result: Any | None
 
     try:
         pos: int = list_origin.index(source)
