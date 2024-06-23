@@ -65,12 +65,10 @@ def file_get_data(file_data: Path | str | bytes) -> bytes:
         file_path: Path = Path(file_data)
         with file_path.open(mode="rb") as f:
             file_bytes: bytearray = bytearray()
-            while True:
-                in_bytes: bytes = f.read(buf_size)
-                if in_bytes:
-                    file_bytes += in_bytes
-                else:
-                    break
+            in_bytes: bytes = f.read(buf_size)
+            while in_bytes:
+                file_bytes += in_bytes
+                in_bytes = f.read(buf_size)
         result = bytes(file_bytes)
 
     return result
