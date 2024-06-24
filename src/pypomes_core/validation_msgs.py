@@ -1,6 +1,6 @@
 from typing import Final, Literal
 
-__ERR_MSGS: Final[dict] = {
+__ERR_MSGS: Final[dict[int,dict[str,str]]] = {
     101: {
         "en": "{}",
         "pt": "{}",
@@ -149,6 +149,10 @@ __ERR_MSGS: Final[dict] = {
         "en": "Error accessing the message queue manager: {}",
         "pt": "Erro na interação com o gerenciador de mensagens: {}",
     },
+    206: {
+        "en": "Record already exists on DB in {}, for {}",
+        "pt": "Registro já existe no BD, em {} para {}",
+    },
     211: {
         "en": "Error accessing the job scheduler: {}",
         "pt": "Erro na interação com o gerenciador de tarefas: {}",
@@ -207,16 +211,16 @@ __ERR_MSGS: Final[dict] = {
     },
 }
 
-_ERR_MSGS_EN: dict = {}
+_ERR_MSGS_EN: dict[int,str] = {}
 for key, value in __ERR_MSGS.items():
     _ERR_MSGS_EN[key] = value["en"]
 
-_ERR_MSGS_PT: dict = {}
+_ERR_MSGS_PT: dict[int,str] = {}
 for key, value in __ERR_MSGS.items():
     _ERR_MSGS_PT[key] = value["pt"]
 
 
-def validate_set_msgs(msgs: dict,
+def validate_set_msgs(msgs: dict[int,str],
                       lang: Literal["en", "pt"] = "en") -> None:
     """
     Set  the standard validation messages list for language *lang* to the coded messages in *msgs*.
@@ -236,7 +240,7 @@ def validate_set_msgs(msgs: dict,
             _ERR_MSGS_PT = msgs
 
 
-def validate_update_msgs(msgs: dict,
+def validate_update_msgs(msgs: dict[int,str],
                          lang: Literal["en", "pt"] = "en") -> None:
     """
     Update the messages in the standard validation messages list with *msgs*, for language *lang*.

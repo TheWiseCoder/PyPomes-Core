@@ -69,7 +69,7 @@ def validate_value(attr: str,
 
 
 def validate_bool(errors: list[str] | None,
-                  scheme: dict,
+                  scheme: dict[str, Any],
                   attr: str,
                   default: bool = None,
                   required: bool = False,
@@ -138,7 +138,7 @@ def validate_bool(errors: list[str] | None,
 
 
 def validate_int(errors: list[str] | None,
-                 scheme: dict,
+                 scheme: dict[str, Any],
                  attr: str,
                  min_val: int = None,
                  max_val: int = None,
@@ -201,7 +201,7 @@ def validate_int(errors: list[str] | None,
 
 
 def validate_float(errors: list[str] | None,
-                   scheme: dict,
+                   scheme: dict[str, Any],
                    attr: str,
                    min_val: float = None,
                    max_val: float = None,
@@ -264,7 +264,7 @@ def validate_float(errors: list[str] | None,
 
 
 def validate_str(errors: list[str] | None,
-                 scheme: dict,
+                 scheme: dict[str, Any],
                  attr: str,
                  min_length: int = None,
                  max_length: int = None,
@@ -323,7 +323,7 @@ def validate_str(errors: list[str] | None,
 
 
 def validate_date(errors: list[str] | None,
-                  scheme: dict,
+                  scheme: dict[str, Any],
                   attr: str,
                   day_first: bool = False,
                   default: date = None,
@@ -382,7 +382,7 @@ def validate_date(errors: list[str] | None,
 
 
 def validate_datetime(errors: list[str] | None,
-                      scheme: dict,
+                      scheme: dict[str, Any],
                       attr: str,
                       day_first: bool = True,
                       default: datetime = None,
@@ -438,7 +438,7 @@ def validate_datetime(errors: list[str] | None,
 
 
 def validate_ints(errors: list[str] | None,
-                  scheme: dict,
+                  scheme: dict[str, Any],
                   attr: str,
                   min_val: int = None,
                   max_val: int = None,
@@ -501,7 +501,7 @@ def validate_ints(errors: list[str] | None,
 
 
 def validate_strs(errors: list[str] | None,
-                  scheme: dict,
+                  scheme: dict[str, Any],
                   attr: str,
                   min_length: int = None,
                   max_length: int = None,
@@ -611,7 +611,7 @@ def validate_format_error(error_id: int,
     return result
 
 
-def validate_format_errors(errors: list[str]) -> list[dict]:
+def validate_format_errors(errors: list[str]) -> list[dict[str, str]]:
     """
     Build and return a list of dicts from the list of errors *errors*.
 
@@ -638,12 +638,12 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
         # was the attribute's name found ?
         if pos == -1:
             # no
-            out_error: dict = {}
+            out_error: dict[str, str] = {}
             desc: str = error
         else:
             # yes
             term: str = "attribute" if VALIDATION_MSG_LANGUAGE == "en" else "atributo"
-            out_error: dict = {term: error[pos + 1:]}
+            out_error: dict[str, str] = {term: error[pos + 1:]}
             desc: str = error[:pos - 1]
 
         # does the text contain an error code ?
@@ -661,7 +661,7 @@ def validate_format_errors(errors: list[str]) -> list[dict]:
     return result
 
 
-def validate_unformat_errors(errors: list[dict | str]) -> list[str]:
+def validate_unformat_errors(errors: list[dict[str, str] | str]) -> list[str]:
     """
     Extract and return the list of errors used to build the list of dicts *errors*.
 

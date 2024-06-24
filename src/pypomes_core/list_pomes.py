@@ -70,7 +70,7 @@ def list_unflatten(source: str) -> list[str]:
     return str_split_on_mark(source, ".")
 
 
-def list_find_coupled(coupled_elements: list[tuple[str, str]],
+def list_find_coupled(coupled_elements: list[tuple[str,str]],
                       primary_element: str) -> str:
     """
     Locate in *coupled_elements*, and return, the element coupled to *primary_element*.
@@ -105,7 +105,7 @@ def list_find_coupled(coupled_elements: list[tuple[str, str]],
 
 
 def list_transform(source: list[Any],
-                   from_to_keys: list[tuple[str, str]],
+                   from_to_keys: list[tuple[str,str]],
                    prefix_from: str = None,
                    prefix_to: str = None) -> list[Any]:
     """

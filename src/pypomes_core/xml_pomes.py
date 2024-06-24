@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Final
+from typing import Any, Final
 from xmltodict3 import XmlTextToDict
 
 from .file_pomes import file_get_data
@@ -7,7 +7,7 @@ from .file_pomes import file_get_data
 XML_FILE_HEADER: Final[str] = '<?xml version="1.0" encoding="UTF-8" ?>'
 
 
-def xml_normalize_keys(source: dict) -> dict:
+def xml_normalize_keys(source: dict[str, Any]) -> dict[str, Any]:
     """
     Clone *source*, removing *namespaces* and the prefixes *'@'* e *'#'* from its key names.
 
@@ -17,7 +17,7 @@ def xml_normalize_keys(source: dict) -> dict:
     :return: the new, normalized, dict
     """
     # initialize the return variable
-    result: dict = {}
+    result: dict[str, Any] = {}
 
     # traverse the dictionary
     for curr_key, curr_value in source.items():
@@ -51,7 +51,7 @@ def xml_normalize_keys(source: dict) -> dict:
     return result
 
 
-def xml_to_dict(file_data: Path | str | bytes) -> dict:
+def xml_to_dict(file_data: Path | str | bytes) -> dict[str, Any]:
     """
     Convert the XML into a *dict*, by removing namespaces, and keys prefixed with "@" e "#".
 
@@ -67,7 +67,7 @@ def xml_to_dict(file_data: Path | str | bytes) -> dict:
     # convert XML to dict
     xml_data = XmlTextToDict(xml_text=file_bytes.decode(),
                              ignore_namespace=True)
-    result: dict = xml_data.get_dict()
+    result: dict[str, Any] = xml_data.get_dict()
 
     # normalize the dict, removing namespaces and prefixes '@' e '#' from the key names
     return xml_normalize_keys(source=result)

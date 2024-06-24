@@ -1,8 +1,9 @@
 import base64
 from collections.abc import Iterable
+from typing import Any
 
 
-def json_normalize_dict(source: dict) -> None:
+def json_normalize_dict(source: dict[Any,Any]) -> None:
     """
     Turn the values in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
 
