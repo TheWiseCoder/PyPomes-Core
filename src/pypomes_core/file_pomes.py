@@ -27,14 +27,16 @@ def file_from_request(request: Request,
     # inicialize the return variable
     result: bytes | None = None
 
-    count: int = len(request.files)
+    count: int = len(request.files) \
+                 if hasattr(request, "files") and request.files else 0
     # has a file been found ?
     if count > 0:
         # yes, retrieve it
         file: FileStorage | None = None
         if isinstance(file_name, str):
             file = request.files.get(file_name)
-        elif isinstance(file_seq, int) and file_seq >= 0:
+        elif (isinstance(file_seq, int) and
+              len(request.files) > file_seq >= 0):
             file_in: str = list(request.files)[file_seq]
             file = request.files[file_in]
 
