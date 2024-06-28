@@ -19,7 +19,8 @@ from .encoding_pomes import (
 )
 from .env_pomes import (
     APP_PREFIX,
-    env_get_str, env_get_int, env_get_bool, env_get_float, env_get_path,
+    env_get_str, env_get_bool, env_get_date,
+    env_get_int, env_get_float, env_get_path,
 )
 from .exception_pomes import (
     exc_format,
@@ -75,7 +76,8 @@ __all__ = [
     "encode_ascii_hex", "decode_ascii_hex",
     # env_pomes
     "APP_PREFIX",
-    "env_get_str", "env_get_int", "env_get_bool", "env_get_float", "env_get_path",
+    "env_get_str", "env_get_bool", "env_get_date",
+    "env_get_int", "env_get_float", "env_get_path",
     # exception_pomes
     "exc_format",
     # file_pomes

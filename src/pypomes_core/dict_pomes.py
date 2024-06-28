@@ -3,7 +3,7 @@ import types
 from typing import Any
 
 
-def dict_has_key_chain(source: dict[Any,Any],
+def dict_has_key_chain(source: dict[Any, Any],
                        key_chain: list[str]) -> bool:
     """
     Indicate the existence of an element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
@@ -54,7 +54,7 @@ def dict_has_key_chain(source: dict[Any,Any],
     return result
 
 
-def dict_get_value(source: dict[Any,Any],
+def dict_get_value(source: dict[Any, Any],
                    key_chain: list[str]) -> any:
     """
     Obtain the value of the element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
@@ -169,7 +169,7 @@ def dict_set_value(target: dict,
             dict_item[key] = value
 
 
-def dict_pop_value(target: dict[Any,Any],
+def dict_pop_value(target: dict[Any, Any],
                    key_chain: list[str]) -> any:
     """
     Obtain the value of the element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
@@ -228,7 +228,7 @@ def dict_pop_value(target: dict[Any,Any],
     return result
 
 
-def dict_replace_value(target: dict[Any,Any],
+def dict_replace_value(target: dict[Any, Any],
                        old_value: any,
                        new_value: any) -> None:
     """
@@ -281,7 +281,7 @@ def dict_replace_value(target: dict[Any,Any],
                                new_val=new_value)
 
 
-def dict_get_key(source: dict[Any,Any],
+def dict_get_key(source: dict[Any, Any],
                  value: any) -> any:
     """
     Return the key in *source*, mapping the first occurrence of *value* found.
@@ -316,7 +316,7 @@ def dict_get_keys(source: [Any,Any],
     return [key for key, val in source.items() if val == value]
 
 
-def dict_merge(target: dict[Any,Any],
+def dict_merge(target: dict[Any, Any],
                source: dict) -> None:
     """
     Traverse the elements in *source* to update *target*, according to the criteria presented herein.
@@ -360,7 +360,7 @@ def dict_merge(target: dict[Any,Any],
             target[skey] = svalue
 
 
-def dict_coalesce(target: dict[Any,Any],
+def dict_coalesce(target: dict[Any, Any],
                   key_chain: list[str]) -> None:
     """
     Coalesce the element of type *list* in *target* at the level *n* with the list at the level immediately above.
@@ -455,7 +455,7 @@ def dict_coalesce(target: dict[Any,Any],
         curr_dict[key_chain[-2]] = penultimate_list
 
 
-def dict_reduce(target: dict[Any,Any],
+def dict_reduce(target: dict[Any, Any],
                 key_chain: list[str]) -> None:
     """
     Relocate the elements from *target* at level *n*, to the level immediately above.
@@ -506,7 +506,7 @@ def dict_reduce(target: dict[Any,Any],
                 curr_dict[key] = value
 
 
-def dict_from_list(source: list[dict[Any,Any]],
+def dict_from_list(source: list[dict[Any, Any]],
                    key_chain: list[str],
                    value: any) -> dict:
     """
@@ -577,7 +577,7 @@ def dict_from_object(source: object) -> dict:
     return result
 
 
-def dict_transform(source: dict[Any,Any],
+def dict_transform(source: dict[Any, Any],
                    from_to_keys: list[tuple[str,str]],
                    prefix_from: str = None,
                    prefix_to: str = None) -> dict:
@@ -684,7 +684,7 @@ def dict_clone(source: dict,
     return result
 
 
-def dict_listify(target: dict[Any,Any],
+def dict_listify(target: dict[Any, Any],
                  key_chain: list[str]) -> None:
     """
     Insert the value of the item pointed to by the key chain *[keys[0]: ... :keys[n]* in a list.

@@ -14,7 +14,6 @@ select = [
     "B",     # flake8-bugbear - warnings for likely bugs / antipatterns
     "C4",    # flake8-comprehensions - check for bad use of list/set/dict comprehensions
     "COM",   # flake8-commas - rules for trailing commas
-    "DTZ",   # flake8-datetimez - check for usage of unsafe naive datetime class
     "EM",    # flake8-errmsg - enforce good formatting of error messages
     "FA",    # flake8-future-annotations - verify use of 'from __future__ import annotations'
     "FIX",   # flake8-fix_me - check for FIXMEs, TODOs and other temporary developer notes
@@ -61,6 +60,7 @@ select = [
 #   "BLE",   # flake8-blind-except - check for except clauses that catch all exceptions
 #   "CPY",   # flake8-copyright - check for copyright notices in all python files
 #   "DJ",    # flake8-django - detect bad practices on Django projects
+#   "DTZ",   # flake8-datetimez - check for usage of unsafe naive datetime class
 #   "ERA",   # eradicate - check for commented-out code
 #   "EXE",   # flake8-executable - ensure the executable permissions and shebangs of Python files are correctly set
 #   "FBT",   # flake8-boolean-trap - check for boolean traps
@@ -79,8 +79,6 @@ ignore = [
     "D204",     # 1 blank line required after class docstring
     "D210",     # whitespaces surrounding docstring text
     "D212",     # multi-line docstring summary to start at the second line
-    "DTZ005",   # the use of datetime.datetime.now() without tz argument is not allowed
-    "DTZ006",   # usage of 'datetime.datetime.fromtimestamp()' that do not specify a timezone
     "G004",     # logging statement uses 'f-string'
     "PGH004",   # use specific rule codes when using 'noqa'
     "PLR2004",  # magic value used in comparison, consider replacing it with a constant variable

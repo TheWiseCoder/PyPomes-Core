@@ -1,4 +1,5 @@
 import base64
+from datetime import date
 from collections.abc import Iterable
 from typing import Any
 
@@ -9,6 +10,7 @@ def json_normalize_dict(source: dict[Any,Any]) -> None:
 
     Possible transformations:
         - *bytes* e *bytearray* are changed to *str* in *Base64* format
+        - *date* and *datetime* are changed to their respective ISO formats
         - *Iterable* is changed into a *list*
         - all other types are left unchanged
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
@@ -20,6 +22,8 @@ def json_normalize_dict(source: dict[Any,Any]) -> None:
             json_normalize_dict(source=value)
         elif isinstance(value, bytes | bytearray):
             source[key] = base64.b64encode(s=value).decode()
+        elif isinstance(value, date):
+            source[key] = value.isoformat()
         elif isinstance(value, Iterable) and not isinstance(value, str):
             source[key] = json_normalize_iterable(source=value)
 
@@ -30,6 +34,7 @@ def json_normalize_iterable(source: Iterable) -> list[any]:
 
     Possible operations:
         - *bytes* e *bytearray* are changed to *str* in *Base64* format
+        - *date* and *datetime* are changed to their respective ISO formats
         - *Iterable* is changed into a *list*
         - all other types are left unchanged
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
@@ -44,6 +49,8 @@ def json_normalize_iterable(source: Iterable) -> list[any]:
             result.append(value)
         elif isinstance(value, bytes | bytearray):
             result.append(base64.b64encode(value).decode())
+        elif isinstance(value, date):
+            result.append(value.isoformat())
         elif isinstance(value, Iterable) and not isinstance(value, str):
             result.append(json_normalize_iterable(source=value))
         else:
