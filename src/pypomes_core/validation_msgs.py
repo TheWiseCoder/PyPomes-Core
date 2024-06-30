@@ -153,6 +153,10 @@ __ERR_MSGS: Final[dict[int,dict[str,str]]] = {
         "en": "Record already exists on DB in {}, for {}",
         "pt": "Registro já existe no BD, em {} para {}",
     },
+    207: {
+        "en": "More than one record exists on DB in {}, for {}",
+        "pt": "Mais de um registro existente no BD, em {} para {}",
+    },
     211: {
         "en": "Error accessing the job scheduler: {}",
         "pt": "Erro na interação com o gerenciador de tarefas: {}",
