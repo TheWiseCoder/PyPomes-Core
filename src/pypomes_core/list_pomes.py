@@ -184,28 +184,57 @@ def list_elem_starting_with(source: list[str | bytes],
     return result
 
 
+def list_prune_duplicates(target: list[Any]) -> list[Any]:
+    """
+    Remove all duplicates from *target*.
+
+    The pruned input list is returned, for convenience.
+
+    :param target: the target list
+    :return: the target list without duplicate elements
+    """
+    # a 'dict' maintains the insertion order of its elements
+    uniques: dict[Any, None] = dict.fromkeys(target)
+    return list(uniques.keys())
+
+
 def list_prune_in(target: list[Any],
-                  ref: list[Any]) -> None:
+                  ref: list[Any]) -> list[Any]:
     """
     Remove from *target* all its elements that are also in *ref*.
+
+    The pruned input list is returned, for convenience.
 
     :param target: the target list
     :param ref: the reference list
     :return: the target list without the elements also in the reference list
     """
-    removals: list[Any] = [item for item in target if item in ref]
+    # initialize the return variable
+    result: list[Any] = target
+
+    removals: list[Any] = [item for item in result if item in ref]
     for item in removals:
-        target.remove(item)
+        result.remove(item)
+
+    return result
 
 
-def list_prune_not_in(target: list[Any], ref: list[Any]) -> None:
+def list_prune_not_in(target: list[Any],
+                      ref: list[Any]) -> list[Any]:
     """
     Remove from *target* all its elements that are not also in *ref*.
+
+    The pruned input list is returned, for convenience.
 
     :param target: the target list
     :param ref: the reference list
     :return: the target list without the elements not in the reference list
     """
-    removals: list[Any] = [item for item in target if item not in ref]
+    # initialize the return variable
+    result: list[Any] = target
+
+    removals: list[Any] = [item for item in result if item not in ref]
     for item in removals:
-        target.remove(item)
+        result.remove(item)
+
+    return result

@@ -19,7 +19,7 @@ def dict_has_key_chain(source: dict[Any, Any],
     result: bool = False
 
     # define the parent el;ement
-    parent: dict | None = None
+    parent: dict[Any, Any] | None = None
 
     # does the key chain contain just 1 element ?
     if len(key_chain) == 1:
@@ -55,7 +55,7 @@ def dict_has_key_chain(source: dict[Any, Any],
 
 
 def dict_get_value(source: dict[Any, Any],
-                   key_chain: list[str]) -> any:
+                   key_chain: list[str]) -> Any:
     """
     Obtain the value of the element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
@@ -71,7 +71,7 @@ def dict_get_value(source: dict[Any, Any],
     :return: the value obtained
     """
     # initialize the return variable
-    result: any = source
+    result: Any = source
 
     # traverse the keys in the chain
     for key in key_chain:
@@ -105,7 +105,7 @@ def dict_get_value(source: dict[Any, Any],
     return result
 
 
-def dict_set_value(target: dict,
+def dict_set_value(target: dict[Any, Any],
                    key_chain: list[str],
                    value: Any) -> None:
     """
@@ -121,7 +121,7 @@ def dict_set_value(target: dict,
     :param key_chain: the key chain
     :param value: the value to be assigned
     """
-    dict_item: any = target
+    dict_item: Any = target
     # traverse the chain, up to end including its penultimate element
     for key in key_chain[:-1]:
 
@@ -170,7 +170,7 @@ def dict_set_value(target: dict,
 
 
 def dict_pop_value(target: dict[Any, Any],
-                   key_chain: list[str]) -> any:
+                   key_chain: list[str]) -> Any:
     """
     Obtain the value of the element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
@@ -186,10 +186,10 @@ def dict_pop_value(target: dict[Any, Any],
     :return: the value removed
     """
     # initialize the return variable
-    result: any = None
+    result: Any = None
 
     # obtain the element pointed to by the las key in the chain
-    parent: dict | None = None
+    parent: dict[Any, Any] | None = None
 
     # does the key chain contain just 1 element ?
     if len(key_chain) == 1:
@@ -213,7 +213,7 @@ def dict_pop_value(target: dict[Any, Any],
             pos: int = key.find("[")
             inx: int = int(key[pos+1:-1])
             key = key[:pos]
-            child: any = parent.get(key)
+            child: Any = parent.get(key)
 
             # is the element pointed to by the last key in the chain a list with more than 'inx' elements ?
             if isinstance(child, list) and len(child) > inx:
@@ -229,8 +229,8 @@ def dict_pop_value(target: dict[Any, Any],
 
 
 def dict_replace_value(target: dict[Any, Any],
-                       old_value: any,
-                       new_value: any) -> None:
+                       old_value: Any,
+                       new_value: Any) -> None:
     """
     Replace, in *target*, all occurrences of *old_value* with *new_value*.
 
@@ -238,9 +238,9 @@ def dict_replace_value(target: dict[Any, Any],
     :param old_value: the value to be replaced
     :param new_value: the new value
     """
-    def list_replace_value(items: list[any],
-                           old_val: any,
-                           new_val: any) -> None:
+    def list_replace_value(items: list[Any],
+                           old_val: Any,
+                           new_val: Any) -> None:
         # traverse the list
         for item in items:
 
@@ -281,8 +281,22 @@ def dict_replace_value(target: dict[Any, Any],
                                new_val=new_value)
 
 
+def dict_unique_values(source: dict[Any, Any]) -> list[Any]:
+    """
+    Return a list with the values in *source*, pruned of duplicates.
+
+    The elements in the returned list maintain the original insertion order in *source*.
+
+    :param source: the dict to retrieve the values from
+    :return: list the values in the source 'dict', pruned of duplicated
+    """
+    # a 'dict' maintains the insertion order of its elements
+    uniques: dict[Any, None] = dict.fromkeys(source.values())
+    return list(uniques.keys())
+
+
 def dict_get_key(source: dict[Any, Any],
-                 value: any) -> any:
+                 value: Any) -> Any:
     """
     Return the key in *source*, mapping the first occurrence of *value* found.
 
@@ -293,7 +307,7 @@ def dict_get_key(source: dict[Any, Any],
     :param value: the reference value
     :return: first key mapping the reference value
     """
-    result: any = None
+    result: Any = None
     for key, val in source.items():
         if val == value:
             result = key
@@ -303,7 +317,7 @@ def dict_get_key(source: dict[Any, Any],
 
 
 def dict_get_keys(source: [Any,Any],
-                  value: any) -> list[str]:
+                  value: Any) -> list[str]:
     """
     Return all keys in *source*, mapping the value *value*.
 
@@ -317,7 +331,7 @@ def dict_get_keys(source: [Any,Any],
 
 
 def dict_merge(target: dict[Any, Any],
-               source: dict) -> None:
+               source: dict[Any, Any]) -> None:
     """
     Traverse the elements in *source* to update *target*, according to the criteria presented herein.
 
@@ -338,7 +352,7 @@ def dict_merge(target: dict[Any, Any],
         # is the item in target ?
         if skey in target:
             # yes, proceed
-            tvalue: any = target.get(skey)
+            tvalue: Any = target.get(skey)
 
             # are both elements dictionaries  ?
             if isinstance(svalue, dict) and isinstance(tvalue, dict):
@@ -372,7 +386,7 @@ def dict_coalesce(target: dict[Any, Any],
     :param key_chain: the chain of nested keys
     """
     # traverse the kay chain up to its penultimate element
-    curr_dict: dict | None = target
+    curr_dict: dict[Any, Any] | None = target
     # 'key_chain[:-2]' returns an empy list if it has less the 3 elements
     for inx, key in enumerate(key_chain[:-2]):
 
@@ -382,7 +396,7 @@ def dict_coalesce(target: dict[Any, Any],
             break
 
         # is 'key' associated to a list ?
-        in_list: list[any] = curr_dict.get(key)
+        in_list: list[Any] = curr_dict.get(key)
         if isinstance(in_list, list):
             # yes, recursively invoke the coalescing of the dictionaries in the list
             for in_dict in in_list:
@@ -411,8 +425,8 @@ def dict_coalesce(target: dict[Any, Any],
             # is 'last_elem' a dictionary ?
             if isinstance(last_elem, dict):
                 # yes, proceed
-                outer_dict: dict = {}
-                last_list: list[dict] = []
+                outer_dict: dict[Any, Any] = {}
+                last_list: list[dict[Any, Any]] = []
 
                 # traverse the last element
                 for k1, v1 in last_elem.items():
@@ -423,7 +437,7 @@ def dict_coalesce(target: dict[Any, Any],
                             # is 'in_dict' a dictionary ?
                             if isinstance(in_dict, dict):
                                 # yes, coalesce and save it
-                                inner_dict: dict = {}
+                                inner_dict: dict[Any, Any] = {}
                                 for k2, v2 in in_dict.items():
                                     inner_dict[k2] = v2
                                 last_list.append(inner_dict)
@@ -470,7 +484,7 @@ def dict_reduce(target: dict[Any, Any],
     if len(key_chain) > 0:
         # yes, proceed
 
-        curr_dict: dict | None = target
+        curr_dict: dict[Any, Any] | None = target
         # traverse the chain up to its penultimate key
         for inx, key in enumerate(key_chain[:-1]):
 
@@ -480,7 +494,7 @@ def dict_reduce(target: dict[Any, Any],
                 break
 
             # is 'key' associated with a list ?
-            in_list: list[any] = curr_dict.get(key)
+            in_list: list[Any] = curr_dict.get(key)
             if isinstance(in_list, list):
                 # yes, recursively invoke reduction of the dictionaries in 'in_list'
                 for in_dict in in_list:
@@ -501,14 +515,14 @@ def dict_reduce(target: dict[Any, Any],
         if isinstance(curr_dict, dict) and \
            isinstance(curr_dict.get(last_key), dict):
             # yes, proceed with the reduction
-            last: dict = curr_dict.pop(last_key)
+            last: dict[Any, Any] = curr_dict.pop(last_key)
             for key, value in last.items():
                 curr_dict[key] = value
 
 
 def dict_from_list(source: list[dict[Any, Any]],
                    key_chain: list[str],
-                   value: any) -> dict:
+                   value: Any) -> dict[Any, Any]:
     """
     Locate in *source*, and return, the element of type *dict* with value *value* in the key chain *key_chain*.
 
@@ -518,7 +532,7 @@ def dict_from_list(source: list[dict[Any, Any]],
     :return: the 'dict' wanted, or 'None' if not found
     """
     # initialize the return variable
-    result: dict | None = None
+    result: dict[Any, Any] | None = None
 
     for item in source:
         if isinstance(item, dict) and \
@@ -530,7 +544,7 @@ def dict_from_list(source: list[dict[Any, Any]],
     return result
 
 
-def dict_from_object(source: object) -> dict:
+def dict_from_object(source: object) -> dict[Any, Any]:
     """
     Create a *dict* and populate it with the attributes in *source* containing non-None values.
 
@@ -540,12 +554,12 @@ def dict_from_object(source: object) -> dict:
     :return: 'dict' structurally similar to the reference object
     """
     # initialize the return variable
-    result: dict = {}
+    result: dict[Any, Any] = {}
 
     # obtain the object's source module
     source_module: types.ModuleType = inspect.getmodule(object=source)
     # obtain the source module's dictionary
-    source_dict: dict = source.__dict__
+    source_dict: dict[Any, Any] = source.__dict__
     # traverse it
     for key, value in source_dict.items():
         # is 'value' None or an empty list ?
@@ -578,9 +592,9 @@ def dict_from_object(source: object) -> dict:
 
 
 def dict_transform(source: dict[Any, Any],
-                   from_to_keys: list[tuple[str,str]],
+                   from_to_keys: list[tuple[str, str]],
                    prefix_from: str = None,
-                   prefix_to: str = None) -> dict:
+                   prefix_to: str = None) -> dict[Any, Any]:
     """
     Build a new *dict*, according to the rules presented herein.
 
@@ -603,7 +617,7 @@ def dict_transform(source: dict[Any, Any],
     from .list_pomes import list_find_coupled, list_transform, list_unflatten
 
     # initialize the return variable
-    result: dict = {}
+    result: dict[Any, Any] = {}
 
     # traverse the source dictionary
     for key, value in source.items():
@@ -623,10 +637,10 @@ def dict_transform(source: dict[Any, Any],
             # yes, get the target value
             if isinstance(value, dict):
                 # 'value' is a dictionary, transform it
-                to_value: dict = dict_transform(source=value,
-                                                from_to_keys=from_to_keys,
-                                                prefix_from=from_keys,
-                                                prefix_to=to_keys)
+                to_value: dict[Any, Any] = dict_transform(source=value,
+                                                          from_to_keys=from_to_keys,
+                                                          prefix_from=from_keys,
+                                                          prefix_to=to_keys)
             elif isinstance(value, list):
                 # 'value' is a list, transform it
                 to_value: list = list_transform(source=value,
@@ -635,7 +649,7 @@ def dict_transform(source: dict[Any, Any],
                                                 prefix_to=to_keys)
             else:
                 # 'value' is neither a dictionary nor a list
-                to_value: any = value
+                to_value: Any = value
 
             # has the target prefix been defined and does it occur in the target string ?
             if prefix_to and to_keys.startswith(prefix_to):
@@ -651,8 +665,8 @@ def dict_transform(source: dict[Any, Any],
     return result
 
 
-def dict_clone(source: dict,
-               from_to_keys: list[str | tuple[str,str]]) -> dict:
+def dict_clone(source: dict[Any, Any],
+               from_to_keys: list[str | tuple[str, str]]) -> dict[Any, Any]:
     """
     Build a new *dict*, according to the rules presented herein.
 
@@ -672,7 +686,7 @@ def dict_clone(source: dict,
     from .list_pomes import list_unflatten
 
     # inicialize the return variable
-    result: dict = {}
+    result: dict[Any, Any] = {}
 
     # traverse the list of elements and add to the target dict
     for elem in from_to_keys:
@@ -712,7 +726,7 @@ def dict_listify(target: dict[Any, Any],
                 items_listify(in_targets=in_target,
                               in_keys=in_keys)
 
-    parent: any = target
+    parent: Any = target
     # traverse the chain up to its penultimate key
     for inx, key in enumerate(key_chain[:-1]):
         parent = parent.get(key)
@@ -733,7 +747,7 @@ def dict_listify(target: dict[Any, Any],
         # does the item exist and is not a list ?
         if key in parent and not isinstance(parent.get(key), list):
             # yes, insert it in a list
-            item: any = parent.pop(key)
+            item: Any = parent.pop(key)
             parent[key] = [item]
 
 
