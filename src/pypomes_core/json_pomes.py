@@ -23,8 +23,6 @@ def json_normalize_dict(source: dict[Any,Any]) -> None:
         elif isinstance(value, bytes | bytearray):
             source[key] = base64.b64encode(s=value).decode()
         elif isinstance(value, date):
-            source[key].append(value.isoformat())
-        elif isinstance(value, date):
             source[key] = value.isoformat()
         elif isinstance(value, Iterable) and not isinstance(value, str):
             source[key] = json_normalize_iterable(source=value)
