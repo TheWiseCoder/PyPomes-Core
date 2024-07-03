@@ -4,7 +4,7 @@ from collections.abc import Iterable
 from typing import Any
 
 
-def json_normalize_dict(source: dict[Any,Any]) -> None:
+def json_normalize_dict(source: dict[Any, Any]) -> dict[Any, Any]:
     """
     Turn the values in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
 
@@ -13,6 +13,7 @@ def json_normalize_dict(source: dict[Any,Any]) -> None:
         - *date* and *datetime* are changed to their respective ISO formats
         - *Iterable* is changed into a *list*
         - all other types are left unchanged
+    For convenience, the possible modified input *dict* itself is returned.
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
     :param source: the dict to be made serializable
@@ -27,22 +28,25 @@ def json_normalize_dict(source: dict[Any,Any]) -> None:
         elif isinstance(value, Iterable) and not isinstance(value, str):
             source[key] = json_normalize_iterable(source=value)
 
+    return source
 
-def json_normalize_iterable(source: Iterable) -> list[any]:
+
+def json_normalize_iterable(source: Iterable) -> list[Any]:
     """
-    Return in a *list* the values in *source* that can be serialized to JSON, thus avoiding *TypeError*.
+    Return a new *list* containing the values in *source*, made serializable if necessary.
 
     Possible operations:
         - *bytes* e *bytearray* are changed to *str* in *Base64* format
         - *date* and *datetime* are changed to their respective ISO formats
         - *Iterable* is changed into a *list*
         - all other types are left unchanged
+    The serialization allows for these values to be used in JSON strings.
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
     :param source: the dict to be made serializable
     :return: list with serialized values
     """
-    result: list[any] = []
+    result: list[Any] = []
     for value in source:
         if isinstance(value, dict):
             json_normalize_dict(source=value)
