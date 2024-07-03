@@ -22,8 +22,8 @@ def validate_value(attr: str,
     :param val: the value to be validated
     :param min_val: if val is a string, specifies its minimum length; otherwise, specifies its minimum value
     :param max_val: if val is a string, specifies its maximum length; otherwise, specifies its maximum value
-    :param values: if provided, requires 'val' to be in it
-    :param required:  requires 'val' to be specified;
+    :param values: if provided, requires 'val' to be contained therein
+    :param required:  requires 'val' to be specified
     :return: 'None' if val passes validation, or the corresponding error message otherwise
     """
     # initialize the return variable
