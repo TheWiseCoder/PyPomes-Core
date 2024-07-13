@@ -70,8 +70,8 @@ def list_unflatten(source: str) -> list[str]:
     return str_split_on_mark(source, ".")
 
 
-def list_find_coupled(coupled_elements: list[tuple[str, str]],
-                      primary_element: str) -> str:
+def list_find_coupled(coupled_elements: list[tuple[str, Any]],
+                      primary_element: str) -> Any:
     """
     Locate in *coupled_elements*, and return, the element coupled to *primary_element*.
 
@@ -79,12 +79,12 @@ def list_find_coupled(coupled_elements: list[tuple[str, str]],
     This function is used in the transformation of *dicts* (*dict_transform*) and *lists* (*list_transform*),
     from sequences of key pairs.
 
-    :param coupled_elements: list of tupl4s containing the pairs of elements
+    :param coupled_elements: list of tuples containing the pairs of elements
     :param primary_element: the primary element
     :return: the couple element, or 'None' if it is not foundo
     """
     # initialize the return variable
-    result: str | None = None
+    result: Any | None = None
 
     # remove the list element indication
     pos1: int = primary_element.find("[")
@@ -105,7 +105,7 @@ def list_find_coupled(coupled_elements: list[tuple[str, str]],
 
 
 def list_transform(source: list[Any],
-                   from_to_keys: list[tuple[str, str]],
+                   from_to_keys: list[tuple[str, Any]],
                    prefix_from: str = None,
                    prefix_to: str = None) -> list[Any]:
     """

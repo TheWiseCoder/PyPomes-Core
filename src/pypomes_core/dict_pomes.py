@@ -316,7 +316,7 @@ def dict_get_key(source: dict[Any, Any],
     return result
 
 
-def dict_get_keys(source: [Any,Any],
+def dict_get_keys(source: [Any, Any],
                   value: Any) -> list[str]:
     """
     Return all keys in *source*, mapping the value *value*.
@@ -592,7 +592,7 @@ def dict_from_object(source: object) -> dict[Any, Any]:
 
 
 def dict_transform(source: dict[Any, Any],
-                   from_to_keys: list[tuple[str, str]],
+                   from_to_keys: list[tuple[str, Any]],
                    prefix_from: str = None,
                    prefix_to: str = None) -> dict[Any, Any]:
     """
@@ -603,7 +603,7 @@ def dict_transform(source: dict[Any, Any],
     the value of the *source* element indicated by the first term of the tuple. Both terms
     of the tuples are represented by a chain of nested keys.
 
-    The prefixes for the source and destination keys, if defined, have fferent treatments.
+    The prefixes for the source and destination keys, if defined, have different treatments.
     They are added when searching for values in *Source*, and removed when assigning values
     to the return *dict*.
 
@@ -666,7 +666,7 @@ def dict_transform(source: dict[Any, Any],
 
 
 def dict_clone(source: dict[Any, Any],
-               from_to_keys: list[str | tuple[str, str]]) -> dict[Any, Any]:
+               from_to_keys: list[Any | tuple[Any, Any]]) -> dict[Any, Any]:
     """
     Build a new *dict*, according to the rules presented herein.
 
@@ -694,7 +694,6 @@ def dict_clone(source: dict[Any, Any],
         to_key: str = (elem[1] if isinstance(elem, tuple) and len(elem) > 1 else None) or from_key
         result[to_key] = dict_get_value(source=source,
                                         key_chain=list_unflatten(from_key))
-
     return result
 
 

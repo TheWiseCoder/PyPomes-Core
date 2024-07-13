@@ -13,7 +13,7 @@ def json_normalize_dict(source: dict[Any, Any]) -> dict[Any, Any]:
         - *date* and *datetime* are changed to their respective ISO formats
         - *Iterable* is changed into a *list*
         - all other types are left unchanged
-    For convenience, the possible modified input *dict* itself is returned.
+    For convenience, the possibly modified *source* itself is returned.
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
     :param source: the dict to be made serializable

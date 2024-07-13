@@ -1,6 +1,6 @@
 from typing import Final, Literal
 
-__ERR_MSGS: Final[dict[int,dict[str,str]]] = {
+__ERR_MSGS: Final[dict[int, dict[str, str]]] = {
     101: {
         "en": "{}",
         "pt": "{}",
@@ -59,7 +59,7 @@ __ERR_MSGS: Final[dict[int,dict[str,str]]] = {
     },
     126: {
         "en": "Value {} cannot be assigned for attributes {} at the same time",
-        "pt": "Valor {} não pode ser especficado aos atributos {} ao mesmo tempo",
+        "pt": "Valor {} não pode ser especificado aos atributos {} ao mesmo tempo",
     },
     127: {
         "en": "Attributes {} cannot be assigned values at the same time",
@@ -215,16 +215,16 @@ __ERR_MSGS: Final[dict[int,dict[str,str]]] = {
     },
 }
 
-_ERR_MSGS_EN: dict[int,str] = {}
+_ERR_MSGS_EN: dict[int, str] = {}
 for key, value in __ERR_MSGS.items():
     _ERR_MSGS_EN[key] = value["en"]
 
-_ERR_MSGS_PT: dict[int,str] = {}
+_ERR_MSGS_PT: dict[int, str] = {}
 for key, value in __ERR_MSGS.items():
     _ERR_MSGS_PT[key] = value["pt"]
 
 
-def validate_set_msgs(msgs: dict[int,str],
+def validate_set_msgs(msgs: dict[int, str],
                       lang: Literal["en", "pt"] = "en") -> None:
     """
     Set  the standard validation messages list for language *lang* to the coded messages in *msgs*.
@@ -244,7 +244,7 @@ def validate_set_msgs(msgs: dict[int,str],
             _ERR_MSGS_PT = msgs
 
 
-def validate_update_msgs(msgs: dict[int,str],
+def validate_update_msgs(msgs: dict[int, str],
                          lang: Literal["en", "pt"] = "en") -> None:
     """
     Update the messages in the standard validation messages list with *msgs*, for language *lang*.

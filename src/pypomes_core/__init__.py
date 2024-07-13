@@ -108,19 +108,19 @@ __all__ = [
 ]
 
 from importlib.metadata import version
-__version__ = version("pypomes_core")
-__version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
+__version__: str = version("pypomes_core")
+__version_info__: tuple = tuple(int(i) for i in __version__.split(".") if i.isdigit())
 
 
 from contextlib import suppress
 from importlib import import_module
-def get_versions() -> dict:
+def get_versions() -> dict[str, str]:
     """
     Retrieve and return the versions of the *Pypomes* packages in use.
 
     :return: the versions of the Pypomes packages in use
     """
-    result: dict = {
+    result: dict[str, str] = {
         "PyPomes-Core": __version__
     }
 

@@ -3,7 +3,7 @@ from logging import Logger
 from typing import Any, Final
 from .datetime_pomes import TIMEZONE_LOCAL
 from .env_pomes import APP_PREFIX, env_get_str
-from .str_pomes import str_sanitize, str_find_whitespace
+from .str_pomes import str_as_list, str_sanitize, str_find_whitespace
 
 VALIDATION_MSG_LANGUAGE: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_LANGUAGE", "en")
 VALIDATION_MSG_PREFIX: Final[str] = env_get_str(f"{APP_PREFIX}_VALIDATION_MSG_PREFIX", APP_PREFIX)
@@ -468,6 +468,8 @@ def validate_ints(errors: list[str] | None,
     # obtain the values
     values: list[Any] = scheme.get(suffix)
     if values:
+        if isinstance(values, str):
+            values = str_as_list(values)
         if isinstance(values, list):
             result = []
             if len(values) > 0:
@@ -531,6 +533,8 @@ def validate_strs(errors: list[str] | None,
     # obtain the values
     values: list[Any] = scheme.get(suffix)
     if values:
+        if isinstance(values, str):
+            values = str_as_list(values)
         if isinstance(values, list):
             result = []
             if len(values) > 0:
@@ -622,7 +626,7 @@ def validate_format_errors(errors: list[str]) -> list[dict[str, str]]:
     :return: the built list
     """
     # initialize the return variable
-    result: list[dict] = []
+    result: list[dict[str, str]] = []
 
     # extract error code, description, and attribute from text
     for error in errors:
