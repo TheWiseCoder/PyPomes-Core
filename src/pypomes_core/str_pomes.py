@@ -1,6 +1,30 @@
 from typing import Any
 
 
+def str_to_hex(source: str) -> str:
+    """
+    Obtain and return the hex representation of *source*.
+
+    To get the original string back from its hex representation, use *str_from_hex()*.
+
+    :param source: the input string
+    :return: the hex representation of the input string
+    """
+    return "".join([hex(ord(ch)).replace("0x", "") for ch in source])
+
+
+def str_from_hex(source: str) -> str:
+    """
+    Obtain and return the original string from its hex representation in *source*.
+
+    To obtain the hex representation of a string, use *str_to_hex()*.
+
+    :param source: the hex representation of a string
+    :return: the original string
+    """
+    return "".join([chr(int(source[inx:inx+2], 16)) for inx in range(0, len(source), 2)])
+
+
 def str_as_list(source: str | Any,
                 separator: str = ",") -> list[any]:
     """

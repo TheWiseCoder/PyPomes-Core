@@ -300,8 +300,8 @@ def dict_get_key(source: dict[Any, Any],
     """
     Return the key in *source*, mapping the first occurrence of *value* found.
 
-    Return *None*, if no key is found.
     No recursion is attempted; only the first-level attributes in *source* are inspected.
+    Return *None*, if no key is found.
 
     :param source: dict to search
     :param value: the reference value
@@ -317,17 +317,27 @@ def dict_get_key(source: dict[Any, Any],
 
 
 def dict_get_keys(source: [Any, Any],
-                  value: Any) -> list[str]:
+                  value: Any) -> list[Any]:
     """
     Return all keys in *source*, mapping the value *value*.
 
+    The search is done recursively. Note that *dict*s in *list*s are not searched.
+    The order of the keys returned should not be taken as relevant.
     Return *[]* if no key is found.
 
     :param source: dict to search
     :param value: the reference value
     :return: list containing all keys mapping the reference value
     """
-    return [key for key, val in source.items() if val == value]
+    # initialize the return variable
+    result: list[Any] = []
+    for item_key, item_value in source.items():
+        if item_value == value:
+            result.append(item_key)
+        elif isinstance(item_value, dict):
+            result.extend(dict_get_keys(source=item_value,
+                                        value=value))
+    return result
 
 
 def dict_merge(target: dict[Any, Any],

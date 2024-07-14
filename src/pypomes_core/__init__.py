@@ -39,9 +39,10 @@ from .list_pomes import (
     list_prune_in, list_prune_not_in
 )
 from .str_pomes import (
+    str_to_hex, str_from_hex, str_lower, str_upper,
     str_as_list, str_sanitize, str_split_on_mark,
-    str_find_whitespace, str_get_between, str_get_positional,
-    str_rreplace, str_lower, str_upper,
+    str_get_between, str_get_positional,
+    str_find_whitespace, str_rreplace,
 )
 from .validation_msgs import (
     validate_set_msgs, validate_update_msgs,
@@ -92,9 +93,10 @@ __all__ = [
     "list_transform", "list_prune_duplicates",
     "list_prune_in", "list_prune_not_in",
     # str_pomes
+    "str_to_hex", "str_from_hex", "str_lower", "str_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",
-    "str_find_whitespace", "str_get_between", "str_get_positional",
-    "str_rreplace", "str_lower", "str_upper",
+    "str_get_between", "str_get_positional",
+    "str_find_whitespace", "str_rreplace",
     # validation_msgs
     "validate_set_msgs", "validate_update_msgs",
     # validation_pomes
