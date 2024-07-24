@@ -42,7 +42,7 @@ from .str_pomes import (
     str_to_hex, str_from_hex, str_lower, str_upper,
     str_as_list, str_sanitize, str_split_on_mark,
     str_get_between, str_get_positional,
-    str_find_whitespace, str_rreplace,
+    str_find_whitespace, str_rreplace, str_from_any
 )
 from .validation_msgs import (
     validate_set_msgs, validate_update_msgs,
@@ -96,7 +96,7 @@ __all__ = [
     "str_to_hex", "str_from_hex", "str_lower", "str_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",
     "str_get_between", "str_get_positional",
-    "str_find_whitespace", "str_rreplace",
+    "str_find_whitespace", "str_rreplace", "str_from_any",
     # validation_msgs
     "validate_set_msgs", "validate_update_msgs",
     # validation_pomes

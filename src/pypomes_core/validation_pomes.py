@@ -447,7 +447,7 @@ def validate_ints(errors: list[str] | None,
     """
     Validate the list of *int* values associated with *attr* in *scheme*.
 
-    If provided, this list must contain *ints*, or valid string representations of *ints*.
+    If provided, this list must contain *int*s, or valid string representations of *int*s.
 
     :param errors: incidental error messages
     :param scheme: dictionary containing the list of values to be validated
@@ -512,7 +512,7 @@ def validate_strs(errors: list[str] | None,
     """
     Validate the list of *str* values associated with *attr* in *scheme*.
 
-    If provided, this list must contain *strs*.
+    If provided, this list must contain *str*s.
 
     :param errors: incidental error messages
     :param scheme: dictionary containing the list of values to be validated

@@ -1,3 +1,5 @@
+from datetime import date
+from pathlib import Path
 from typing import Any
 
 
@@ -26,7 +28,7 @@ def str_from_hex(source: str) -> str:
 
 
 def str_as_list(source: str | Any,
-                separator: str = ",") -> list[any]:
+                separator: str = ",") -> list[Any]:
     """
     Return *source* as a *list*, by splitting its contents separated by *separator*.
 
@@ -199,3 +201,38 @@ def str_upper(source: str) -> str:
     :return: 'source' in upper-case, or 'source' itself, if it is not a string
     """
     return source.upper() if isinstance(source, str) else source
+
+
+def str_from_any(source: Any) -> str:
+    """
+    Convert *source* to its string representation.
+
+    These are the string representations returned:
+        - *None*: the string 'None'
+        - *str* : the source string itself
+        - *bytes*: its hex representation
+        - *date*: the date in iso format (*datetime* is a *date* subtype)
+        - *Path*: its Posix form
+        - all other types: their *str()* representation
+
+    :param source: the data to be converted to string.
+    :return: the string representation of the source data
+    """
+    # declare the return variable
+    result: str
+
+    # obtain the string representation
+    if source is None:
+        result = "None"
+    elif isinstance(source, str):
+        result = source
+    elif isinstance(source, bytes):
+        result = source.hex()
+    elif isinstance(source, date):
+        result = source.isoformat()
+    elif isinstance(source, Path):
+        result = source.as_posix()
+    else:
+        result = str(source)
+
+    return result

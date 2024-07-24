@@ -48,10 +48,10 @@ def file_from_request(request: Request,
 
 def file_get_data(file_data: Path | str | bytes) -> bytes:
     """
-    Retrieve and return the data in *file_data* (type *bytes*), or in a file in path *file_data* (type *Path* or *str*).
+    Retrieve the data in *file_data* (type *bytes*), or in a file in path *file_data* (type *Path* or *str*).
 
     :param file_data: file data, or the path to locate the file
-    :return: the data, or None if the file data could not be obtained
+    :return: the data, or 'None' if the file data could not be obtained
     """
     # initialize the return variable
     result: bytes | None = None
