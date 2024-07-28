@@ -267,7 +267,7 @@ def validate_str(errors: list[str] | None,
                  attr: str,
                  min_length: int = None,
                  max_length: int = None,
-                 values: list[int] = None,
+                 values: list[str] = None,
                  default: str = None,
                  required: bool = False,
                  logger: Logger = None) -> str:
