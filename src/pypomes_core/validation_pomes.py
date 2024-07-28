@@ -142,7 +142,8 @@ def validate_int(errors: list[str] | None,
                  attr: str,
                  min_val: int = None,
                  max_val: int = None,
-                 default: int | list[int] = None,
+                 values: list[int] = None,
+                 default: int = None,
                  required: bool = False,
                  logger: Logger = None) -> int:
     """
@@ -155,8 +156,8 @@ def validate_int(errors: list[str] | None,
     :param attr: the attribute associated with the value to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
-    :param default: if 'int', specifies the default value, overriding the other constraints
-                    if 'list', requires the value, if provided, to be in it
+    :param values: optional list of allowed values
+    :param default: optional default value
     :param required: specifies whether a value must be provided
     :param logger: optional logger
     :return: the validated value, or 'None' if validation failed
@@ -171,19 +172,17 @@ def validate_int(errors: list[str] | None,
     # retrieve the value
     value: int = scheme.get(suffix)
 
-    # validate it
-    if value is None and isinstance(default, int):
+    # validate it ('bool' is subtype of 'int')
+    if value is None and isinstance(default, int) and not isinstance(default, bool):
         value = default
     elif isinstance(value, str) and value.isnumeric():
         value = int(value)
-    # 'bool' is subtype of 'int'
     elif value is not None and \
          (isinstance(value, bool) or not isinstance(value, int)):
         # 152: Invalid value {}: must be type {}
         stat = validate_format_error(152, value, "int", f"@{attr}")
 
     if not stat:
-        values = default if isinstance(default, list) else None
         stat = validate_value(attr=attr,
                               val=value,
                               min_val=min_val,
@@ -206,7 +205,8 @@ def validate_float(errors: list[str] | None,
                    min_val: float = None,
                    max_val: float = None,
                    required: bool = False,
-                   default: int | float | list[float | int] = None,
+                   values: list[float | int] = None,
+                   default: int | float = None,
                    logger: Logger = None) -> float:
     """
     Validate the *float* value associated with *attr* in *scheme*.
@@ -218,8 +218,8 @@ def validate_float(errors: list[str] | None,
     :param attr: the attribute associated with the value to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
-    :param default: if 'float' or 'int', specifies the default value, overriding the other constraints
-                    if 'list', requires the value, if provided, to be in it
+    :param values: optional list of allowed values
+    :param default: optional default value
     :param required: specifies whether a value must be provided
     :param logger: optional logger
     :return: the validated value, or 'None' if validation failed
@@ -246,7 +246,6 @@ def validate_float(errors: list[str] | None,
         stat = validate_format_error(152, value, "float", f"@{attr}")
 
     if not stat:
-        values = default if isinstance(default, list) else None
         stat = validate_value(attr=attr,
                               val=value,
                               min_val=min_val,
@@ -268,7 +267,8 @@ def validate_str(errors: list[str] | None,
                  attr: str,
                  min_length: int = None,
                  max_length: int = None,
-                 default: str | list[str] = None,
+                 values: list[int] = None,
+                 default: str = None,
                  required: bool = False,
                  logger: Logger = None) -> str:
     """
@@ -281,8 +281,8 @@ def validate_str(errors: list[str] | None,
     :param attr: the attribute associated with the value to be validated
     :param min_length: optional minimum length accepted
     :param max_length:  optional maximum length accepted
-    :param default: if 'str', specifies the default value, overrinding the other constraints
-                    if 'list', requires the value, if provided, to be in it
+    :param values: optional list of allowed values
+    :param default: optional default value
     :param required: specifies whether a value must be provided
     :param logger: optional logger
     :return: the validated value, or None if validation failed
@@ -304,14 +304,12 @@ def validate_str(errors: list[str] | None,
         # 152: Invalid value {}: must be type {}
         stat = validate_format_error(152, value, "str", f"@{attr}")
     else:
-        values = default if isinstance(default, list) else None
         stat = validate_value(attr=attr,
                               val=value,
                               min_val=min_length,
                               max_val=max_length,
                               values=values,
                               required= required)
-
     if stat:
         __validate_log(errors=errors,
                        err_msg=stat,
@@ -377,7 +375,6 @@ def validate_date(errors: list[str] | None,
         __validate_log(errors=errors,
                        err_msg=stat,
                        logger=logger)
-
     return result
 
 
@@ -433,7 +430,6 @@ def validate_datetime(errors: list[str] | None,
         __validate_log(errors=errors,
                        err_msg=stat,
                        logger=logger)
-
     return result
 
 
