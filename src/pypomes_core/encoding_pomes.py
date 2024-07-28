@@ -99,7 +99,3 @@ def decode_ascii_hex(source: bytes) -> bytes:
     result += source[pos1:]
 
     return result
-
-
-s=b'\x06\r\x06\x05\x07\x05\x02\x00\x04\x03\x04\x0f\x05\x02\x04\x01\x0c\x07\x0c\x03\x04\x0f'
-print(encode_ascii_hex(s))
