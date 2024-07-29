@@ -820,15 +820,15 @@ def dict_hexify(source: dict[Any, Any]) -> dict[Any, Any]:
 
     Possible transformations:
         - *bytes* e *bytearray* are changed using their built-in *hex()* method
-        - *str* is changed to its hex form (see warning below)
-        - *date* and *datetime* are changed to the hex form of their respective ISO representations
-        - *Path* is changed to the hex form of its POSIX representation
+        - *str* is changed to its hexadecimal form (see warning below)
+        - *date* and *datetime* are changed to the hexadecimal form of their respective ISO representations
+        - *Path* is changed to the hexadecimal form of its POSIX representation
         - *Iterable* is changed to a *list*
-        - to all the other types *str()* is applied and its hex representation is used
+        - for all the other types, *str()* is applied and its hexadecimal representation is used
+    Note that the reversal of this process is limited to recovering the original strings back from their
+    hexadecimal representation. Further recovery, when possible, would have to be carried out manually.
     For convenience, the possibly modified *source* itself is returned.
-    HAZARD:
-        - depending on the type of objects in *source*, the final result may not have been fully hexified
-        - will raise a *ValueError* exception if a target string has a character with codepoint greater than 255
+    HAZARD: will raise a *ValueError* exception if a target string has a character with codepoint greater than 255
 
     :param source: the dict to be made serializable
     :return: the modified input 'dict'
@@ -851,6 +851,8 @@ def dict_hexify(source: dict[Any, Any]) -> dict[Any, Any]:
             source[key] = value.hex()
         elif isinstance(value, date):
             source[key] = str_to_hex(value.isoformat())
+        else:
+            source[key] = str_to_hex(str(value))
 
     return source
 
