@@ -8,7 +8,7 @@ from .dict_pomes import (
     dict_has_key_chain, dict_get_value, dict_set_value, dict_reduce,
     dict_listify, dict_transform, dict_merge, dict_coalesce, dict_clone,
     dict_get_key, dict_get_keys, dict_from_object, dict_from_list,
-    dict_replace_value, dict_pop_value, dict_unique_values, dict_jsonify
+    dict_replace_value, dict_pop_value, dict_unique_values, dict_jsonify, dict_hexify
 )
 from .email_pomes import (
     EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SERVER,
@@ -30,10 +30,9 @@ from .file_pomes import (
     file_from_request, file_get_data
 )
 from .list_pomes import (
-    list_compare, list_flatten, list_unflatten,
-    list_find_coupled, list_elem_starting_with,
-    list_transform, list_prune_duplicates,
-    list_prune_in, list_prune_not_in, list_jsonify
+    list_compare, list_flatten, list_unflatten, list_find_coupled,
+    list_elem_starting_with, list_transform, list_prune_duplicates,
+    list_prune_in, list_prune_not_in, list_jsonify, list_hexify
 )
 from .str_pomes import (
     str_to_hex, str_from_hex, str_lower, str_upper,
@@ -67,7 +66,7 @@ __all__ = [
     "dict_has_key_chain", "dict_get_value", "dict_set_value", "dict_reduce",
     "dict_listify", "dict_transform", "dict_merge", "dict_coalesce", "dict_clone",
     "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
-    "dict_replace_value", "dict_pop_value", "dict_unique_values", "dict_jsonify",
+    "dict_replace_value", "dict_pop_value", "dict_unique_values", "dict_jsonify", "dict_hexify",
     # email_pomes
     "EMAIL_ACCOUNT", "EMAIL_PWD", "EMAIL_PORT", "EMAIL_SERVER",
     "email_send",
@@ -83,10 +82,9 @@ __all__ = [
     "TEMP_FOLDER",
     "file_from_request", "file_get_data",
     # list_pomes
-    "list_compare", "list_flatten", "list_unflatten",
-    "list_find_coupled", "list_elem_starting_with",
-    "list_transform", "list_prune_duplicates",
-    "list_prune_in", "list_prune_not_in", "list_jsonify",
+    "list_compare", "list_flatten", "list_unflatten", "list_find_coupled",
+    "list_elem_starting_with", "list_transform", "list_prune_duplicates",
+    "list_prune_in", "list_prune_not_in", "list_jsonify", "list_hexify",
     # str_pomes
     "str_to_hex", "str_from_hex", "str_lower", "str_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",

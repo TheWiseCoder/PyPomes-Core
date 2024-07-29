@@ -1,6 +1,7 @@
 from datetime import date
 from base64 import b64encode
 from collections.abc import Iterable
+from pathlib import Path
 from typing import Any
 
 def list_compare(list1: list[Any],
@@ -247,16 +248,17 @@ def list_jsonify(source: list[Any]) -> list[Any]:
     """
     Return a new *list* containing the values in *source*, made serializable if necessary.
 
-    Possible operations:
+    Possible transformations:
         - *bytes* e *bytearray* are changed to *str* in *Base64* format
         - *date* and *datetime* are changed to their respective ISO representations
-        - *Iterable* is changed into a *list*
+        - *Path* is changed to its POSIX representation
+        - *Iterable* is changed to a *list*
         - all other types are left unchanged
     The serialization allows for these values to be used in JSON strings.
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
     :param source: the dict to be made serializable
-    :return: list with serialized values
+    :return: a list with serialized values
     """
     result: list[Any] = []
     for value in source:
@@ -264,6 +266,8 @@ def list_jsonify(source: list[Any]) -> list[Any]:
             from .dict_pomes import dict_jsonify
             dict_jsonify(source=value)
             result.append(value)
+        elif isinstance(value, Path):
+            result.append(value.as_posix())
         elif isinstance(value, bytes | bytearray):
             result.append(b64encode(value).decode())
         elif isinstance(value, date):
@@ -272,5 +276,49 @@ def list_jsonify(source: list[Any]) -> list[Any]:
             result.append(list_jsonify(source=list(value)))
         else:
             result.append(value)
+
+    return result
+
+
+def list_hexify(source: list[Any]) -> list[Any]:
+    """
+    Return a new *list* containing the values in *source* changed to appropriate hexadecimal representations.
+
+    Possible transformations:
+        - *bytes* e *bytearray* are changed using their built-in *hex()* method
+        - *str* is changed to its hex form (see warning below)
+        - *date* and *datetime* are changed to the hex form of their respective ISO representations
+        - *Path* is changed to the hex form of its POSIX representation
+        - *Iterable* is changed to a *list*
+        - to all the other types *str()* is applied and its hex representation is used
+    HAZARD:
+        - depending on the type of objects in *source*, the final result may not have been fully hexified
+        - will raise a *ValueError* exception if a target string has a character with codepoint greater than 255
+
+    :param source: the dict to be made serializable
+    :return: a list with serialized values
+    :raises ValueError: if a target string has a character with codepoint greater than 255
+    """
+    # needed imports
+    from .str_pomes import str_to_hex
+    from .dict_pomes import dict_hexify
+
+    result: list[Any] = []
+    for value in source:
+        if isinstance(value, dict):
+            dict_hexify(source=value)
+            result.append(value)
+        elif isinstance(value, str):
+            result.append(str_to_hex(value))
+        elif isinstance(value, Iterable):
+            result.append(list_jsonify(source=list(value)))
+        elif isinstance(value, Path):
+            result.append(str_to_hex(value.as_posix()))
+        elif isinstance(value, bytes | bytearray):
+            result.append(value.hex())
+        elif isinstance(value, date):
+            result.append(str_to_hex(value.isoformat()))
+        else:
+            result.append(str_to_hex(str(value)))
 
     return result

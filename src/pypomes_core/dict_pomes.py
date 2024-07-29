@@ -3,6 +3,7 @@ import types
 from base64 import b64encode
 from collections.abc import Iterable
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 
@@ -110,7 +111,7 @@ def dict_get_value(source: dict[Any, Any],
 
 def dict_set_value(target: dict[Any, Any],
                    key_chain: list[str],
-                   value: Any) -> None:
+                   value: Any) -> dict[Any, Any]:
     """
     Assign to an element of *source* the value *value*.
 
@@ -119,10 +120,12 @@ def dict_set_value(target: dict[Any, Any],
     Any non-existing intermediate elements are created with the value of an empty *dict*.
     A key might indicate the position of the element within a list, using the format *<key>[<pos>]*.
     In such a case, that element must exist.
+    For convenience, the possibly modified *target* itself is returned.
 
     :param target: the reference dict
     :param key_chain: the key chain
     :param value: the value to be assigned
+    :return: the modified input 'dict'
     """
     dict_item: Any = target
     # traverse the chain, up to end including its penultimate element
@@ -170,6 +173,8 @@ def dict_set_value(target: dict[Any, Any],
         else:
             # no, assign 'value' to the element 'key' in the dictionary
             dict_item[key] = value
+
+    return target
 
 
 def dict_pop_value(target: dict[Any, Any],
@@ -233,34 +238,34 @@ def dict_pop_value(target: dict[Any, Any],
 
 def dict_replace_value(target: dict[Any, Any],
                        old_value: Any,
-                       new_value: Any) -> None:
+                       new_value: Any) -> dict[Any, Any]:
     """
     Replace, in *target*, all occurrences of *old_value* with *new_value*.
+
+    For convenience, the possibly modified *target* itself is returned.
 
     :param target: the reference dict
     :param old_value: the value to be replaced
     :param new_value: the new value
+    :return: the modified input 'dict'
     """
     def list_replace_value(items: list[Any],
                            old_val: Any,
                            new_val: Any) -> None:
         # traverse the list
         for item in items:
-
             # is 'item' a dict ?
             if isinstance(item, dict):
                 # yes, process it recursively
                 dict_replace_value(target=item,
                                    old_value=old_val,
                                    new_value=new_val)
-
             # is 'item' a list ?
             elif isinstance(item, list):
                 # yes, process it recursively
                 list_replace_value(items=item,
                                    old_val=old_val,
                                    new_val=new_val)
-
     # traverse the dict
     for curr_key, curr_value in target.items():
 
@@ -282,6 +287,7 @@ def dict_replace_value(target: dict[Any, Any],
             list_replace_value(items=curr_value,
                                old_val=old_value,
                                new_val=new_value)
+    return target
 
 
 def dict_unique_values(source: dict[Any, Any]) -> list[Any]:
@@ -344,20 +350,21 @@ def dict_get_keys(source: [Any, Any],
 
 
 def dict_merge(target: dict[Any, Any],
-               source: dict[Any, Any]) -> None:
+               source: dict[Any, Any]) -> dict[Any, Any]:
     """
     Traverse the elements in *source* to update *target*, according to the criteria presented herein.
 
     The criteria to be followed are:
       - add the element to *target*, if it does not exist
       - if the element exists in *target*:
-
         - recursively process both elements, if both are type *dict*
         - add the missing items, if both are type *list*
         - replace the element in *target* if it is a different type, ou if both elements are not of the same type
+    For convenience, the possibly modified *target* itself is returned.
 
     :param target: the dictionary to be updated
     :param source: the dictionary with the new elements
+    :return: the modified target 'dict'
     """
     # traverse the dictionary with the new elements
     for skey, svalue in source.items():
@@ -386,17 +393,21 @@ def dict_merge(target: dict[Any, Any],
             # the item is not in target, add it
             target[skey] = svalue
 
+    return target
+
 
 def dict_coalesce(target: dict[Any, Any],
-                  key_chain: list[str]) -> None:
+                  key_chain: list[str]) -> dict[Any, Any]:
     """
     Coalesce the element of type *list* in *target* at the level *n* with the list at the level immediately above.
 
     This element is pointed to by the key chain *[keys[0]: ... :keys[n]*, and is processed as a sequence
     of multiple elements. The two last keys in *key_chain* must be associated with values of type *list*.
+    For convenience, the possibly modified *target* itself is returned.
 
     :param target: the dictionary to be coalesced
     :param key_chain: the chain of nested keys
+    :return: the modified input 'dict'
     """
     # traverse the kay chain up to its penultimate element
     curr_dict: dict[Any, Any] | None = target
@@ -481,17 +492,21 @@ def dict_coalesce(target: dict[Any, Any],
         # replace the original list with the coalesced new list
         curr_dict[key_chain[-2]] = penultimate_list
 
+    return target
+
 
 def dict_reduce(target: dict[Any, Any],
-                key_chain: list[str]) -> None:
+                key_chain: list[str]) -> dict[Any, Any]:
     """
     Relocate the elements from *target* at level *n*, to the level immediately above.
 
     These elements are pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
     The element at level *n* is removed at the end.
+    For convenience, the possibly modified *target* itself is returned.
 
     :param target: the 'dict' to be reduced
     :param key_chain: the key chain
+    :return: the modified input 'dict'
     """
     # does the key chain contain at least 1 key ?
     if len(key_chain) > 0:
@@ -531,6 +546,8 @@ def dict_reduce(target: dict[Any, Any],
             last: dict[Any, Any] = curr_dict.pop(last_key)
             for key, value in last.items():
                 curr_dict[key] = value
+
+    return target
 
 
 def dict_from_list(source: list[dict[Any, Any]],
@@ -615,7 +632,6 @@ def dict_transform(source: dict[Any, Any],
     *from_to_keys*, the element indicated by the second term of the tuple, assigning to it
     the value of the *source* element indicated by the first term of the tuple. Both terms
     of the tuples are represented by a chain of nested keys.
-
     The prefixes for the source and destination keys, if defined, have different treatments.
     They are added when searching for values in *Source*, and removed when assigning values
     to the return *dict*.
@@ -711,19 +727,20 @@ def dict_clone(source: dict[Any, Any],
 
 
 def dict_listify(target: dict[Any, Any],
-                 key_chain: list[str]) -> None:
+                 key_chain: list[str]) -> dict[Any, Any]:
     """
     Insert the value of the item pointed to by the key chain *[keys[0]: ... :keys[n]* in a list.
 
     This insertion will happen only if such a value is not itself a list.
     All lists eventually found, up to the penultimate key in the chain, will be processed recursively.
+    For convenience, the possibly modified *target* itself is returned.
 
     :param target: the dictionary to be modified
     :param key_chain: the chain of nested keys pointing to the item in question
+    :return: the modified input 'dict'
     """
     def items_listify(in_targets: list,
                       in_keys: list[str]) -> None:
-
         # traverse the list
         for in_target in in_targets:
             # is the element a dictionary ?
@@ -762,6 +779,8 @@ def dict_listify(target: dict[Any, Any],
             item: Any = parent.pop(key)
             parent[key] = [item]
 
+    return target
+
 
 def dict_jsonify(source: dict[Any, Any]) -> dict[Any, Any]:
     """
@@ -770,16 +789,20 @@ def dict_jsonify(source: dict[Any, Any]) -> dict[Any, Any]:
     Possible transformations:
         - *bytes* e *bytearray* are changed to *str* in *Base64* format
         - *date* and *datetime* are changed to their respective ISO representations
-        - *Iterable* is changed into a *list*
+        - *Path* is changed to its POSIX representation
+        - *Iterable* is changed to a *list*
         - all other types are left unchanged
     For convenience, the possibly modified *source* itself is returned.
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
     :param source: the dict to be made serializable
+    :return: the modified input 'dict'
     """
     for key, value in source.items():
         if isinstance(value, dict):
             dict_jsonify(source=value)
+        elif isinstance(value, Path):
+            source[key] = value.as_posix()
         elif isinstance(value, bytes | bytearray):
             source[key] = b64encode(s=value).decode()
         elif isinstance(value, date):
@@ -787,6 +810,47 @@ def dict_jsonify(source: dict[Any, Any]) -> dict[Any, Any]:
         elif isinstance(value, Iterable) and not isinstance(value, str):
             from .list_pomes import list_jsonify
             source[key] = list_jsonify(source=list(value))
+
+    return source
+
+
+def dict_hexify(source: dict[Any, Any]) -> dict[Any, Any]:
+    """
+    Turn the values in *source* into appropriate hexadecimal representations.
+
+    Possible transformations:
+        - *bytes* e *bytearray* are changed using their built-in *hex()* method
+        - *str* is changed to its hex form (see warning below)
+        - *date* and *datetime* are changed to the hex form of their respective ISO representations
+        - *Path* is changed to the hex form of its POSIX representation
+        - *Iterable* is changed to a *list*
+        - to all the other types *str()* is applied and its hex representation is used
+    For convenience, the possibly modified *source* itself is returned.
+    HAZARD:
+        - depending on the type of objects in *source*, the final result may not have been fully hexified
+        - will raise a *ValueError* exception if a target string has a character with codepoint greater than 255
+
+    :param source: the dict to be made serializable
+    :return: the modified input 'dict'
+    :raises ValueError: if a target string has a character with codepoint greater than 255
+    """
+    # needed imports
+    from .str_pomes import str_to_hex
+    from .list_pomes import list_hexify
+
+    for key, value in source.items():
+        if isinstance(value, dict):
+            dict_hexify(source=value)
+        elif isinstance(value, str):
+            source[key] = str_to_hex(value)
+        elif isinstance(value, Iterable):
+            source[key] = list_hexify(source=list(value))
+        elif isinstance(value, Path):
+            source[key] = str_to_hex(value.as_posix())
+        elif isinstance(value, bytes | bytearray):
+            source[key] = value.hex()
+        elif isinstance(value, date):
+            source[key] = str_to_hex(value.isoformat())
 
     return source
 
