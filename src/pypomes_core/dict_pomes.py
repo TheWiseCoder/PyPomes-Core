@@ -1,5 +1,8 @@
 import inspect
 import types
+from base64 import b64encode
+from collections.abc import Iterable
+from datetime import date
 from typing import Any
 
 
@@ -758,6 +761,34 @@ def dict_listify(target: dict[Any, Any],
             # yes, insert it in a list
             item: Any = parent.pop(key)
             parent[key] = [item]
+
+
+def dict_jsonify(source: dict[Any, Any]) -> dict[Any, Any]:
+    """
+    Turn the values in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
+
+    Possible transformations:
+        - *bytes* e *bytearray* are changed to *str* in *Base64* format
+        - *date* and *datetime* are changed to their respective ISO representations
+        - *Iterable* is changed into a *list*
+        - all other types are left unchanged
+    For convenience, the possibly modified *source* itself is returned.
+    HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
+
+    :param source: the dict to be made serializable
+    """
+    for key, value in source.items():
+        if isinstance(value, dict):
+            dict_jsonify(source=value)
+        elif isinstance(value, bytes | bytearray):
+            source[key] = b64encode(s=value).decode()
+        elif isinstance(value, date):
+            source[key] = value.isoformat()
+        elif isinstance(value, Iterable) and not isinstance(value, str):
+            from .list_pomes import list_jsonify
+            source[key] = list_jsonify(source=list(value))
+
+    return source
 
 
 if __name__ == "__main__":

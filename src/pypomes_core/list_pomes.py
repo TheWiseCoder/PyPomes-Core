@@ -1,3 +1,6 @@
+from datetime import date
+from base64 import b64encode
+from collections.abc import Iterable
 from typing import Any
 
 def list_compare(list1: list[Any],
@@ -236,5 +239,38 @@ def list_prune_not_in(target: list[Any],
     removals: list[Any] = [item for item in result if item not in ref]
     for item in removals:
         result.remove(item)
+
+    return result
+
+
+def list_jsonify(source: list[Any]) -> list[Any]:
+    """
+    Return a new *list* containing the values in *source*, made serializable if necessary.
+
+    Possible operations:
+        - *bytes* e *bytearray* are changed to *str* in *Base64* format
+        - *date* and *datetime* are changed to their respective ISO representations
+        - *Iterable* is changed into a *list*
+        - all other types are left unchanged
+    The serialization allows for these values to be used in JSON strings.
+    HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
+
+    :param source: the dict to be made serializable
+    :return: list with serialized values
+    """
+    result: list[Any] = []
+    for value in source:
+        if isinstance(value, dict):
+            from .dict_pomes import dict_jsonify
+            dict_jsonify(source=value)
+            result.append(value)
+        elif isinstance(value, bytes | bytearray):
+            result.append(b64encode(value).decode())
+        elif isinstance(value, date):
+            result.append(value.isoformat())
+        elif isinstance(value, Iterable) and not isinstance(value, str):
+            result.append(list_jsonify(source=list(value)))
+        else:
+            result.append(value)
 
     return result
