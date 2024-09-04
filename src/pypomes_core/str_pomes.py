@@ -232,8 +232,8 @@ def str_from_any(source: Any) -> str:
         - *None*: the string 'None'
         - *str* : the source string itself
         - *bytes*: its hex representation
-        - *date*: the date in iso format (*datetime* is a *date* subtype)
-        - *Path*: its Posix form
+        - *date*: the date in ISO format (*datetime* is a *date* subtype)
+        - *Path*: its POSIX form
         - all other types: their *str()* representation
 
     :param source: the data to be converted to string.
