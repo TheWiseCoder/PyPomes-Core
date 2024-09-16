@@ -453,24 +453,22 @@ def dict_coalesce(target: dict[Any, Any],
                 last_list: list[dict[Any, Any]] = []
 
                 # traverse the last element
-                for k1, v1 in last_elem.items():
-                    # if 'k1' the last key, and is it a list ?
-                    if k1 == key_chain[-1] and isinstance(v1, list):
+                for k, v in last_elem.items():
+                    # if 'k' the last key, and is it a list ?
+                    if k == key_chain[-1] and isinstance(v, list):
                         # yes, obtain its items for further coalescing
-                        for in_dict in v1:
+                        for in_dict in v:
                             # is 'in_dict' a dictionary ?
                             if isinstance(in_dict, dict):
                                 # yes, coalesce and save it
-                                inner_dict: dict[Any, Any] = {}
-                                for k2, v2 in in_dict.items():
-                                    inner_dict[k2] = v2
+                                inner_dict: dict[Any, Any] = dict(in_dict.items())
                                 last_list.append(inner_dict)
                             else:
                                 # no, save it as is
                                 last_list.append(in_dict)
                     else:
                         # no, coalesce it
-                        outer_dict[k1] = v1
+                        outer_dict[k] = v
 
                 # are there items to be coalesced ?
                 if len(last_list) > 0:

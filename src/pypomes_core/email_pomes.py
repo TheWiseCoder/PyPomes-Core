@@ -17,7 +17,7 @@ def email_send(errors: list[str] | None,
                content: str,
                logger: Logger = None) -> None:
     """
-    Send email to *user_email", with *subject* as the email subject, and *content* as the email message.
+    Send email to *user_email*, with *subject* as the email subject, and *content* as the email message.
 
     :param errors: incidental error messages
     :param user_email: the address to send the email to

@@ -19,8 +19,8 @@ from .encoding_pomes import (
 )
 from .env_pomes import (
     APP_PREFIX,
-    env_get_str, env_get_bool, env_get_date,
-    env_get_int, env_get_float, env_get_path,
+    env_get_str, env_get_bytes, env_get_bool,
+    env_get_date, env_get_int, env_get_float, env_get_path,
 )
 from .exception_pomes import (
     exc_format,
@@ -45,8 +45,9 @@ from .validation_msgs import (
 )
 from .validation_pomes import (
     VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
-    validate_value, validate_bool, validate_int, validate_float, validate_str,
-    validate_date, validate_datetime, validate_ints, validate_strs,
+    validate_value, validate_bool, validate_int, validate_float,
+    validate_str, validate_date, validate_datetime,
+    validate_ints, validate_strs, validate_build_response,
     validate_format_error, validate_format_errors, validate_unformat_errors,
 )
 from .xml_pomes import (
@@ -74,8 +75,8 @@ __all__ = [
     "encode_ascii_hex", "decode_ascii_hex",
     # env_pomes
     "APP_PREFIX",
-    "env_get_str", "env_get_bool", "env_get_date",
-    "env_get_int", "env_get_float", "env_get_path",
+    "env_get_str", "env_get_bool", "env_get_bytes",
+    "env_get_date", "env_get_int", "env_get_float", "env_get_path",
     # exception_pomes
     "exc_format",
     # file_pomes
@@ -94,8 +95,9 @@ __all__ = [
     "validate_set_msgs", "validate_update_msgs",
     # validation_pomes
     "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX",
-    "validate_value", "validate_bool", "validate_int", "validate_float", "validate_str",
-    "validate_date", "validate_datetime", "validate_ints", "validate_strs",
+    "validate_value", "validate_bool", "validate_int", "validate_float",
+    "validate_str", "validate_date", "validate_datetime",
+    "validate_ints", "validate_strs", "validate_build_response",
     "validate_format_error", "validate_format_errors", "validate_unformat_errors",
     # xml_pomes
     "XML_FILE_HEADER",
@@ -132,6 +134,9 @@ def get_versions() -> dict[str, str]:
         result["PyPomes-HTTP"] =  import_module(name="pypomes_http").__version__
 
     with suppress(Exception):
+        result["PyPomes-JWT"] =  import_module(name="pypomes_jwt").__version__
+
+    with suppress(Exception):
         result["PyPomes-LDAP"] =  import_module(name="pypomes_ldap").__version__
 
     with suppress(Exception):
@@ -145,9 +150,6 @@ def get_versions() -> dict[str, str]:
 
     with suppress(Exception):
         result["PyPomes-Scheduling"] =  import_module(name="pypomes_scheduling").__version__
-
-    with suppress(Exception):
-        result["PyPomes-Security"] =  import_module(name="pypomes_security").__version__
 
     with suppress(Exception):
         result["PyPomes-SOAP"] =  import_module(name="pypomes_soap").__version__

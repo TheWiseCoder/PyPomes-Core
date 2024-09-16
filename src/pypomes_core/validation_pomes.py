@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from flask import jsonify, Response
 from logging import Logger
 from typing import Any, Final
 from .datetime_pomes import TIMEZONE_LOCAL
@@ -559,6 +560,31 @@ def validate_strs(errors: list[str] | None,
                        err_msg=stat,
                        logger=logger)
         result = None
+
+    return result
+
+
+def validate_build_response(errors: list[str],
+                            reply: dict) -> Response:
+    """
+    Build a *Response* object based on the given *errors* list and the set of key/value pairs in *reply*.
+
+    :param errors: the reference errors
+    :param reply: the key/value pairs to add to the response as JSON string
+    :return: the appropriate 'Response' object
+    """
+    # declare the return variable
+    result: Response
+
+    if len(errors) == 0:
+        # 'reply' might be 'None'
+        result = jsonify(reply)
+    else:
+        reply_err: dict = {"errors": validate_format_errors(errors=errors)}
+        if isinstance(reply, dict):
+            reply_err.update(reply)
+        result = jsonify(reply_err)
+        result.status_code = 400
 
     return result
 

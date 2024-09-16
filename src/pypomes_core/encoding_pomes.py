@@ -72,7 +72,7 @@ def decode_ascii_hex(source: bytes) -> bytes:
         match next_byte:
             case b"x":
                 # '\x' prefixes a character denoted by a hexadecimal string ('\x00' through '\xff')
-                # HAZARD: intermediate chars are necessary - 'int(byte)' breaks for byte > b'\x09'
+                # HAZARD: intermediate chars are necessary - 'int(byte)' breaks for byte > '\x09'
                 upper_char: str = source[pos2+2:pos2+3].decode()
                 lower_char: str = source[pos2+3:pos2+4].decode()
                 int_val: int = 16 * int(upper_char, base=16) + int(lower_char, base=16)

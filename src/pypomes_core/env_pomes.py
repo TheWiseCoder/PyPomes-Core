@@ -25,6 +25,26 @@ def env_get_str(key: str,
     return result
 
 
+def env_get_bytes(key: str,
+                  def_value: bytes = None) -> bytes:
+    """
+    Retrieve and return the byte value defined for *key* in the current operating environment.
+
+    This corresponding string value defined in the environment must be *UTF-8* encodable.
+
+    :param key: the key the value is associated with
+    :param def_value: the default value to return, if the key has not been defined
+    :return: the byte value associated with the key
+    """
+    result: bytes
+    try:
+        result = (os.environ[key]).encode()
+    except (AttributeError, KeyError, TypeError, UnicodeEncodeError):
+        result = def_value
+
+    return result
+
+
 def env_get_bool(key: str,
                  def_value: bool = None) -> bool:
     """

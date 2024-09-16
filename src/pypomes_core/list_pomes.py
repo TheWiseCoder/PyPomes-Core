@@ -9,7 +9,7 @@ def list_compare(list1: list[Any],
     """
     Compare the contents of the two lists *list1* e *list2*.
 
-    Return *True* if all the elements in *list1* are also in *list2*, and vice-versa, with the same cardinality.
+    Return *True* if all the elements in *list1* are also in *list2*, and vice versa, with the same cardinality.
 
     :param list1: the first list
     :param list2: the second list
