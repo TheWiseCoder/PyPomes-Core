@@ -30,7 +30,8 @@ def env_get_bytes(key: str,
     """
     Retrieve and return the byte value defined for *key* in the current operating environment.
 
-    This corresponding string value defined in the environment must be *UTF-8* encodable.
+    The corresponding string defined in the environment must be a hexadecimal representation
+    of the byte value. As such, it is restricted to contain characters in the range *[0-9a-f]*.
 
     :param key: the key the value is associated with
     :param def_value: the default value to return, if the key has not been defined
@@ -38,8 +39,8 @@ def env_get_bytes(key: str,
     """
     result: bytes
     try:
-        result = (os.environ[key]).encode()
-    except (AttributeError, KeyError, TypeError, UnicodeEncodeError):
+        result = bytes.fromhex(os.environ[key])
+    except (AttributeError, KeyError, TypeError):
         result = def_value
 
     return result
