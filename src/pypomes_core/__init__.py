@@ -19,15 +19,15 @@ from .encoding_pomes import (
 )
 from .env_pomes import (
     APP_PREFIX,
-    env_get_str, env_get_bytes, env_get_bool,
-    env_get_date, env_get_int, env_get_float, env_get_path,
+    env_get_str, env_get_int, env_get_float, env_get_bytes,
+    env_get_bool, env_get_date, env_get_path, env_is_docker,
 )
 from .exception_pomes import (
     exc_format,
 )
 from .file_pomes import (
     TEMP_FOLDER,
-    file_from_request, file_get_data
+    file_from_request, file_get_data, file_get_mimetype, file_is_binary
 )
 from .list_pomes import (
     list_compare, list_flatten, list_unflatten, list_find_coupled,
@@ -37,7 +37,7 @@ from .list_pomes import (
 from .str_pomes import (
     str_to_hex, str_from_hex, str_lower, str_upper,
     str_as_list, str_sanitize, str_split_on_mark,
-    str_get_between, str_get_positional,
+    str_between, str_positional,
     str_find_whitespace, str_rreplace, str_from_any
 )
 from .validation_msgs import (
@@ -75,13 +75,13 @@ __all__ = [
     "encode_ascii_hex", "decode_ascii_hex",
     # env_pomes
     "APP_PREFIX",
-    "env_get_str", "env_get_bool", "env_get_bytes",
-    "env_get_date", "env_get_int", "env_get_float", "env_get_path",
+    "env_get_str", "env_get_int", "env_get_float", "env_get_bytes",
+    "env_get_bool", "env_get_date", "env_get_path", "env_is_docker",
     # exception_pomes
     "exc_format",
     # file_pomes
     "TEMP_FOLDER",
-    "file_from_request", "file_get_data",
+    "file_from_request", "file_get_data", "file_get_mimetype", "file_is_binary",
     # list_pomes
     "list_compare", "list_flatten", "list_unflatten", "list_find_coupled",
     "list_elem_starting_with", "list_transform", "list_prune_duplicates",
@@ -89,7 +89,7 @@ __all__ = [
     # str_pomes
     "str_to_hex", "str_from_hex", "str_lower", "str_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",
-    "str_get_between", "str_get_positional",
+    "str_between", "str_positional",
     "str_find_whitespace", "str_rreplace", "str_from_any",
     # validation_msgs
     "validate_set_msgs", "validate_update_msgs",

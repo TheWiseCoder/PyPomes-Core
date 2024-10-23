@@ -137,9 +137,9 @@ def str_find_whitespace(source: str) -> int:
     return result
 
 
-def str_get_between(source: str,
-                    from_str: str,
-                    to_str: str) -> str:
+def str_between(source: str,
+                from_str: str,
+                to_str: str) -> str:
     """
     Extract and return the *substring* in *source* located between the delimiters *from_str* and *to_str*.
 
@@ -161,9 +161,9 @@ def str_get_between(source: str,
     return result
 
 
-def str_get_positional(source: str,
-                       list_origin: list[str],
-                       list_dest: list[Any]) -> Any:
+def str_positional(source: str,
+                   list_origin: list[str],
+                   list_dest: list[Any]) -> Any:
     """
     Locate the position of *source* within *list_origin*, and return the element in the same position in *list_dest*.
 

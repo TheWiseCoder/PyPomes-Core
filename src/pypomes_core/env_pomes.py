@@ -1,4 +1,5 @@
 import os
+from contextlib import suppress
 from datetime import date
 from dateutil import parser
 from dateutil.parser import ParserError
@@ -10,36 +11,95 @@ APP_PREFIX: Final[str] = os.getenv("PYPOMES_APP_PREFIX", "")
 
 
 def env_get_str(key: str,
+                values: list[str] = None,
                 def_value: str = None) -> str:
     """
     Retrieve and return the string value defined for *key* in the current operating environment.
 
+    If *values* is specified, the value obtained is checked for occurrence therein.
+
     :param key: the key the value is associated with
+    :param values: optional list of valid values
     :param def_value: the default value to return, if the key has not been defined
     :return: the string value associated with the key
     """
-    result: str = os.getenv(key)
+    result: str | None = os.getenv(key)
     if result is None:
+        result = def_value
+    elif values and result not in values:
+        result = None
+
+    return result
+
+
+def env_get_int(key: str,
+                  values: list[int] = None,
+                def_value: int = None) -> int:
+    """
+    Retrieve and return the integer value defined for *key* in the current operating environment.
+
+    If *values* is specified, the value obtained is checked for occurrence therein.
+
+    :param key: the key the value is associated with
+    :param values: optional list of valid values
+    :param def_value: the default value to return, if the key has not been defined
+    :return: the integer value associated with the key
+    """
+    result: int | None
+    try:
+        result = int(os.environ[key])
+        if values and result not in values:
+            result = None
+    except (AttributeError, KeyError, TypeError):
+        result = def_value
+
+    return result
+
+
+def env_get_float(key: str,
+                  values: list[float] = None,
+                  def_value: float = None) -> float:
+    """
+    Retrieve and return the float value defined for *key* in the current operating environment.
+
+    If *values* is specified, the value obtained is checked for occurrence therein.
+
+    :param key: the key the value is associated with
+    :param values: optional list of valid values
+    :param def_value: the default value to return, if the key has not been defined
+    :return: the float value associated with the key
+    """
+    result: float | None
+    try:
+        result = float(os.environ[key])
+        if values and result not in values:
+            result = None
+    except (AttributeError, KeyError, TypeError):
         result = def_value
 
     return result
 
 
 def env_get_bytes(key: str,
+                  values: list[bytes] = None,
                   def_value: bytes = None) -> bytes:
     """
     Retrieve and return the byte value defined for *key* in the current operating environment.
 
     The corresponding string defined in the environment must be a hexadecimal representation
     of the byte value. As such, it is restricted to contain characters in the range *[0-9a-f]*.
+    If *values* is specified, the value obtained is checked for occurrence therein.
 
     :param key: the key the value is associated with
+    :param values: optional list of valid values
     :param def_value: the default value to return, if the key has not been defined
     :return: the byte value associated with the key
     """
-    result: bytes
+    result: bytes | None
     try:
         result = bytes.fromhex(os.environ[key])
+        if values and result not in values:
+            result = None
     except (AttributeError, KeyError, TypeError):
         result = def_value
 
@@ -93,42 +153,6 @@ def env_get_date(key: str,
     return result
 
 
-def env_get_int(key: str,
-                def_value: int = None) -> int:
-    """
-    Retrieve and return the integer value defined for *key* in the current operating environment.
-
-    :param key: the key the value is associated with
-    :param def_value: the default value to return, if the key has not been defined
-    :return: the integer value associated with the key
-    """
-    result: int
-    try:
-        result = int(os.environ[key])
-    except (AttributeError, KeyError, TypeError):
-        result = def_value
-
-    return result
-
-
-def env_get_float(key: str,
-                  def_value: float = None) -> float:
-    """
-    Retrieve and return the float value defined for *key* in the current operating environment.
-
-    :param key: the key the value is associated with
-    :param def_value: the default value to return, if the key has not been defined
-    :return: the float value associated with the key
-    """
-    result: float
-    try:
-        result = float(os.environ[key])
-    except (AttributeError, KeyError, TypeError):
-        result = def_value
-
-    return result
-
-
 def env_get_path(key: str,
                  def_value: Path = None) -> Path:
     """
@@ -143,5 +167,22 @@ def env_get_path(key: str,
         result = Path(os.environ[key])
     except (AttributeError, KeyError, TypeError):
         result = def_value
+
+    return result
+
+
+def env_is_docker() -> bool:
+    """
+    Determine whether the application is running inside a Docker container.
+
+    Note that a resonable, but not infallible, heuristics is used.
+
+    :return: 'True' if this could be determined, 'False' otherwise
+    """
+    result: bool = os.path.exists('/.dockerenv')
+    if not result:
+        with suppress(Exception):
+            with open('/proc/1/cgroup', 'rt') as f:
+                result = "docker" in f.read()
 
     return result
