@@ -19,8 +19,9 @@ from .encoding_pomes import (
 )
 from .env_pomes import (
     APP_PREFIX,
-    env_get_str, env_get_int, env_get_float, env_get_bytes,
-    env_get_bool, env_get_date, env_get_path, env_is_docker,
+    env_get_str, env_get_int, env_get_float,
+    env_get_strs, env_get_ints, env_get_floats,
+    env_get_bytes, env_get_bool, env_get_date, env_get_path, env_is_docker,
 )
 from .exception_pomes import (
     exc_format,
@@ -33,6 +34,9 @@ from .list_pomes import (
     list_compare, list_flatten, list_unflatten, list_find_coupled,
     list_elem_starting_with, list_transform, list_prune_duplicates,
     list_prune_in, list_prune_not_in, list_jsonify, list_hexify
+)
+from .obj_pomes import (
+    obj_is_serializable
 )
 from .str_pomes import (
     str_to_hex, str_from_hex, str_lower, str_upper,
@@ -75,8 +79,9 @@ __all__ = [
     "encode_ascii_hex", "decode_ascii_hex",
     # env_pomes
     "APP_PREFIX",
-    "env_get_str", "env_get_int", "env_get_float", "env_get_bytes",
-    "env_get_bool", "env_get_date", "env_get_path", "env_is_docker",
+    "env_get_str", "env_get_int", "env_get_float",
+    "env_get_strs", "env_get_ints", "env_get_floats",
+    "env_get_bytes", "env_get_bool", "env_get_date", "env_get_path", "env_is_docker",
     # exception_pomes
     "exc_format",
     # file_pomes
@@ -86,6 +91,8 @@ __all__ = [
     "list_compare", "list_flatten", "list_unflatten", "list_find_coupled",
     "list_elem_starting_with", "list_transform", "list_prune_duplicates",
     "list_prune_in", "list_prune_not_in", "list_jsonify", "list_hexify",
+    # obj_pomes
+    "obj_is_serializable",
     # str_pomes
     "str_to_hex", "str_from_hex", "str_lower", "str_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",

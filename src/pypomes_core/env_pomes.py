@@ -80,6 +80,85 @@ def env_get_float(key: str,
     return result
 
 
+def env_get_strs(key: str,
+                 values: list[str] = None) -> list[str]:
+    """
+    Retrieve and return the string values defined for *key* in the current operating environment.
+
+    The values must be provided as a comma-separated list of strings.
+    If *values* is specified, the values obtained are checked for occurrence therein.
+    On failure, 'None' is returned.
+
+    :param key: the key the values ares associated with
+    :param values: optional list of valid values
+    :return: the string values associated with the key
+    """
+    result: list[str] | None = None
+    vals: str = os.getenv(key)
+    if vals:
+        result = vals.split(",")
+        if values:
+            for val in result:
+                if val not in values:
+                    result = None
+                    break
+    return result
+
+
+def env_get_ints(key: str,
+                 values: list[str] = None) -> list[int]:
+    """
+    Retrieve and return the integer values defined for *key* in the current operating environment.
+
+    The values must be provided as a comma-separated list of integers.
+    If *values* is specified, the values obtained are checked for occurrence therein.
+    On failure, 'None' is returned.
+
+    :param key: the key the values ares associated with
+    :param values: optional list of valid values
+    :return: the integer values associated with the key
+    """
+    result: list[int] | None = None
+    # noinspection PyUnusedLocal
+    with suppress(Exception):
+        vals: list[str] = os.environ[key].split(",")
+        if vals:
+            result = [int(val) for val in vals]
+            if values:
+                for val in result:
+                    if val not in values:
+                        result = None
+                        break
+    return result
+
+
+def env_get_floats(key: str,
+                   values: list[str] = None) -> list[float]:
+    """
+    Retrieve and return the float values defined for *key* in the current operating environment.
+
+    The values must be provided as a comma-separated list of floats.
+    If *values* is specified, the values obtained are checked for occurrence therein.
+    On failure, 'None' is returned.
+
+    :param key: the key the values ares associated with
+    :param values: optional list of valid values
+    :return: the float values associated with the key
+    """
+    result: list[float] | None = None
+    # noinspection PyUnusedLocal
+    with suppress(Exception):
+        vals: list[str] = os.environ[key].split(",")
+        if vals:
+            result = [float(val) for val in vals]
+            if values:
+                for val in result:
+                    if val not in values:
+                        result = None
+                        break
+    return result
+
+
 def env_get_bytes(key: str,
                   values: list[bytes] = None,
                   def_value: bytes = None) -> bytes:
