@@ -111,13 +111,13 @@ __all__ = [
     "xml_to_dict", "xml_normalize_keys",
 ]
 
+from contextlib import suppress
+from importlib import import_module
 from importlib.metadata import version
 __version__: str = version("pypomes_core")
 __version_info__: tuple = tuple(int(i) for i in __version__.split(".") if i.isdigit())
 
 
-from contextlib import suppress
-from importlib import import_module
 def get_versions() -> dict[str, str]:
     """
     Retrieve and return the versions of the *Pypomes* packages in use.
@@ -129,36 +129,36 @@ def get_versions() -> dict[str, str]:
     }
 
     with suppress(Exception):
-        result["PyPomes-Cloud"] =  import_module(name="pypomes_cloud").__version__
+        result["PyPomes-Cloud"] = import_module(name="pypomes_cloud").__version__
 
     with suppress(Exception):
-        result["PyPomes-Crypto"] =  import_module(name="pypomes_crypto").__version__
+        result["PyPomes-Crypto"] = import_module(name="pypomes_crypto").__version__
 
     with suppress(Exception):
-        result["PyPomes-DB"] =  import_module(name="pypomes_db").__version__
+        result["PyPomes-DB"] = import_module(name="pypomes_db").__version__
 
     with suppress(Exception):
-        result["PyPomes-HTTP"] =  import_module(name="pypomes_http").__version__
+        result["PyPomes-HTTP"] = import_module(name="pypomes_http").__version__
 
     with suppress(Exception):
-        result["PyPomes-JWT"] =  import_module(name="pypomes_jwt").__version__
+        result["PyPomes-JWT"] = import_module(name="pypomes_jwt").__version__
 
     with suppress(Exception):
-        result["PyPomes-LDAP"] =  import_module(name="pypomes_ldap").__version__
+        result["PyPomes-LDAP"] = import_module(name="pypomes_ldap").__version__
 
     with suppress(Exception):
-        result["PyPomes-Logging"] =  import_module(name="pypomes_logging").__version__
+        result["PyPomes-Logging"] = import_module(name="pypomes_logging").__version__
 
     with suppress(Exception):
-        result["PyPomes-Messaging"] =  import_module(name="pypomes_messaging").__version__
+        result["PyPomes-Messaging"] = import_module(name="pypomes_messaging").__version__
 
     with suppress(Exception):
-        result["PyPomes-S3"] =  import_module(name="pypomes_s3").__version__
+        result["PyPomes-S3"] = import_module(name="pypomes_s3").__version__
 
     with suppress(Exception):
-        result["PyPomes-Scheduling"] =  import_module(name="pypomes_scheduling").__version__
+        result["PyPomes-Scheduling"] = import_module(name="pypomes_scheduling").__version__
 
     with suppress(Exception):
-        result["PyPomes-SOAP"] =  import_module(name="pypomes_soap").__version__
+        result["PyPomes-SOAP"] = import_module(name="pypomes_soap").__version__
 
     return result

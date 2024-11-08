@@ -181,7 +181,7 @@ def validate_int(errors: list[str] | None,
     elif isinstance(value, str) and value.isnumeric():
         value = int(value)
     elif value is not None and \
-         (isinstance(value, bool) or not isinstance(value, int)):
+            (isinstance(value, bool) or not isinstance(value, int)):
         # 152: Invalid value {}: must be type {}
         stat = validate_format_error(152, value, "int", f"@{attr}")
 
@@ -241,10 +241,10 @@ def validate_float(errors: list[str] | None,
     if value is None and isinstance(default, int | float):
         value = float(default)
     elif (isinstance(value, int) and not isinstance(value, bool)) or \
-          (isinstance(value, str) and value.replace(".", "", 1).isnumeric()):
+            (isinstance(value, str) and value.replace(".", "", 1).isnumeric()):
         value = float(value)
     elif isinstance(value, bool) or \
-         (value is not None and not isinstance(value, int | float)):
+            (value is not None and not isinstance(value, int | float)):
         # 152: Invalid value {}: must be type {}
         stat = validate_format_error(152, value, "float", f"@{attr}")
 
@@ -312,7 +312,7 @@ def validate_str(errors: list[str] | None,
                               min_val=min_length,
                               max_val=max_length,
                               values=values,
-                              required= required)
+                              required=required)
     if stat:
         __validate_log(errors=errors,
                        err_msg=stat,

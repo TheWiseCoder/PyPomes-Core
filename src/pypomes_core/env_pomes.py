@@ -33,7 +33,7 @@ def env_get_str(key: str,
 
 
 def env_get_int(key: str,
-                  values: list[int] = None,
+                values: list[int] = None,
                 def_value: int = None) -> int:
     """
     Retrieve and return the integer value defined for *key* in the current operating environment.

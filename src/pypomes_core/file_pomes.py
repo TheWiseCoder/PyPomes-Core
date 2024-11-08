@@ -31,7 +31,7 @@ def file_from_request(request: Request,
     result: bytes | None = None
 
     count: int = len(request.files) \
-                 if hasattr(request, "files") and request.files else 0
+        if hasattr(request, "files") and request.files else 0
     # has a file been found ?
     if count > 0:
         # yes, retrieve it

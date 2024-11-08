@@ -1,9 +1,10 @@
 import json
 from typing import Any
 
+
 def obj_is_serializable(obj: Any) -> bool:
     """
-    Determine if *obj* is serializable
+    Determine if *obj* is serializable.
 
     :param obj: the reference object
     :return: 'True' if serializable, 'False' otherwise
@@ -11,7 +12,7 @@ def obj_is_serializable(obj: Any) -> bool:
     # initialize the return variable
     result: bool = True
 
-    # verify
+    # verify the object
     try:
         json.dumps(obj)
     except (TypeError, OverflowError):
