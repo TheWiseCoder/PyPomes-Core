@@ -1,3 +1,4 @@
+from contextlib import suppress
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -257,3 +258,71 @@ def str_from_any(source: Any) -> str:
         result = str(source)
 
     return result
+
+
+def str_to_bool(source: str) -> bool:
+    """
+    Obtain and return the *bool* value encoded in *source*.
+
+    These are the criteria:
+        - case is disregarded
+        - the string values accepted to stand for *True* are *1*, *t*, or *true*
+        - the string values accepted to stand for *False* are *0*, *f*, or *false*
+        - all other values causes *None* to be returned
+
+    :param source: the encoded bool value
+    :return: the decoded bool value
+    """
+    # noinspection PyUnusedLocal
+    result: bool | None = None
+    if source in ["1", "t", "true"]:
+        result = True
+    elif source in ["0", "f", "false"]:
+        result = False
+
+    return result
+
+
+def str_to_int(source: str,
+               values: list[float] = None) -> int:
+    """
+    Obtain and return the *int* value encoded in *source*.
+
+    If *values* is specified, the value obtained is checked for occurrence therein.
+    If no valid value was obtained, *None* is returned.
+
+    :param source: the encoded int value
+    :param values: optional list of valid values
+    :return: the decoded int value
+    """
+    # noinspection PyUnusedLocal
+    result: int | None = None
+    with suppress(Exception):
+        result = int(source)
+    if values and result not in values:
+        result = None
+
+    return result
+
+
+def str_to_float(source: str,
+                 values: list[float] = None) -> float:
+    """
+    Obtain and return the *float* value encoded in *source*.
+
+    If *values* is specified, the value obtained is checked for occurrence therein.
+    If no valid value was obtained, *None* is returned.
+
+    :param source: the encoded float value
+    :param values: optional list of valid values
+    :return: the decoded float value
+    """
+    # noinspection PyUnusedLocal
+    result: float | None = None
+    with suppress(Exception):
+        result = float(source)
+    if values and result not in values:
+        result = None
+
+    return result
+
