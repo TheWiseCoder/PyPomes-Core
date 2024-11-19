@@ -1,7 +1,6 @@
 from .datetime_pomes import (
     DATE_FORMAT_STD, DATE_FORMAT_COMPACT, DATE_FORMAT_INV,
-    DATETIME_FORMAT_STD, DATETIME_FORMAT_COMPACT, DATETIME_FORMAT_INV,
-    TIMEZONE_LOCAL, TIMEZONE_UTC,
+    DATETIME_FORMAT_STD, DATETIME_FORMAT_COMPACT, DATETIME_FORMAT_INV, TIMEZONE_LOCAL,
     date_reformat, date_parse, datetime_parse,
 )
 from .dict_pomes import (
@@ -65,8 +64,7 @@ __all__ = [
     "get_versions",
     # datetime_pomes
     "DATE_FORMAT_STD", "DATE_FORMAT_COMPACT", "DATE_FORMAT_INV",
-    "DATETIME_FORMAT_STD", "DATETIME_FORMAT_COMPACT", "DATETIME_FORMAT_INV",
-    "TIMEZONE_LOCAL", "TIMEZONE_UTC",
+    "DATETIME_FORMAT_STD", "DATETIME_FORMAT_COMPACT", "DATETIME_FORMAT_INV", "TIMEZONE_LOCAL",
     "date_reformat", "date_parse", "datetime_parse",
     # dict_pomes
     "dict_has_key_chain", "dict_get_value", "dict_set_value", "dict_reduce",

@@ -2,7 +2,7 @@ from datetime import date, datetime
 from dateutil import parser
 from dateutil.parser import ParserError
 from typing import Final
-from pytz import UTC, BaseTzInfo, timezone
+from zoneinfo import ZoneInfo
 
 from .env_pomes import APP_PREFIX, env_get_str
 
@@ -14,9 +14,8 @@ DATETIME_FORMAT_STD: Final[str] = "%m/%d/%Y %H:%M:%S"
 DATETIME_FORMAT_COMPACT: Final[str] = "%Y%m%d%H%M%S"
 DATETIME_FORMAT_INV: Final[str] = "%Y-%m-%d %H:%M:%S"
 
-TIMEZONE_LOCAL: Final[BaseTzInfo] = timezone(zone=env_get_str(key=f"{APP_PREFIX}_TIMEZONE_LOCAL",
-                                                              def_value="America/Sao_Paulo"))
-TIMEZONE_UTC: Final[BaseTzInfo] = UTC
+TIMEZONE_LOCAL: Final[ZoneInfo] = ZoneInfo(key=env_get_str(key=f"{APP_PREFIX}_TIMEZONE_LOCAL",
+                                                           def_value="America/Sao_Paulo"))
 
 
 def date_reformat(dt_str: str,
