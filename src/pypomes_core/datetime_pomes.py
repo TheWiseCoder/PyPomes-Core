@@ -14,6 +14,7 @@ DATETIME_FORMAT_STD: Final[str] = "%m/%d/%Y %H:%M:%S"
 DATETIME_FORMAT_COMPACT: Final[str] = "%Y%m%d%H%M%S"
 DATETIME_FORMAT_INV: Final[str] = "%Y-%m-%d %H:%M:%S"
 
+# HAZARD: requires 'tzdata' package installed to work
 TIMEZONE_LOCAL: Final[ZoneInfo] = ZoneInfo(key=env_get_str(key=f"{APP_PREFIX}_TIMEZONE_LOCAL",
                                                            def_value="America/Sao_Paulo"))
 
