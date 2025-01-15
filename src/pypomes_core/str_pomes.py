@@ -119,6 +119,27 @@ def str_split_on_mark(source: str,
     return result
 
 
+def str_find_char(source: str,
+                  chars: str) -> int:
+    """
+    Locate and return the position of the first occurence, in *source*, of a character in *chars*.
+
+    :param source: the string to be inspected
+    :param chars: the reference characters
+    :return: the position of the first character in *chars*, or -1 if none was found
+    """
+    # initialize the return variable
+    result: int = -1
+
+    # search for whitespace
+    for inx, char in enumerate(source):
+        if char in chars:
+            result = inx
+            break
+
+    return result
+
+
 def str_find_whitespace(source: str) -> int:
     """
     Locate and return the position of the first occurence of a *whitespace* character in *source*.
