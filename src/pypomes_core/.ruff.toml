@@ -1,7 +1,7 @@
 # environment
 cache-dir = "~/.cache/ruff"
 force-exclude = true
-required-version = ">=0.9.1"
+required-version = ">=0.9.2"
 respect-gitignore = true
 task-tags = ["TODO", "FIXME", "HACK", "HAZARD"]
 select = [

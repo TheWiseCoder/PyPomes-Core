@@ -1,7 +1,7 @@
 from .datetime_pomes import (
     DATE_FORMAT_STD, DATE_FORMAT_COMPACT, DATE_FORMAT_INV,
     DATETIME_FORMAT_STD, DATETIME_FORMAT_COMPACT, DATETIME_FORMAT_INV, TIMEZONE_LOCAL,
-    date_reformat, date_parse, datetime_parse,
+    date_reformat, date_parse, datetime_parse
 )
 from .dict_pomes import (
     dict_has_key_chain, dict_get_value, dict_set_value, dict_reduce,
@@ -11,16 +11,16 @@ from .dict_pomes import (
 )
 from .email_pomes import (
     EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SERVER,
-    email_send,
+    email_send
 )
 from .encoding_pomes import (
-    encode_ascii_hex, decode_ascii_hex,
+    encode_ascii_hex, decode_ascii_hex
 )
 from .env_pomes import (
     APP_PREFIX,
     env_get_str, env_get_int, env_get_float,
     env_get_strs, env_get_ints, env_get_floats,
-    env_get_bytes, env_get_bool, env_get_date, env_get_path, env_is_docker,
+    env_get_bytes, env_get_bool, env_get_date, env_get_path, env_is_docker
 )
 from .exception_pomes import (
     exc_format,
@@ -32,7 +32,7 @@ from .file_pomes import (
 from .list_pomes import (
     list_compare, list_flatten, list_unflatten, list_find_coupled,
     list_elem_starting_with, list_transform, list_prune_duplicates,
-    list_prune_in, list_prune_not_in, list_jsonify, list_hexify
+    list_prune_in, list_prune_not_in, list_jsonify, list_hexify, list_hierarchize
 )
 from .obj_pomes import (
     obj_is_serializable
@@ -45,18 +45,18 @@ from .str_pomes import (
     str_to_bool, str_to_int, str_to_float
 )
 from .validation_msgs import (
-    validate_set_msgs, validate_update_msgs,
+    validate_set_msgs, validate_update_msgs
 )
 from .validation_pomes import (
     VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
     validate_value, validate_bool, validate_int, validate_float,
     validate_str, validate_date, validate_datetime,
     validate_ints, validate_strs, validate_build_response,
-    validate_format_error, validate_format_errors, validate_unformat_errors,
+    validate_format_error, validate_format_errors, validate_unformat_errors
 )
 from .xml_pomes import (
     XML_FILE_HEADER,
-    xml_to_dict, xml_normalize_keys,
+    xml_to_dict, xml_normalize_keys
 )
 
 __all__ = [
@@ -89,7 +89,7 @@ __all__ = [
     # list_pomes
     "list_compare", "list_flatten", "list_unflatten", "list_find_coupled",
     "list_elem_starting_with", "list_transform", "list_prune_duplicates",
-    "list_prune_in", "list_prune_not_in", "list_jsonify", "list_hexify",
+    "list_prune_in", "list_prune_not_in", "list_jsonify", "list_hexify", "list_hierarchize",
     # obj_pomes
     "obj_is_serializable",
     # str_pomes
@@ -108,7 +108,7 @@ __all__ = [
     "validate_format_error", "validate_format_errors", "validate_unformat_errors",
     # xml_pomes
     "XML_FILE_HEADER",
-    "xml_to_dict", "xml_normalize_keys",
+    "xml_to_dict", "xml_normalize_keys"
 ]
 
 from contextlib import suppress

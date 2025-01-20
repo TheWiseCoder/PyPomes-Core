@@ -56,11 +56,12 @@ def file_get_data(file_data: Path | str | bytes,
     Retrieve the data in *file_data*, or in a file in path *file_data*.
 
     The distinction is made with the parameter's type:
-        - type *bytes*: *file_data* holds the data
-        - type *Path* or *str*: *file_data* is a path to a file holding the data
+        - type *bytes*: *file_data* holds the data (returned as is)
+        - type *str*: *file_data* holds the data (returned as utf8-encoded)
+        - type *Path*: *file_data* is a path to a file holding the data
 
-    :param file_data: the data, or the path to locate the file containing the data
-    :param max_len: optional maximum length of the data to return, or all data if not provided
+    :param file_data: the data as *bytes* or *str*, or the path to locate the file containing the data
+    :param max_len: optional maximum length of the data to return, defaults to all data
     :param chunk_size: optional chunk size to use in reading the data, defaults to 128 KB
     :return: the data, or 'None' if the file data could not be obtained
     """
@@ -82,7 +83,11 @@ def file_get_data(file_data: Path | str | bytes,
         # argument is type 'bytes'
         result = file_data
 
-    elif isinstance(file_data, Path | str):
+    elif isinstance(file_data, str):
+        # argument is type 'str
+        result = file_data.encode()
+
+    elif isinstance(file_data, Path):
         # argument is a file path
         file_bytes: bytearray = bytearray()
         file_path: Path = Path(file_data)

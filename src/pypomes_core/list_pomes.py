@@ -1,5 +1,6 @@
 from datetime import date
 from base64 import b64encode
+from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
@@ -323,3 +324,59 @@ def list_hexify(source: list[Any]) -> list[Any]:
             result.append(str_to_hex(str(value)))
 
     return result
+
+
+def list_hierarchize(source: list[list | tuple]) -> list[Any]:
+    """
+    Hierarquize a fully sorted list of tuples or list of lists by aggregating common values at all levels.
+
+    To ilustrate, let us assume *source* is the input list:
+    ::
+      [
+        ('John', 'parent Fred', 'old age', 'indifferent'),
+        ('John', 'parent Fred', 'old age', 'unaffected'),
+        ('John', 'parent Fred', 'poor health', 'dependent'),
+        ('John', 'parent Fred', 'poor health', 'constrained'),
+        ('John', 'parent Kate', 'happy soul'),
+        ('John', 'parent Kate', 'very intelligent'),
+        ('Mary', 'child John', 'brown eyes'),
+        ('Mary', 'child John', 'red hair'),
+        ('Mary', 'child Susan', 'blue eyes'),
+        ('Mary', 'child Susan', 'median height'),
+     ]
+
+    The resulting hierarquization would yield the list:
+    ::
+      [
+        ['John',
+          ['parent Fred',
+            ['old age', 'indifferent', 'unaffected'],
+            ['poor health', 'dependent', 'constrained']],
+          ['parent Kate', 'happy soul', 'very intelligent']],
+        ['Mary',
+          ['child John', 'brown eyes', 'red hair'],
+          ['child Susan', 'blue eyes', 'median height']]
+      ]
+
+    :param source: the fully sorted list of lists to be hierarchized
+    :return: the hierarchized list
+    """
+    def add_to_hierarchy(hierarchy: dict,
+                         keys: list[Any],
+                         value: list[Any] | tuple[Any]) -> None:
+        for key in keys[:-1]:
+            hierarchy = hierarchy.setdefault(key, {})
+        hierarchy.setdefault(keys[-1], []).append(value)
+
+    hierarchy: dict = defaultdict(dict)
+    for item in source:
+        add_to_hierarchy(hierarchy=hierarchy,
+                         keys=item[:-1],
+                         value=item[-1])
+
+    def convert_to_list(item: dict | list) -> dict | list:
+        if isinstance(item, dict):
+            return [[k] + convert_to_list(item=v) for k, v in item.items()]
+        return item
+
+    return convert_to_list(item=hierarchy)
