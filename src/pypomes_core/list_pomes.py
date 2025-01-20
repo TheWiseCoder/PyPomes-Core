@@ -343,6 +343,8 @@ def list_hierarchize(source: list[list | tuple]) -> list[Any]:
         ('Mary', 'child John', 'red hair'),
         ('Mary', 'child Susan', 'blue eyes'),
         ('Mary', 'child Susan', 'median height'),
+        ('Mary', 'sibling Joan', 'charming dude'),
+        ('Mary', 'sibling Joan', 'smart girl')
      ]
 
     The resulting hierarquization would yield the list:
@@ -350,20 +352,23 @@ def list_hierarchize(source: list[list | tuple]) -> list[Any]:
       [
         ['John',
           ['parent Fred',
-            ['old age', 'indifferent', 'unaffected'],
-            ['poor health', 'dependent', 'constrained']],
-          ['parent Kate', 'happy soul', 'very intelligent']],
+            ['old age', ['indifferent', 'unaffected']],
+            ['poor health', ['dependent', 'constrained']]],
+          ['parent Kate', ['happy soul', 'very intelligent']]],
         ['Mary',
-          ['child John', 'brown eyes', 'red hair'],
-          ['child Susan', 'blue eyes', 'median height']]
+          ['child John', ['brown eyes', 'red hair']],
+          ['child Susan', ['blue eyes', 'median height']],
+          ['sibling Joan', 'charming dude']]
       ]
+
+    Note that the elements in *source* must not contain embedded lists or tuples.
 
     :param source: the fully sorted list of lists to be hierarchized
     :return: the hierarchized list
     """
     def add_to_hierarchy(hierarchy: dict,
-                         keys: list[Any],
-                         value: list[Any] | tuple[Any]) -> None:
+                         keys: list,
+                         value: list | tuple) -> None:
         for key in keys[:-1]:
             hierarchy = hierarchy.setdefault(key, {})
         hierarchy.setdefault(keys[-1], []).append(value)
@@ -374,9 +379,41 @@ def list_hierarchize(source: list[list | tuple]) -> list[Any]:
                          keys=item[:-1],
                          value=item[-1])
 
-    def convert_to_list(item: dict | list) -> dict | list:
+    def convert_to_list(item: dict | list) -> list:
+        result: list
         if isinstance(item, dict):
-            return [[k] + convert_to_list(item=v) for k, v in item.items()]
-        return item
+            result = []
+            for k, v in item.items():
+                if isinstance(v, dict):
+                    result.append([k] + convert_to_list(v))
+                else:
+                    result.append([k, v] if len(v) > 1 else [k] + v)
+        elif isinstance(item, list):
+            result = item
+        else:
+            result = [item]
+        return result
 
     return convert_to_list(item=hierarchy)
+
+# my_input_list = [
+#         ('John', 'parent Fred', 'old age', 'indifferent'),
+#         ('John', 'parent Fred', 'old age', 'unaffected'),
+#         ('John', 'parent Fred', 'poor health', 'dependent'),
+#         ('John', 'parent Fred', 'poor health', 'constrained'),
+#         ('John', 'parent Kate', 'happy soul'),
+#         ('John', 'parent Kate', 'very intelligent'),
+#         ('Mary', 'child John', 'brown eyes'),
+#         ('Mary', 'child John', 'red hair'),
+#         ('Mary', 'child Susan', 'blue eyes'),
+#         ('Mary', 'child Susan', 'median height'),
+#         ('Mary', 'sibling Joan', 'charming dude'),
+#         ('Mary', 'sibling Joan', 'smart girl')
+#      ]
+# print(list_hierarchize(my_input_list))
+# replacing
+#         ('John', 'parent Fred', 'poor health', 'constrained'),
+# with
+#         ('John', 'parent Fred', 'poor health', 'constrained', 'simple'),
+#         ('John', 'parent Fred', 'poor health', 'constrained', 'complex'),
+# breaks the code
