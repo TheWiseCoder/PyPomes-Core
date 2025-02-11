@@ -1,6 +1,7 @@
 import filetype
 import mimetypes
 from contextlib import suppress
+from enum import StrEnum
 from flask import Request
 from pathlib import Path
 from tempfile import gettempdir
@@ -11,6 +12,36 @@ from .env_pomes import APP_PREFIX, env_get_path
 
 TEMP_FOLDER: Final[Path] = env_get_path(key=f"{APP_PREFIX}_TEMP_FOLDER",
                                         def_value=Path(gettempdir()))
+
+
+# see https://mimetype.io/all-types
+class Mimetype(StrEnum):
+    BINARY = "application/octet-stream"
+    BMP = "image/bmp"
+    BZIP = "application/x-bzip"
+    CSS = "text/css"
+    CSV = "text/csv"
+    GIF = "image/gif"
+    GZIP = "application/gzip"
+    HTML = "text/html"
+    JAVASCRIPT = "text/javascript"
+    JPEG = "image/jpeg"
+    JSON = "application/json"
+    MSWORD = "application/msword"
+    MP3 = "audio/mpeg"
+    MP4 = "video/mp4"
+    MULTIPART = "multipart/form-data"
+    PDF = "application/pdf"
+    PKCS7 = "application/pkcs7-signature"
+    PNG = "image/png"
+    RTF = "application/rtf"
+    SOAP = "application/soap+xml"
+    TEXT = "text/plain"
+    TIFF = "image/tiff"
+    URLENCODED = "application/x-www-form-urlencoded"
+    WEBM = "udio/webm"
+    XML = "application/xml"
+    ZIP = "application/zip"
 
 
 def file_from_request(request: Request,
@@ -112,30 +143,41 @@ def file_get_data(file_data: Path | str | bytes,
     return result
 
 
-def file_get_mimetype(file_data: Path | str | bytes) -> str:
+def file_get_mimetype(file_data: Path | str | bytes) -> Mimetype | str:
     """
     Heuristics to determine the mimetype for *file_data*.
 
     The parameter *file_data* might be the data itself (type *bytes*), or a filepath (type *Path* or *str*).
     The heuristics used, as heuristics go, provide an educated guess, not an accurate result.
 
+    If a mimetype is found, and it is not in *Mimetype* (which is a small subset of known mimetypes),
+    then its identifying string is returned.
+
     :param file_data: file data, or the path to locate the file
     :return: the probable mimetype, or None if a determination was not possible
     """
     # initialize the return variable
-    result: str | None = None
+    result: Mimetype | None = None
 
     # inspect the filepath
+    mimetype: str | None = None
     if isinstance(file_data, Path | str):
-        result, _ = mimetypes.guess_file_type(path=file_data)
+        mimetype, _ = mimetypes.guess_file_type(path=file_data)
 
-    if not result:
+    if not mimetype:
         with suppress(TypeError):
             kind: filetype.Type = filetype.guess(obj=file_data)
             if kind:
-                result = kind.mime
+                mimetype = kind.mime
 
-    return result
+    if mimetype:
+        for mime in Mimetype:
+            if mimetype == mime.value:
+                result = mime
+                break
+
+    # for unknown mimetypes, return its identifying string
+    return result or mimetype
 
 
 def file_is_binary(file_data: Path | str | bytes) -> bool:

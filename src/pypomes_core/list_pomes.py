@@ -1,3 +1,4 @@
+import contextlib
 from datetime import date
 from base64 import b64encode
 from collections import defaultdict
@@ -6,8 +7,8 @@ from pathlib import Path
 from typing import Any
 
 
-def list_compare(list1: list[Any],
-                 list2: list[Any]) -> bool:
+def list_compare(list1: list,
+                 list2: list) -> bool:
     """
     Compare the contents of the two lists *list1* e *list2*.
 
@@ -76,10 +77,12 @@ def list_unflatten(source: str) -> list[str]:
     return str_split_on_mark(source, ".")
 
 
-def list_find_coupled(coupled_elements: list[tuple[str, Any]],
-                      primary_element: str) -> Any:
+def list_get_coupled(coupled_elements: list[tuple[str, Any]],
+                     primary_element: str) -> Any:
     """
-    Locate in *coupled_elements*, and return, the element coupled to *primary_element*.
+    Retrieve from *coupled_elements*, and return, the element coupled to *primary_element*.
+
+    A coupled element is the second element in the tuple whose first element is *primary_element*.
 
     If *primary_element* contains an index indication (denoted by *[<pos>]*), this indication is removed.
     This function is used in the transformation of *dicts* (*dict_transform*) and *lists* (*list_transform*),
@@ -100,20 +103,20 @@ def list_find_coupled(coupled_elements: list[tuple[str, Any]],
         pos1 = primary_element.find("[")
 
     # traverse the list of coupled elements
-    for primary, coupled in coupled_elements:
+    for coupled_element in coupled_elements:
         # has the primary element been found ?
-        if primary == primary_element:
+        if coupled_element[0] == primary_element:
             # yes, return the corresponding coupled element
-            result = coupled
+            result = coupled_element[1]
             break
 
     return result
 
 
-def list_transform(source: list[Any],
+def list_transform(source: list,
                    from_to_keys: list[tuple[str, Any]],
                    prefix_from: str = None,
-                   prefix_to: str = None) -> list[Any]:
+                   prefix_to: str = None) -> list:
     """
     Construct a new *list*, transforming elements of type *list* and *dict* found in *source*.
 
@@ -133,7 +136,7 @@ def list_transform(source: list[Any],
     from .dict_pomes import dict_transform
 
     # initialize the return variable
-    result: list[Any] = []
+    result: list = []
 
     # traverse the source list
     for inx, value in enumerate(source):
@@ -158,6 +161,35 @@ def list_transform(source: list[Any],
 
         # added the value transformed to 'result'
         result.append(to_value)
+
+    return result
+
+
+def list_elem_with_attr(source: list,
+                        attr: str,
+                        value: Any) -> Any:
+    """
+    Locate and return the first element in *source* having an attribute named *attr* with value *value*.
+
+    Values obtained by invoking *get* on the element are also considered. *None* is a valid value for *value*.
+
+    :param source: The list to search for the element
+    :param attr: the name of the reference attribute
+    :param value: the reference value
+    :return: The element in *source* having an attribute *attr* with value *value*, or *None*
+    """
+    # initialize the return variable
+    result: Any = None
+
+    # traverse the source list
+    for element in source:
+        if hasattr(element, attr) and getattr(element, attr) == value:
+            result = element
+            break
+        with contextlib.suppress(Exception):
+            if element.get(attr) == value:
+                result = element
+                break
 
     return result
 
@@ -190,7 +222,7 @@ def list_elem_starting_with(source: list[str | bytes],
     return result
 
 
-def list_prune_duplicates(target: list[Any]) -> list[Any]:
+def list_prune_duplicates(target: list) -> list:
     """
     Remove all duplicates from *target*.
 
@@ -204,8 +236,8 @@ def list_prune_duplicates(target: list[Any]) -> list[Any]:
     return list(uniques.keys())
 
 
-def list_prune_in(target: list[Any],
-                  ref: list[Any]) -> list[Any]:
+def list_prune_in(target: list,
+                  ref: list) -> list:
     """
     Remove from *target* all its elements that are also in *ref*.
 
@@ -216,19 +248,19 @@ def list_prune_in(target: list[Any],
     :return: the target list without the elements also in the reference list
     """
     # initialize the return variable
-    result: list[Any] = target
+    result: list = target
 
-    removals: list[Any] = [item for item in result if item in ref]
+    removals: list = [item for item in result if item in ref]
     for item in removals:
         result.remove(item)
 
     return result
 
 
-def list_prune_not_in(target: list[Any],
-                      ref: list[Any]) -> list[Any]:
+def list_prune_not_in(target: list,
+                      ref: list) -> list:
     """
-    Remove from *target* all its elements that are not also in *ref*.
+    Remove from *target* all of its elements that are not also in *ref*.
 
     The pruned input list is returned, for convenience.
 
@@ -237,16 +269,16 @@ def list_prune_not_in(target: list[Any],
     :return: the target list without the elements not in the reference list
     """
     # initialize the return variable
-    result: list[Any] = target
+    result: list = target
 
-    removals: list[Any] = [item for item in result if item not in ref]
+    removals: list = [item for item in result if item not in ref]
     for item in removals:
         result.remove(item)
 
     return result
 
 
-def list_jsonify(source: list[Any]) -> list[Any]:
+def list_jsonify(source: list) -> list:
     """
     Return a new *list* containing the values in *source*, made serializable if necessary.
 
@@ -262,7 +294,7 @@ def list_jsonify(source: list[Any]) -> list[Any]:
     :param source: the dict to be made serializable
     :return: a list with serialized values
     """
-    result: list[Any] = []
+    result: list = []
     for value in source:
         if isinstance(value, dict):
             from .dict_pomes import dict_jsonify
@@ -282,7 +314,7 @@ def list_jsonify(source: list[Any]) -> list[Any]:
     return result
 
 
-def list_hexify(source: list[Any]) -> list[Any]:
+def list_hexify(source: list) -> list:
     """
     Return a new *list* containing the values in *source* changed to appropriate hexadecimal representations.
 
@@ -305,7 +337,7 @@ def list_hexify(source: list[Any]) -> list[Any]:
     from .str_pomes import str_to_hex
     from .dict_pomes import dict_hexify
 
-    result: list[Any] = []
+    result: list = []
     for value in source:
         if isinstance(value, dict):
             dict_hexify(source=value)
@@ -326,7 +358,7 @@ def list_hexify(source: list[Any]) -> list[Any]:
     return result
 
 
-def list_hierarchize(source: list[list | tuple]) -> list[Any]:
+def list_hierarchize(source: list[list | tuple]) -> list:
     """
     Hierarquize a fully sorted list of tuples or list of lists by aggregating common values at all levels.
 
@@ -335,8 +367,9 @@ def list_hierarchize(source: list[list | tuple]) -> list[Any]:
       [
         ('John', 'parent Fred', 'old age', 'indifferent'),
         ('John', 'parent Fred', 'old age', 'unaffected'),
-        ('John', 'parent Fred', 'poor health', 'dependent'),
+        ('John', 'parent Fred', 'poor health', 'broken'),
         ('John', 'parent Fred', 'poor health', 'constrained'),
+        ('John', 'parent Fred', 'poor health', 'dependent'),
         ('John', 'parent Kate', 'happy soul'),
         ('John', 'parent Kate', 'very intelligent'),
         ('Mary', 'child John', 'brown eyes'),
@@ -353,39 +386,42 @@ def list_hierarchize(source: list[list | tuple]) -> list[Any]:
         ['John',
           ['parent Fred',
             ['old age', ['indifferent', 'unaffected']],
-            ['poor health', ['dependent', 'constrained']]],
+            ['poor health', ['broken', 'constrained', 'dependent']]],
           ['parent Kate', ['happy soul', 'very intelligent']]],
         ['Mary',
           ['child John', ['brown eyes', 'red hair']],
           ['child Susan', ['blue eyes', 'median height']],
-          ['sibling Joan', 'charming dude']]
+          ['sibling Joan', ['charming dude', 'smart girl']]]
       ]
 
-    Note that the elements in *source* must not contain embedded lists or tuples.
+    Notes:
+      - the elements in *source* must not contain embedded lists or tuples
+      - onced an aggregation has been given a value, another aggregation cannot be added to it, such as:
 
-    :param source: the fully sorted list of lists to be hierarchized
+        ('John', 'parent Fred', 'poor health', 'dependent'),
+
+        ('John', 'parent Fred', 'poor health', 'constrained', 'simple'),
+
+        ('John', 'parent Fred', 'poor health', 'constrained', 'complex'),
+
+    :param source: the fully sorted list of tuples or list of lists to be hierarchized
     :return: the hierarchized list
     """
     def add_to_hierarchy(hierarchy: dict,
                          keys: list,
                          value: list | tuple) -> None:
         for key in keys[:-1]:
-            hierarchy = hierarchy.setdefault(key, {})
+            hierarchy.setdefault(key, {})
+        # if isinstance(hierarchy.get(keys[-1]), dict):
         hierarchy.setdefault(keys[-1], []).append(value)
 
-    hierarchy: dict = defaultdict(dict)
-    for item in source:
-        add_to_hierarchy(hierarchy=hierarchy,
-                         keys=item[:-1],
-                         value=item[-1])
-
-    def convert_to_list(item: dict | list) -> list:
+    def convert_to_list(item: Any) -> list:
         result: list
         if isinstance(item, dict):
             result = []
             for k, v in item.items():
                 if isinstance(v, dict):
-                    result.append([k] + convert_to_list(v))
+                    result.append([k] + convert_to_list(item=v))
                 else:
                     result.append([k, v] if len(v) > 1 else [k] + v)
         elif isinstance(item, list):
@@ -394,26 +430,10 @@ def list_hierarchize(source: list[list | tuple]) -> list[Any]:
             result = [item]
         return result
 
-    return convert_to_list(item=hierarchy)
+    hierarchy: dict = defaultdict(dict)
+    for item in source:
+        add_to_hierarchy(hierarchy=hierarchy,
+                         keys=item[:-1],
+                         value=item[-1])
 
-# my_input_list = [
-#         ('John', 'parent Fred', 'old age', 'indifferent'),
-#         ('John', 'parent Fred', 'old age', 'unaffected'),
-#         ('John', 'parent Fred', 'poor health', 'dependent'),
-#         ('John', 'parent Fred', 'poor health', 'constrained'),
-#         ('John', 'parent Kate', 'happy soul'),
-#         ('John', 'parent Kate', 'very intelligent'),
-#         ('Mary', 'child John', 'brown eyes'),
-#         ('Mary', 'child John', 'red hair'),
-#         ('Mary', 'child Susan', 'blue eyes'),
-#         ('Mary', 'child Susan', 'median height'),
-#         ('Mary', 'sibling Joan', 'charming dude'),
-#         ('Mary', 'sibling Joan', 'smart girl')
-#      ]
-# print(list_hierarchize(my_input_list))
-# replacing
-#         ('John', 'parent Fred', 'poor health', 'constrained'),
-# with
-#         ('John', 'parent Fred', 'poor health', 'constrained', 'simple'),
-#         ('John', 'parent Fred', 'poor health', 'constrained', 'complex'),
-# breaks the code
+    return convert_to_list(item=hierarchy)

@@ -50,7 +50,7 @@ def str_from_hex(source: str) -> str:
 
 
 def str_as_list(source: str | Any,
-                separator: str = ",") -> list[Any]:
+                separator: str = ",") -> list:
     """
     Return *source* as a *list*, by splitting its contents separated by *separator*.
 
@@ -61,7 +61,7 @@ def str_as_list(source: str | Any,
     :param separator: the separator (defaults to ",")
     :return: a list built from the contents of 'source', or 'source' itself, if is not a string
     """
-    result: list[Any]
+    result: list
     if isinstance(source, str):
         result = [s.strip() for s in source.split(sep=separator)]
     else:
@@ -185,7 +185,7 @@ def str_between(source: str,
 
 def str_positional(source: str,
                    list_origin: list[str],
-                   list_dest: list[Any]) -> Any:
+                   list_dest: list) -> Any:
     """
     Locate the position of *source* within *list_origin*, and return the element in the same position in *list_dest*.
 

@@ -10,7 +10,7 @@ from .dict_pomes import (
     dict_replace_value, dict_pop_value, dict_unique_values, dict_jsonify, dict_hexify
 )
 from .email_pomes import (
-    EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SERVER,
+    EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SECURITY, EMAIL_SERVER,
     email_send
 )
 from .encoding_pomes import (
@@ -26,13 +26,14 @@ from .exception_pomes import (
     exc_format,
 )
 from .file_pomes import (
-    TEMP_FOLDER,
+    TEMP_FOLDER, Mimetype,
     file_from_request, file_get_data, file_get_mimetype, file_is_binary
 )
 from .list_pomes import (
-    list_compare, list_flatten, list_unflatten, list_find_coupled,
-    list_elem_starting_with, list_transform, list_prune_duplicates,
-    list_prune_in, list_prune_not_in, list_jsonify, list_hexify, list_hierarchize
+    list_compare, list_flatten, list_unflatten, list_get_coupled,
+    list_elem_starting_with, list_elem_with_attr, list_transform,
+    list_prune_duplicates, list_prune_in, list_prune_not_in,
+    list_jsonify, list_hexify, list_hierarchize
 )
 from .obj_pomes import (
     obj_is_serializable
@@ -72,7 +73,7 @@ __all__ = [
     "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
     "dict_replace_value", "dict_pop_value", "dict_unique_values", "dict_jsonify", "dict_hexify",
     # email_pomes
-    "EMAIL_ACCOUNT", "EMAIL_PWD", "EMAIL_PORT", "EMAIL_SERVER",
+    "EMAIL_ACCOUNT", "EMAIL_PWD", "EMAIL_PORT", "EMAIL_SECURITY", "EMAIL_SERVER",
     "email_send",
     # encoding_pomes
     "encode_ascii_hex", "decode_ascii_hex",
@@ -84,12 +85,13 @@ __all__ = [
     # exception_pomes
     "exc_format",
     # file_pomes
-    "TEMP_FOLDER",
+    "TEMP_FOLDER", "Mimetype",
     "file_from_request", "file_get_data", "file_get_mimetype", "file_is_binary",
     # list_pomes
-    "list_compare", "list_flatten", "list_unflatten", "list_find_coupled",
-    "list_elem_starting_with", "list_transform", "list_prune_duplicates",
-    "list_prune_in", "list_prune_not_in", "list_jsonify", "list_hexify", "list_hierarchize",
+    "list_compare", "list_flatten", "list_unflatten", "list_get_coupled",
+    "list_elem_starting_with", "list_elem_with_attr", "list_transform",
+    "list_prune_duplicates", "list_prune_in", "list_prune_not_in",
+    "list_jsonify", "list_hexify", "list_hierarchize",
     # obj_pomes
     "obj_is_serializable",
     # str_pomes

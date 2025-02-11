@@ -16,7 +16,7 @@ def validate_value(attr: str,
                    val: str | int | float,
                    min_val: int = None,
                    max_val: int = None,
-                   values: list[Any] = None,
+                   values: list = None,
                    required: bool = False) -> str:
     """
     Validate *val* according to value, range, or membership in values list, as specified.
@@ -458,14 +458,14 @@ def validate_ints(errors: list[str] | None,
     :return: the list of validated values, '[]' if not required and no values found, or 'None' if validation failed
     """
     # initialize the return variable
-    result: list[Any] | None = []
+    result: list | None = []
 
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
 
     # obtain the values
-    values: list[Any] = scheme.get(suffix)
+    values: list = scheme.get(suffix)
     if values:
         if isinstance(values, str):
             values = str_as_list(values)
@@ -523,14 +523,14 @@ def validate_strs(errors: list[str] | None,
     :return: the list of validated values, '[]' if not required and no values found, or 'None' if validation failed
     """
     # initialize the return variable
-    result: list[Any] | None = []
+    result: list | None = []
 
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
     suffix: str = attr[pos:]
 
     # obtain the values
-    values: list[Any] = scheme.get(suffix)
+    values: list = scheme.get(suffix)
     if values:
         if isinstance(values, str):
             values = str_as_list(values)
