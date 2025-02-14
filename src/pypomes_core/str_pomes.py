@@ -1,3 +1,5 @@
+import random
+import string
 from contextlib import suppress
 from datetime import date
 from pathlib import Path
@@ -206,6 +208,17 @@ def str_positional(source: str,
     return result
 
 
+def str_random(size: int) -> str:
+    """
+    Generate and return a random string containing *len* characters.
+
+    :param size: the length of the random string to generate
+    :return: the random string
+    """
+    chars: str = string.ascii_letters + string.digits + string.punctuation
+    return "".join(random.choice(chars) for _ in range(size))
+
+
 def str_rreplace(source: str,
                  old: str,
                  new: str,
@@ -346,4 +359,3 @@ def str_to_float(source: str,
         result = None
 
     return result
-

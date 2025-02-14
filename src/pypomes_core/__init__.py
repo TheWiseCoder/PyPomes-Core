@@ -41,7 +41,7 @@ from .obj_pomes import (
 from .str_pomes import (
     str_to_hex, str_from_hex, str_lower, str_upper,
     str_as_list, str_sanitize, str_split_on_mark,
-    str_between, str_positional, str_find_char,
+    str_between, str_positional, str_random, str_find_char,
     str_find_whitespace, str_rreplace, str_from_any,
     str_to_bool, str_to_int, str_to_float
 )
@@ -97,7 +97,7 @@ __all__ = [
     # str_pomes
     "str_to_hex", "str_from_hex", "str_lower", "str_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",
-    "str_between", "str_positional", "str_find_char",
+    "str_between", "str_positional", "str_random", "str_find_char",
     "str_find_whitespace", "str_rreplace", "str_from_any",
     "str_to_bool", "str_to_int", "str_to_float",
     # validation_msgs
