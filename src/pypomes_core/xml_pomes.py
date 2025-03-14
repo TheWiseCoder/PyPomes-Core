@@ -13,8 +13,8 @@ def xml_normalize_keys(source: dict[str, Any]) -> dict[str, Any]:
 
     The key order is kept unchanged.
 
-    :param source: the reference dict
-    :return: the new, normalized, dict
+    :param source: the reference *dict*
+    :return: the new, normalized, *dict*
     """
     # initialize the return variable
     result: dict[str, Any] = {}
@@ -59,7 +59,7 @@ def xml_to_dict(file_data: Path | str | bytes) -> dict[str, Any]:
    system file with the path specified by *file_data* (type *Path* or *str*).
 
     :param file_data: XML to be converted
-    :return: normalized dict
+    :return: the normalized *dict*
     """
     # obtain the file data
     file_bytes: bytes = file_get_data(file_data=file_data)

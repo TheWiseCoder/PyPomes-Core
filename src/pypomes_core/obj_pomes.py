@@ -7,7 +7,7 @@ def obj_is_serializable(obj: Any) -> bool:
     Determine if *obj* is serializable.
 
     :param obj: the reference object
-    :return: 'True' if serializable, 'False' otherwise
+    :return: *True* if serializable, *False* otherwise
     """
     # initialize the return variable
     result: bool = True

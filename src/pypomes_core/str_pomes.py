@@ -61,7 +61,7 @@ def str_as_list(source: str | Any,
 
     :param source: the string value to be worked on
     :param separator: the separator (defaults to ",")
-    :return: a list built from the contents of 'source', or 'source' itself, if is not a string
+    :return: a list built from the contents of *source*, or *source* itself, if is not a string
     """
     result: list
     if isinstance(source, str):
@@ -208,15 +208,28 @@ def str_positional(source: str,
     return result
 
 
-def str_random(size: int) -> str:
+def str_random(size: int,
+               chars: str | list[str] = None) -> str:
     """
     Generate and return a random string containing *len* characters.
 
-    :param size: the length of the random string to generate
+    If *chars* is  provided, either as a string or as a list of characters, the characters
+    therein will be used in the construction of the random string. Otherwise, a concatenation of
+    *string.ascii_letters*, *string.digits*, and *string.puctuation* will provide the base characters.
+
+    :param size: the length of the target random string
+    :param chars: optional characters to build the random string from (a string or a list of characteres)
     :return: the random string
     """
-    chars: str = string.ascii_letters + string.digits + string.punctuation
-    return "".join(random.choice(chars) for _ in range(size))
+    # establish the base characters
+    if not chars:
+        chars: str = string.ascii_letters + string.digits + string.punctuation
+    elif isinstance(chars, list):
+        chars: str = "".join(chars)
+
+    # generate and return the random string
+    # ruff: noqa: S311
+    return "".join(random.choice(seq=chars) for _ in range(size))
 
 
 def str_rreplace(source: str,
@@ -235,26 +248,26 @@ def str_rreplace(source: str,
     return source[::-1].replace(old[::-1], new[::-1], count)[::-1]
 
 
-def str_lower(source: str) -> str:
+def str_to_lower(source: Any) -> str:
     """
     Safely convert *source* to lower-case.
 
     If *source* is not a *str*, then it is itself returned.
 
     :param source: the string to convert to lower-case
-    :return: 'source' in lower-case, or 'source' itself, if is not a string
+    :return: *source* in lower-case, or *source* itself, if is not a string
     """
     return source.lower() if isinstance(source, str) else source
 
 
-def str_upper(source: str) -> str:
+def str_to_upper(source: Any) -> str:
     """
     Safely convert *source* to upper-case.
 
     If *source* is not a *str*, then it is itself returned.
 
     :param source: the string to convert to upper-case
-    :return: 'source' in upper-case, or 'source' itself, if it is not a string
+    :return: *source* in upper-case, or *source* itself, if it is not a string
     """
     return source.upper() if isinstance(source, str) else source
 
@@ -265,6 +278,7 @@ def str_from_any(source: Any) -> str:
 
     These are the string representations returned:
         - *None*: the string 'None'
+        - *bool*: the string 'True' of 'Talse'
         - *str* : the source string itself
         - *bytes*: its hex representation
         - *date*: the date in ISO format (*datetime* is a *date* subtype)
@@ -278,11 +292,7 @@ def str_from_any(source: Any) -> str:
     result: str
 
     # obtain the string representation
-    if source is None:
-        result = "None"
-    elif isinstance(source, str):
-        result = source
-    elif isinstance(source, bytes):
+    if isinstance(source, bytes):
         result = source.hex()
     elif isinstance(source, date):
         result = source.isoformat()

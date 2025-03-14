@@ -39,7 +39,7 @@ from .obj_pomes import (
     obj_is_serializable
 )
 from .str_pomes import (
-    str_to_hex, str_from_hex, str_lower, str_upper,
+    str_to_hex, str_from_hex, str_to_lower, str_to_upper,
     str_as_list, str_sanitize, str_split_on_mark,
     str_between, str_positional, str_random, str_find_char,
     str_find_whitespace, str_rreplace, str_from_any,
@@ -62,7 +62,7 @@ from .xml_pomes import (
 
 __all__ = [
     # __init__
-    "get_versions",
+    "pypomes_versions",
     # datetime_pomes
     "DATE_FORMAT_STD", "DATE_FORMAT_COMPACT", "DATE_FORMAT_INV",
     "DATETIME_FORMAT_STD", "DATETIME_FORMAT_COMPACT", "DATETIME_FORMAT_INV", "TIMEZONE_LOCAL",
@@ -95,7 +95,7 @@ __all__ = [
     # obj_pomes
     "obj_is_serializable",
     # str_pomes
-    "str_to_hex", "str_from_hex", "str_lower", "str_upper",
+    "str_to_hex", "str_from_hex", "str_to_lower", "str_to_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",
     "str_between", "str_positional", "str_random", "str_find_char",
     "str_find_whitespace", "str_rreplace", "str_from_any",
@@ -120,7 +120,7 @@ __version__: str = version("pypomes_core")
 __version_info__: tuple = tuple(int(i) for i in __version__.split(".") if i.isdigit())
 
 
-def get_versions() -> dict[str, str]:
+def pypomes_versions() -> dict[str, str]:
     """
     Retrieve and return the versions of the *Pypomes* packages in use.
 

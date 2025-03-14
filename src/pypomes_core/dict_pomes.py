@@ -125,7 +125,7 @@ def dict_set_value(target: dict,
     :param target: the reference dict
     :param key_chain: the key chain
     :param value: the value to be assigned
-    :return: the modified input 'dict'
+    :return: the modified input *dict*
     """
     dict_item: Any = target
     # traverse the chain, up to end including its penultimate element
@@ -247,7 +247,7 @@ def dict_replace_value(target: dict,
     :param target: the reference dict
     :param old_value: the value to be replaced
     :param new_value: the new value
-    :return: the modified input 'dict'
+    :return: the modified input *dict*
     """
     def list_replace_value(items: list,
                            old_val: Any,
@@ -297,7 +297,7 @@ def dict_unique_values(source: dict) -> list:
     The elements in the returned list maintain the original insertion order in *source*.
 
     :param source: the dict to retrieve the values from
-    :return: list the values in the source 'dict', pruned of duplicated
+    :return: list the values in the source *dict*, pruned of duplicated
     """
     # a 'dict' maintains the insertion order of its elements
     uniques: dict[Any, None] = dict.fromkeys(source.values())
@@ -364,7 +364,7 @@ def dict_merge(target: dict,
 
     :param target: the dictionary to be updated
     :param source: the dictionary with the new elements
-    :return: the modified target 'dict'
+    :return: the modified target *dict*
     """
     # traverse the dictionary with the new elements
     for skey, svalue in source.items():
@@ -407,7 +407,7 @@ def dict_coalesce(target: dict,
 
     :param target: the dictionary to be coalesced
     :param key_chain: the chain of nested keys
-    :return: the modified input 'dict'
+    :return: the modified input *dict*
     """
     # traverse the kay chain up to its penultimate element
     curr_dict: dict | None = target
@@ -504,7 +504,7 @@ def dict_reduce(target: dict,
 
     :param target: the 'dict' to be reduced
     :param key_chain: the key chain
-    :return: the modified input 'dict'
+    :return: the modified input *dict*
     """
     # does the key chain contain at least 1 key ?
     if len(key_chain) > 0:
@@ -557,7 +557,7 @@ def dict_from_list(source: list[dict],
     :param source: the list to be inspected
     :param key_chain: the key chain used in the search process
     :param value: the value of the element pointed to by the key chain
-    :return: the 'dict' wanted, or 'None' if not found
+    :return: the *dict* wanted, or *None* if not found
     """
     # initialize the return variable
     result: dict | None = None
@@ -579,7 +579,7 @@ def dict_from_object(source: object) -> dict:
     The input *source* might be any *object*, specially those decorated with *@dataclass*.
 
     :param source: the reference object
-    :return: 'dict' structurally similar to the reference object
+    :return: *dict* structurally similar to the reference object
     """
     # initialize the return variable
     result: dict = {}
@@ -638,7 +638,7 @@ def dict_transform(source: dict,
     :param from_to_keys: the list of tuples containing the source and destination key sequences
     :param prefix_from: prefix to be added to source keys
     :param prefix_to: prefix to be removed from target keys
-    :return: the new 'dict'
+    :return: the new *dict*
     """
     # import the needed functions
     from .list_pomes import list_get_coupled, list_transform, list_unflatten
@@ -707,7 +707,7 @@ def dict_clone(source: dict,
 
     :param source: the source dict
     :param from_to_keys: list of elements indicative of the source and target keys
-    :return: the new dict
+    :return: the new *dict*
     """
     # import the needed function
     from .list_pomes import list_unflatten
@@ -735,7 +735,7 @@ def dict_listify(target: dict,
 
     :param target: the dictionary to be modified
     :param key_chain: the chain of nested keys pointing to the item in question
-    :return: the modified input 'dict'
+    :return: the modified input *dict*
     """
     def items_listify(in_targets: list,
                       in_keys: list[str]) -> None:
@@ -794,7 +794,7 @@ def dict_jsonify(source: dict) -> dict:
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
     :param source: the dict to be made serializable
-    :return: the modified input 'dict'
+    :return: the modified input *dict*
     """
     for key, value in source.items():
         if isinstance(value, dict):

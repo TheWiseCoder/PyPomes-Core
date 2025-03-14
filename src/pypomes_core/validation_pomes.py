@@ -23,11 +23,11 @@ def validate_value(attr: str,
 
     :param attr: the name of the attribute
     :param val: the value to be validated
-    :param min_val: if val is a string, specifies its minimum length; otherwise, specifies its minimum value
-    :param max_val: if val is a string, specifies its maximum length; otherwise, specifies its maximum value
-    :param values: if provided, requires 'val' to be contained therein
-    :param required:  requires 'val' to be specified
-    :return: 'None' if val passes validation, or the corresponding error message otherwise
+    :param min_val: if *val* is a string, specifies its minimum length; otherwise, specifies its minimum value
+    :param max_val: if *val* is a string, specifies its maximum length; otherwise, specifies its maximum value
+    :param values: if provided, requires *val* to be contained therein
+    :param required:  requires *val* to be specified
+    :return: *None* if *val* passes validation, or the corresponding error message otherwise
     """
     # initialize the return variable
     result: str | None = None
@@ -89,10 +89,10 @@ def validate_bool(errors: list[str] | None,
     :param errors: incidental error messages
     :param scheme: dictionary containing the value to be validated
     :param attr: the name of the attribute whose value is being validated
-    :param default: default value, overiding 'required'
+    :param default: default value, overrides *required*
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or 'None' if validation failed
+    :return: the validated value, or *None* if validation failed
     """
     # initialize the return variable
     result: bool | None = None
@@ -160,10 +160,10 @@ def validate_int(errors: list[str] | None,
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
     :param values: optional list of allowed values
-    :param default: optional default value
+    :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or 'None' if validation failed
+    :return: the validated value, or *None* if validation failed
     """
     # initialize the return variable
     result: int | None = None
@@ -222,10 +222,10 @@ def validate_float(errors: list[str] | None,
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
     :param values: optional list of allowed values
-    :param default: optional default value
+    :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or 'None' if validation failed
+    :return: the validated value, or *None* if validation failed
     """
     # initialize the return variable
     result: float | None = None
@@ -285,10 +285,10 @@ def validate_str(errors: list[str] | None,
     :param min_length: optional minimum length accepted
     :param max_length:  optional maximum length accepted
     :param values: optional list of allowed values
-    :param default: optional default value
+    :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or None if validation failed
+    :return: the validated value, or *None* if validation failed
     """
     # initialize the return variable
     result: str | None = None
@@ -339,10 +339,10 @@ def validate_date(errors: list[str] | None,
     :param scheme: dictionary containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param day_first: indicates that the day precedes the month in the string representing the date
-    :param default: optional default value, overrides 'required'
+    :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or 'None' if validation failed
+    :return: the validated value, or *None* if validation failed
     """
     # import needed module
     from .datetime_pomes import date_parse
@@ -397,10 +397,10 @@ def validate_datetime(errors: list[str] | None,
     :param scheme: dictionary containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param day_first: indicates that the day precedes the month in the string representing the date
-    :param default: optional default value, overrides 'required'
+    :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or 'None' if validation failed
+    :return: the validated value, or *None* if validation failed
     """
     # import needed module
     from .datetime_pomes import datetime_parse
@@ -455,7 +455,7 @@ def validate_ints(errors: list[str] | None,
     :param max_val:  the maximum value accepted
     :param required: whether the list of values must be provided
     :param logger: optional logger
-    :return: the list of validated values, '[]' if not required and no values found, or 'None' if validation failed
+    :return: the list of validated values, *[]* if not required and no values found, or *None* if validation failed
     """
     # initialize the return variable
     result: list | None = []
@@ -520,7 +520,7 @@ def validate_strs(errors: list[str] | None,
     :param max_length:  optional maximum length accepted
     :param required: whether the list of values must be provided
     :param logger: optional logger
-    :return: the list of validated values, '[]' if not required and no values found, or 'None' if validation failed
+    :return: the list of validated values, *[]* if not required and no values found, or *None* if validation failed
     """
     # initialize the return variable
     result: list | None = []
@@ -573,7 +573,7 @@ def validate_build_response(errors: list[str],
 
     :param errors: the reference errors
     :param reply: the key/value pairs to add to the response as JSON string
-    :return: the appropriate 'Response' object
+    :return: the appropriate *Response* object
     """
     # declare the return variable
     result: Response

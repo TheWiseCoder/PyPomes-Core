@@ -41,7 +41,7 @@ def date_reformat(dt_str: str,
     :param dt_str: the date to convert
     :param to_format: the format for the conversion
     :param kwargs: optional arguments for the parser in python-dateutil
-    :return: the converted date
+    :return: the converted date, or *None* if the convertion was not possible
     """
     result: str | None = None
     ts: datetime = parser.parse(timestr=dt_str,
@@ -100,7 +100,7 @@ def datetime_parse(dt_str: str,
 
     :param dt_str: the date, in a supported format
     :param kwargs: optional arguments for the parser in python-dateutil
-    :return: the corresponding datetime object, or None
+    :return: the corresponding datetime object, or *None*
     """
     # declare the return variable
     result: datetime | None

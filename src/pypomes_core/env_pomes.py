@@ -1,10 +1,11 @@
+import base64
 import os
 from contextlib import suppress
 from datetime import date
 from dateutil import parser
 from dateutil.parser import ParserError
 from pathlib import Path
-from typing import Final
+from typing import Final, Literal
 
 # the prefix for the names of the environment variables
 APP_PREFIX: Final[str] = os.getenv("PYPOMES_APP_PREFIX", "")
@@ -12,7 +13,7 @@ APP_PREFIX: Final[str] = os.getenv("PYPOMES_APP_PREFIX", "")
 
 def env_get_str(key: str,
                 values: list[str] = None,
-                def_value: str = None) -> str:
+                def_value: str = None) -> str | None:
     """
     Retrieve and return the string value defined for *key* in the current operating environment.
 
@@ -34,7 +35,7 @@ def env_get_str(key: str,
 
 def env_get_int(key: str,
                 values: list[int] = None,
-                def_value: int = None) -> int:
+                def_value: int = None) -> int | None:
     """
     Retrieve and return the integer value defined for *key* in the current operating environment.
 
@@ -58,7 +59,7 @@ def env_get_int(key: str,
 
 def env_get_float(key: str,
                   values: list[float] = None,
-                  def_value: float = None) -> float:
+                  def_value: float = None) -> float | None:
     """
     Retrieve and return the float value defined for *key* in the current operating environment.
 
@@ -81,7 +82,7 @@ def env_get_float(key: str,
 
 
 def env_get_strs(key: str,
-                 values: list[str] = None) -> list[str]:
+                 values: list[str] = None) -> list[str] | None:
     """
     Retrieve and return the string values defined for *key* in the current operating environment.
 
@@ -106,7 +107,7 @@ def env_get_strs(key: str,
 
 
 def env_get_ints(key: str,
-                 values: list[str] = None) -> list[int]:
+                 values: list[str] = None) -> list[int] | None:
     """
     Retrieve and return the integer values defined for *key* in the current operating environment.
 
@@ -133,7 +134,7 @@ def env_get_ints(key: str,
 
 
 def env_get_floats(key: str,
-                   values: list[str] = None) -> list[float]:
+                   values: list[str] = None) -> list[float] | None:
     """
     Retrieve and return the float values defined for *key* in the current operating environment.
 
@@ -160,23 +161,31 @@ def env_get_floats(key: str,
 
 
 def env_get_bytes(key: str,
+                  style: Literal["hex", "utf8", "base64"] = "base64",
                   values: list[bytes] = None,
-                  def_value: bytes = None) -> bytes:
+                  def_value: bytes = None) -> bytes | None:
     """
     Retrieve and return the byte value defined for *key* in the current operating environment.
 
-    The corresponding string defined in the environment must be a hexadecimal representation
-    of the byte value. As such, it is restricted to contain characters in the range *[0-9a-f]*.
-    If *values* is specified, the value obtained is checked for occurrence therein.
+    The corresponding string defined in the environment must be a representation of the *bytes* value
+     as defined in *format*. If *values* is specified, the value obtained is checked for occurrence therein.
 
     :param key: the key the value is associated with
+    :param style: the representation of the *bytes* value
     :param values: optional list of valid values
     :param def_value: the default value to return, if the key has not been defined
     :return: the byte value associated with the key
     """
-    result: bytes | None
+    result: bytes | None = None
     try:
-        result = bytes.fromhex(os.environ[key])
+        value: str = os.environ[key]
+        match style:
+            case "hex":
+                result = bytes.fromhex(value)
+            case "utf8":
+                result = value.encode()
+            case "base64":
+                result = base64.b64decode(s=value)
         if values and result not in values:
             result = None
     except (AttributeError, KeyError, TypeError):
@@ -258,10 +267,10 @@ def env_is_docker() -> bool:
 
     :return: 'True' if this could be determined, 'False' otherwise
     """
-    result: bool = os.path.exists('/.dockerenv')
+    result: bool = Path("/.dockerenv").exists()
     if not result:
-        with suppress(Exception):
-            with open('/proc/1/cgroup', 'rt') as f:
-                result = "docker" in f.read()
+        with (suppress(Exception),
+              Path("/proc/1/cgroup", "rt").open() as f):
+            result = "docker" in f.read()
 
     return result

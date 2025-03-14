@@ -16,6 +16,9 @@ TEMP_FOLDER: Final[Path] = env_get_path(key=f"{APP_PREFIX}_TEMP_FOLDER",
 
 # see https://mimetype.io/all-types
 class Mimetype(StrEnum):
+    """
+    Commonly used mimetypes.
+    """
     BINARY = "application/octet-stream"
     BMP = "image/bmp"
     BZIP = "application/x-bzip"
@@ -24,6 +27,7 @@ class Mimetype(StrEnum):
     GIF = "image/gif"
     GZIP = "application/gzip"
     HTML = "text/html"
+    JAR = "application/java-archive"
     JAVASCRIPT = "text/javascript"
     JPEG = "image/jpeg"
     JSON = "application/json"
@@ -34,12 +38,15 @@ class Mimetype(StrEnum):
     PDF = "application/pdf"
     PKCS7 = "application/pkcs7-signature"
     PNG = "image/png"
+    RAR = "application/x-rar-compressed"
     RTF = "application/rtf"
     SOAP = "application/soap+xml"
     TEXT = "text/plain"
     TIFF = "image/tiff"
     URLENCODED = "application/x-www-form-urlencoded"
     WEBM = "udio/webm"
+    X7Z = "application/x-7z-compressed"
+    XLS = "application/vnd.ms-excel"
     XML = "application/xml"
     ZIP = "application/zip"
 
@@ -94,7 +101,7 @@ def file_get_data(file_data: Path | str | bytes,
     :param file_data: the data as *bytes* or *str*, or the path to locate the file containing the data
     :param max_len: optional maximum length of the data to return, defaults to all data
     :param chunk_size: optional chunk size to use in reading the data, defaults to 128 KB
-    :return: the data, or 'None' if the file data could not be obtained
+    :return: the data, or *None* if the file data could not be obtained
     """
     # initialize the return variable
     result: bytes | None = None
@@ -115,7 +122,7 @@ def file_get_data(file_data: Path | str | bytes,
         result = file_data
 
     elif isinstance(file_data, str):
-        # argument is type 'str
+        # argument is type 'str'
         result = file_data.encode()
 
     elif isinstance(file_data, Path):
@@ -147,37 +154,44 @@ def file_get_mimetype(file_data: Path | str | bytes) -> Mimetype | str:
     """
     Heuristics to determine the mimetype for *file_data*.
 
-    The parameter *file_data* might be the data itself (type *bytes*), or a filepath (type *Path* or *str*).
-    The heuristics used, as heuristics go, provide an educated guess, not an accurate result.
+    The type of *file_data* determines where the file data is:
+        - type *bytes*: *file_data* holds the data (used as is)
+        - type *str*: *file_data* holds the data (used as utf8-encoded)
+        - type *Path*: *file_data* is a path to a file holding the data
 
+    The heuristics used, as heuristics go, provides an educated guess, not an accurate result.
     If a mimetype is found, and it is not in *Mimetype* (which is a small subset of known mimetypes),
     then its identifying string is returned.
 
     :param file_data: file data, or the path to locate the file
-    :return: the probable mimetype, or None if a determination was not possible
+    :return: the probable mimetype, or *None* if a determination was not possible
     """
     # initialize the return variable
-    result: Mimetype | None = None
+    result: Mimetype | str | None = None
 
-    # inspect the filepath
+    # inspect the file data
     mimetype: str | None = None
-    if isinstance(file_data, Path | str):
+    if isinstance(file_data, Path):
         mimetype, _ = mimetypes.guess_file_type(path=file_data)
 
     if not mimetype:
+        if isinstance(file_data, str):
+            # argument is type 'str'
+            file_data = file_data.encode()
         with suppress(TypeError):
             kind: filetype.Type = filetype.guess(obj=file_data)
             if kind:
                 mimetype = kind.mime
 
     if mimetype:
+        # for unknown mimetypes, return its identifying string
+        result = mimetype
         for mime in Mimetype:
             if mimetype == mime.value:
                 result = mime
                 break
 
-    # for unknown mimetypes, return its identifying string
-    return result or mimetype
+    return result
 
 
 def file_is_binary(file_data: Path | str | bytes) -> bool:
@@ -189,13 +203,14 @@ def file_is_binary(file_data: Path | str | bytes) -> bool:
     Empty or null content is considered to be non-binary.
 
     :param file_data: file data, or the path to locate the file
-    :return: 'True' if the determination resulted positive, 'False' otherwise
+    :return: *True* if the determination resulted positive, *False* otherwise
     """
     # obtain up to 1024 bytes of content for analysis
     chunk: bytes = file_get_data(file_data=file_data,
                                  max_len=1024) or b""
     # check for null byte
-    result: bool = b'\0' in chunk
+    result: bool = b"\0" in chunk
+
     # check for non-printable characters
     if not result:
         # remove the chars listed below - chars remaining indicates content is binary
@@ -208,6 +223,6 @@ def file_is_binary(file_data: Path | str | bytes) -> bool:
         #   27: \x1b (escape)
         #   0x20 - 0x100, less 0x7f: 32-255 char range, less 127 (the DEL control char)
         text_characters = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7f})
-        result = bool(chunk.translate(None, text_characters))
-
+        result = bool(chunk.translate(None,
+                                      delete=text_characters))
     return result

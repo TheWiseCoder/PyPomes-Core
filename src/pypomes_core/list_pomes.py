@@ -176,7 +176,7 @@ def list_elem_with_attr(source: list,
     :param source: The list to search for the element
     :param attr: the name of the reference attribute
     :param value: the reference value
-    :return: The element in *source* having an attribute *attr* with value *value*, or *None*
+    :return: The element in *source* having an attribute *attr* with *value*, or *None*
     """
     # initialize the return variable
     result: Any = None
@@ -205,7 +205,7 @@ def list_elem_starting_with(source: list[str | bytes],
     :param source: the list to be inspected
     :param prefix: the data prefixing the element to be returned
     :param keep_prefix: defines whether or not the found element should be returned with the prefix
-    :return: the prefixed element, with or without the prefix, or 'None' if not found
+    :return: the prefixed element, with or without the prefix, or *None* if not found
     """
     # initialize the return variable
     result: str | bytes | None = None
@@ -396,7 +396,7 @@ def list_hierarchize(source: list[list | tuple]) -> list:
 
     Notes:
       - the elements in *source* must not contain embedded lists or tuples
-      - onced an aggregation has been given a value, another aggregation cannot be added to it, such as:
+      - once an aggregation has been given a value, another aggregation cannot be added to it, such as:
 
         ('John', 'parent Fred', 'poor health', 'dependent'),
 
@@ -406,6 +406,7 @@ def list_hierarchize(source: list[list | tuple]) -> list:
 
     :param source: the fully sorted list of tuples or list of lists to be hierarchized
     :return: the hierarchized list
+
     """
     def add_to_hierarchy(hierarchy: dict,
                          keys: list,
@@ -421,9 +422,9 @@ def list_hierarchize(source: list[list | tuple]) -> list:
             result = []
             for k, v in item.items():
                 if isinstance(v, dict):
-                    result.append([k] + convert_to_list(item=v))
+                    result.append([k, *convert_to_list(item=v)])
                 else:
-                    result.append([k, v] if len(v) > 1 else [k] + v)
+                    result.append([k, v] if len(v) > 1 else [k, *v])
         elif isinstance(item, list):
             result = item
         else:
