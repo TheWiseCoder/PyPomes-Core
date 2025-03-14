@@ -161,17 +161,17 @@ def env_get_floats(key: str,
 
 
 def env_get_bytes(key: str,
-                  style: Literal["hex", "utf8", "base64"] = "base64",
+                  encoding: Literal["base64", "base64url", "hex", "utf8"] = "base64url",
                   values: list[bytes] = None,
                   def_value: bytes = None) -> bytes | None:
     """
     Retrieve and return the byte value defined for *key* in the current operating environment.
 
-    The corresponding string defined in the environment must be a representation of the *bytes* value
-     as defined in *format*. If *values* is specified, the value obtained is checked for occurrence therein.
+    The string defined in the environment must contain the *bytes* value encoded as defined in *encoding*.
+    If *values* is specified, the value obtained is checked for occurrence therein.
 
     :param key: the key the value is associated with
-    :param style: the representation of the *bytes* value
+    :param encoding: the representation of the *bytes* value
     :param values: optional list of valid values
     :param def_value: the default value to return, if the key has not been defined
     :return: the byte value associated with the key
@@ -179,13 +179,15 @@ def env_get_bytes(key: str,
     result: bytes | None = None
     try:
         value: str = os.environ[key]
-        match style:
+        match encoding:
             case "hex":
                 result = bytes.fromhex(value)
             case "utf8":
                 result = value.encode()
             case "base64":
                 result = base64.b64decode(s=value)
+            case "base64url":
+                result = base64.urlsafe_b64decode(s=value)
         if values and result not in values:
             result = None
     except (AttributeError, KeyError, TypeError):
