@@ -178,12 +178,28 @@ __ERR_MSGS: Final[dict[int, dict[str, str]]] = {
         "pt": "Envelope SOAP {} com conteúdo inválido: {}",
     },
     231: {
-        "en": "Authentication token required",
-        "pt": "Token de autenticação deve ser fornecido",
+        "en": "Token not provided",
+        "pt": "Token não fornecido",
     },
     232: {
-        "en": "Invalid authentication token",
-        "pt": "Token de autenticação inválido",
+        "en": "Invalid token",
+        "pt": "Token inválido",
+    },
+    233: {
+        "en": "User not provided",
+        "pt": "Usuário não fornecido",
+    },
+    234: {
+        "en": "Invalid user",
+        "pt": "Usuário inválido",
+    },
+    235: {
+        "en": "User/password not provided",
+        "pt": "Usuário/senha não fornecido",
+    },
+    236: {
+        "en": "Invalid user/password",
+        "pt": "Usuário/senha inválido",
     },
     241: {
         "en": "Error accessing the digital signing service at {}: {}",
