@@ -3,6 +3,7 @@ import types
 from base64 import b64encode
 from collections.abc import Iterable
 from datetime import date
+from enum import Enum, IntEnum
 from pathlib import Path
 from typing import Any
 
@@ -780,34 +781,75 @@ def dict_listify(target: dict,
     return target
 
 
-def dict_jsonify(source: dict) -> dict:
+def dict_jsonify(source: dict,
+                 jsonify_keys: bool = False,
+                 jsonify_values: bool = True) -> dict:
     """
-    Turn the values in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
+    Convert the *[key, value]* pairs in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
 
-    Possible transformations:
-        - *bytes* e *bytearray* are changed to *str* in *Base64* format
-        - *date* and *datetime* are changed to their respective ISO representations
-        - *Path* is changed to its POSIX representation
-        - *Iterable* is changed to a *list*
-        - all other types are left unchanged
-    For convenience, the possibly modified *source* itself is returned.
+    The parameters *jsonify_keys* and *jsonify_values* specify whether keys and values are to be *jsonified*,
+    respectively. It is expected that either *jsonify_keys* or *jsonify_values*, or both, is set to *True*.
+
+    Possible transformations of keys and values:
+      - *bytes* and *bytearray* are changed to *str* in *Base64* format
+      - *date* and *datetime* are changed to their respective ISO representations
+      - *Path* is changed to its POSIX representation
+      - *IntEnum* is changed to its int representation
+      - generic *Enum* is changed to its string representation
+      - *Iterable* is changed to a *list*, with the recursive invocation of *list_jsonify()* on it (for values, only)
+      - all other types are left unchanged
+
+    Note that the transformation is recursively carried out, that is, any *dict* or *list* set as value
+    will be *jsonified* accordingly. For convenience, the possibly modified *source* itself is returned.
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
     :param source: the dict to be made serializable
+    :param jsonify_keys: whether the keys in *source* should be *jsonified* (defaults to *False*)
+    :param jsonify_values: whether the values in *source* should be *jsonified* (defaults to *True*)
     :return: the modified input *dict*
     """
+    # traverse the input 'dict'
+    keys: list[Any] = []
     for key, value in source.items():
+        # recursive transformation
         if isinstance(value, dict):
-            dict_jsonify(source=value)
-        elif isinstance(value, Path):
-            source[key] = value.as_posix()
-        elif isinstance(value, bytes | bytearray):
-            source[key] = b64encode(s=value).decode()
-        elif isinstance(value, date):
-            source[key] = value.isoformat()
-        elif isinstance(value, Iterable) and not isinstance(value, str):
-            from .list_pomes import list_jsonify
-            source[key] = list_jsonify(source=list(value))
+            dict_jsonify(source=value,
+                         jsonify_keys=jsonify_keys,
+                         jsonify_values=jsonify_values)
+
+        # values transformations
+        if jsonify_values:
+            if isinstance(value, IntEnum):
+                source[key] = int(value)
+            elif isinstance(value, Enum):
+                source[key] = str(value)
+            elif isinstance(value, Path):
+                source[key] = value.as_posix()
+            elif isinstance(value, bytes | bytearray):
+                source[key] = b64encode(s=value).decode()
+            elif isinstance(value, date):
+                source[key] = value.isoformat()
+            elif isinstance(value, Iterable) and not isinstance(value, str):
+                from .list_pomes import list_jsonify
+                source[key] = list_jsonify(source=list(value))
+
+        # key transformations
+        if jsonify_keys and \
+                isinstance(key, Enum | Path | bytes | bytearray | date):
+            keys.append(key)
+
+    # transform the keys
+    for key in keys:
+        if isinstance(key, IntEnum):
+            source[int(key)] = source.pop(key)
+        elif isinstance(key, Enum):
+            source[str(key)] = source.pop(key)
+        elif isinstance(key, Path):
+            source[key.as_posix()] = source.pop(key)
+        elif isinstance(key, bytes | bytearray):
+            source[b64encode(s=key).decode()] = source.pop(key)
+        elif isinstance(key, date):
+            source[key.isoformat()] = source.pop(key)
 
     return source
 

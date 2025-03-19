@@ -1,5 +1,5 @@
-import base64
 import os
+from base64 import b64decode, urlsafe_b64decode
 from contextlib import suppress
 from datetime import date
 from dateutil import parser
@@ -185,9 +185,9 @@ def env_get_bytes(key: str,
             case "utf8":
                 result = value.encode()
             case "base64":
-                result = base64.b64decode(s=value)
+                result = b64decode(s=value)
             case "base64url":
-                result = base64.urlsafe_b64decode(s=value)
+                result = urlsafe_b64decode(s=value)
         if values and result not in values:
             result = None
     except (AttributeError, KeyError, TypeError):

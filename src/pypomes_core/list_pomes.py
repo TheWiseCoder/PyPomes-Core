@@ -1,8 +1,9 @@
 import contextlib
-from datetime import date
 from base64 import b64encode
 from collections import defaultdict
 from collections.abc import Iterable
+from datetime import date
+from enum import Enum, IntEnum
 from pathlib import Path
 from typing import Any
 
@@ -285,21 +286,28 @@ def list_jsonify(source: list) -> list:
     Possible transformations:
         - *bytes* e *bytearray* are changed to *str* in *Base64* format
         - *date* and *datetime* are changed to their respective ISO representations
+        - *Enum* and *StrEnum* are changed to its string representation
+        - *IntEnum* is changeds to its integer representation
         - *Path* is changed to its POSIX representation
-        - *Iterable* is changed to a *list*
+        - *Iterable* is changed to a *list*, which is then recursively *jsonified*
+        - *dict* is recursively *jsonified* (its values, only) by invoking *dict_jsonify()* on it
         - all other types are left unchanged
     The serialization allows for these values to be used in JSON strings.
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
-    :param source: the dict to be made serializable
+    :param source: the *dict* to be made serializable
     :return: a list with serialized values
     """
     result: list = []
     for value in source:
         if isinstance(value, dict):
             from .dict_pomes import dict_jsonify
-            dict_jsonify(source=value)
-            result.append(value)
+            result.append(dict_jsonify(source=value,
+                                       jsonify_values=True))
+        elif isinstance(value, IntEnum):
+            result.append(int(value))
+        elif isinstance(value, Enum):
+            result.append(str(value))
         elif isinstance(value, Path):
             result.append(value.as_posix())
         elif isinstance(value, bytes | bytearray):
