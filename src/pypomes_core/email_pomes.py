@@ -1,6 +1,6 @@
 import sys
 from email.message import EmailMessage
-from enum import Enum, auto
+from enum import StrEnum, auto
 from logging import Logger
 from smtplib import SMTP
 from typing import Any, Final
@@ -9,7 +9,7 @@ from .file_pomes import Mimetype
 from .env_pomes import APP_PREFIX, env_get_str, env_get_int
 
 
-class EmailParam(Enum):
+class EmailParam(StrEnum):
     """
     Parameters for connecting to email servers.
     """
@@ -20,7 +20,8 @@ class EmailParam(Enum):
     SECURITY: auto()
 
     def __str__(self) -> str:  # noqa: D105
-        return self.name
+        # noinspection PyTypeChecker
+        return self.value
 
 
 EMAIL_SERVER: Final[dict[EmailParam, Any]] = {

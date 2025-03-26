@@ -5,7 +5,7 @@ from enum import StrEnum
 from typing import Final
 from zoneinfo import ZoneInfo
 
-from .env_pomes import APP_PREFIX, env_get_str
+from env_pomes import APP_PREFIX, env_get_str
 
 # HAZARD: requires 'tzdata' package installed to work
 TIMEZONE_LOCAL: Final[ZoneInfo] = ZoneInfo(key=env_get_str(key=f"{APP_PREFIX}_TIMEZONE_LOCAL",
@@ -21,7 +21,8 @@ class DateFormat(StrEnum):
     INV = "%Y-%m-%d"
 
     def __str__(self) -> str:  # noqa: D105
-        return self.name
+        # noinspection PyTypeChecker
+        return self.value
 
 
 class DatetimeFormat(StrEnum):
@@ -33,7 +34,8 @@ class DatetimeFormat(StrEnum):
     INV = "%Y-%m-%d %H:%M:%S"
 
     def __str__(self) -> str:  # noqa: D105
-        return self.name
+        # noinspection PyTypeChecker
+        return self.value
 
 
 def date_reformat(dt_str: str,

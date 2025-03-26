@@ -51,7 +51,8 @@ class Mimetype(StrEnum):
     ZIP = "application/zip"
 
     def __str__(self) -> str:  # noqa: D105
-        return self.name
+        # noinspection PyTypeChecker
+        return self.value
 
 
 def file_from_request(request: Request,
