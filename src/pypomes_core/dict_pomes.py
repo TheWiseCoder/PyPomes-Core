@@ -1,7 +1,5 @@
 import inspect
 import types
-from base64 import b64encode
-from collections.abc import Iterable
 from datetime import date
 from enum import Enum, IntEnum
 from pathlib import Path
@@ -791,16 +789,18 @@ def dict_jsonify(source: dict,
     respectively. It is expected that either *jsonify_keys* or *jsonify_values*, or both, is set to *True*.
 
     Possible transformations of keys and values:
-      - *bytes* and *bytearray* are changed to *str* in *Base64* format
-      - *date* and *datetime* are changed to their respective ISO representations
-      - *Path* is changed to its POSIX representation
-      - *IntEnum* is changed to its int representation
-      - generic *Enum* is changed to its string representation
-      - *Iterable* is changed to a *list*, with the recursive invocation of *list_jsonify()* on it (for values, only)
+      - *IntEnum* is changed with *int()*
+      - *bytes*, *bytearray*, and generic *Enum* are changed with *str()*
+      - *date* and *datetime* are changed to their *ISO* representations
+      - *Path* is changed to its *POSIX* representation
+      - *dict* is recursively *jsonified* with *dict_jsonify()* (values, only)
+      - *list* is recursively *jsonified* with *list_jsonify()* (values, only)
       - all other types are left unchanged
 
-    Note that the transformation is recursively carried out, that is, any *dict* or *list* set as value
-    will be *jsonified* accordingly. For convenience, the possibly modified *source* itself is returned.
+    Note that retrieving the original values through a reversal of this process is not deterministic.
+    The transformation is recursively carried out, that is, any *dict* or *list* set as value will be
+    *jsonified* accordingly. For convenience, the possibly modified *source* itself is returned.
+
     HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
 
     :param source: the dict to be made serializable
@@ -811,27 +811,24 @@ def dict_jsonify(source: dict,
     # traverse the input 'dict'
     keys: list[Any] = []
     for key, value in source.items():
-        # recursive transformation
-        if isinstance(value, dict):
-            dict_jsonify(source=value,
-                         jsonify_keys=jsonify_keys,
-                         jsonify_values=jsonify_values)
 
         # values transformations
         if jsonify_values:
-            if isinstance(value, IntEnum):
+            if isinstance(value, dict):
+                dict_jsonify(source=value,
+                             jsonify_keys=jsonify_keys,
+                             jsonify_values=jsonify_values)
+            elif isinstance(value, list):
+                from .list_pomes import list_jsonify
+                source[key] = list_jsonify(source=value)
+            elif isinstance(value, IntEnum):
                 source[key] = int(value)
-            elif isinstance(value, Enum):
+            elif isinstance(value, bytes | bytearray | Enum):
                 source[key] = str(value)
-            elif isinstance(value, Path):
-                source[key] = value.as_posix()
-            elif isinstance(value, bytes | bytearray):
-                source[key] = b64encode(s=value).decode()
             elif isinstance(value, date):
                 source[key] = value.isoformat()
-            elif isinstance(value, Iterable) and not isinstance(value, str):
-                from .list_pomes import list_jsonify
-                source[key] = list_jsonify(source=list(value))
+            elif isinstance(value, Path):
+                source[key] = value.as_posix()
 
         # key transformations
         if jsonify_keys and \
@@ -842,57 +839,87 @@ def dict_jsonify(source: dict,
     for key in keys:
         if isinstance(key, IntEnum):
             source[int(key)] = source.pop(key)
-        elif isinstance(key, Enum):
+        elif isinstance(key, bytes | bytearray | Enum):
             source[str(key)] = source.pop(key)
-        elif isinstance(key, Path):
-            source[key.as_posix()] = source.pop(key)
-        elif isinstance(key, bytes | bytearray):
-            source[b64encode(s=key).decode()] = source.pop(key)
         elif isinstance(key, date):
             source[key.isoformat()] = source.pop(key)
+        elif isinstance(key, Path):
+            source[key.as_posix()] = source.pop(key)
 
     return source
 
 
-def dict_hexify(source: dict) -> dict:
+def dict_hexify(source: dict,
+                hexify_keys: bool = False,
+                hexify_values: bool = True) -> dict:
     """
-    Turn the values in *source* into appropriate hexadecimal representations.
+    Convert the *[key, value]* pairs in *source* to their hexadecimal representantions.
 
-    Possible transformations:
-        - *bytes* e *bytearray* are changed using their built-in *hex()* method
-        - *str* is changed to its hexadecimal form (see warning below)
-        - *date* and *datetime* are changed to the hexadecimal form of their respective ISO representations
-        - *Path* is changed to the hexadecimal form of its POSIX representation
-        - *Iterable* is changed to a *list*
-        - for all the other types, *str()* is applied and its hexadecimal representation is used
-    Note that the reversal of this process is limited to recovering the original strings back from their
-    hexadecimal representation. Further recovery, when possible, would have to be carried out manually.
-    For convenience, the possibly modified *source* itself is returned.
-    HAZARD: will raise a *ValueError* exception if a target string has a character with codepoint greater than 255
+    The parameters *hexify_keys* and *hexify_values* specify whether keys and values are to be *hexified*,
+    respectively. It is expected that either *hexify_keys* or *hexify_values*, or both, is set to *True*.
+
+    Possible transformations of keys and values:
+      - *str* is changed with *<value>.encode().hex()*
+      - *int* is changed with *float(<value>).hex()*
+      - *float*, *bytes*, and *bytearray* are changed using their built-in *hex()* method
+      - *date* and *datetime* are changed using their ISO representations
+      - *Path* is changed using its POSIX representation
+      - *dict* is recursively *hexified* with *dict_hexify()*
+      - *list* is recursively *hexified* with *list_hexify()*
+      - all other types are left unchanged
+
+    Note that retrieving the original values through a reversal of this process is not deterministic.
+    The transformation is recursively carried out, that is, any *dict* or *list* set as value will be
+    *hexified* accordingly. For convenience, the possibly modified *source* itself is returned.
 
     :param source: the dict to be made serializable
-    :return: the modified input 'dict'
-    :raises ValueError: if a target string has a character with codepoint greater than 255
+    :param hexify_keys: whether the keys in *source* should be *hexified* (defaults to *False*)
+    :param hexify_values: whether the values in *source* should be *hexified* (defaults to *True*)
+    :return: the modified input *dict*
     """
     # needed imports
-    from .str_pomes import str_to_hex
     from .list_pomes import list_hexify
 
+    # traverse the input 'dict'
+    keys: list[Any] = []
     for key, value in source.items():
-        if isinstance(value, dict):
-            dict_hexify(source=value)
-        elif isinstance(value, str):
-            source[key] = str_to_hex(value)
-        elif isinstance(value, Iterable):
-            source[key] = list_hexify(source=list(value))
-        elif isinstance(value, Path):
-            source[key] = str_to_hex(value.as_posix())
-        elif isinstance(value, bytes | bytearray):
-            source[key] = value.hex()
-        elif isinstance(value, date):
-            source[key] = str_to_hex(value.isoformat())
-        else:
-            source[key] = str_to_hex(str(value))
+
+        # values transformations
+        if hexify_values:
+            if isinstance(value, dict):
+                dict_hexify(source=value,
+                            hexify_keys=hexify_keys,
+                            hexify_values=hexify_values)
+            elif isinstance(value, list):
+                source[key] = list_hexify(source=value)
+            elif isinstance(value, str):
+                source[key] = value.encode().hex()
+            elif isinstance(value, int):
+                source[key] = float(value).hex()
+            elif isinstance(value, float | bytes | bytearray):
+                source[key] = value.hex()
+            elif isinstance(value, Path):
+                source[key] = value.as_posix().encode().hex()
+            elif isinstance(value, date):
+                source[key] = value.isoformat().encode().hex()
+
+        # key transformations
+        if hexify_keys and \
+                isinstance(key, dict | list | int | float | str | Path | bytes | bytearray | date):
+            keys.append(key)
+
+    # transform the keys
+    for key in keys:
+        if isinstance(key, str):
+            source[key.encode().hex()] = source.pop(key)
+        elif isinstance(key, int):
+            source[float(key).hex()] = source.pop(key)
+        elif isinstance(key, float | bytes | bytearray):
+            source[key.hex()] = source.pop(key)
+        elif isinstance(key, Path):
+            source[key.as_posix().encode().hex()] = source.pop(key)
+        elif isinstance(key, date):
+            source[key.isoformat().encode().hex()] = source.pop(key)
 
     return source
 

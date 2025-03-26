@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pypomes_core"
-version = "1.8.7"
+version = "1.9.3"
 authors = [
   { name="GT Nunes", email="wisecoder01@gmail.com" }
 ]
@@ -23,7 +23,7 @@ dependencies = [
     "Flask>=3.1.0",
     "python-dateutil>=2.9.0",
     "requests>=2.32.3",
-    "tzdata>=2025.1",
+    "tzdata>=2025.2",
     "xmltodict3>=0.0.4"
 ]
 

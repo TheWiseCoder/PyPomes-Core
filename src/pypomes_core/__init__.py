@@ -1,6 +1,5 @@
 from .datetime_pomes import (
-    DATE_FORMAT_STD, DATE_FORMAT_COMPACT, DATE_FORMAT_INV,
-    DATETIME_FORMAT_STD, DATETIME_FORMAT_COMPACT, DATETIME_FORMAT_INV, TIMEZONE_LOCAL,
+    DateFormat, DatetimeFormat, TIMEZONE_LOCAL,
     date_reformat, date_parse, datetime_parse
 )
 from .dict_pomes import (
@@ -10,8 +9,7 @@ from .dict_pomes import (
     dict_replace_value, dict_pop_value, dict_unique_values, dict_jsonify, dict_hexify
 )
 from .email_pomes import (
-    EMAIL_ACCOUNT, EMAIL_PWD, EMAIL_PORT, EMAIL_SECURITY, EMAIL_SERVER,
-    email_send
+    EmailParam, email_send
 )
 from .encoding_pomes import (
     encode_ascii_hex, decode_ascii_hex
@@ -64,8 +62,7 @@ __all__ = [
     # __init__
     "pypomes_versions",
     # datetime_pomes
-    "DATE_FORMAT_STD", "DATE_FORMAT_COMPACT", "DATE_FORMAT_INV",
-    "DATETIME_FORMAT_STD", "DATETIME_FORMAT_COMPACT", "DATETIME_FORMAT_INV", "TIMEZONE_LOCAL",
+    "DateFormat", "DatetimeFormat", "TIMEZONE_LOCAL",
     "date_reformat", "date_parse", "datetime_parse",
     # dict_pomes
     "dict_has_key_chain", "dict_get_value", "dict_set_value", "dict_reduce",
@@ -73,8 +70,7 @@ __all__ = [
     "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
     "dict_replace_value", "dict_pop_value", "dict_unique_values", "dict_jsonify", "dict_hexify",
     # email_pomes
-    "EMAIL_ACCOUNT", "EMAIL_PWD", "EMAIL_PORT", "EMAIL_SECURITY", "EMAIL_SERVER",
-    "email_send",
+    "EmailParam", "email_send",
     # encoding_pomes
     "encode_ascii_hex", "decode_ascii_hex",
     # env_pomes

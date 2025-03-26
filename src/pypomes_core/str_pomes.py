@@ -10,61 +10,47 @@ def str_to_hex(source: str) -> str:
     """
     Obtain and return the hex representation of *source*.
 
-    Be aware that this is of very limited use. It is obtained by concatenating the hex
-    representations of the Unicode codepoints of the characters in *source*.
-    Although codepoints have a range of U+0000-U+10FFFF (0-1,114,111), it is assumed that *source* has
-    characteres with codepoints in the range 0-255, only. A *ValueError* exception is raised otherwise.
-    To get the original string back from its hex representation, use *str_from_hex()*.
+    This is an encapsulation of the built-in methods *<str>.encode()* and *<bytes>.hex()*.
 
     :param source: the input string
     :return: the hex representation of the input string
-    :raises ValueError: if the input string has a character with codepoint greater than 255
+    :raises AttributeError: *source* is not a string
+    :raises UnicodeEncodeError:  a UTF-8 encoding error occurred
     """
-    result: str = ""
-    for ch in source:
-        if ord(ch) > 255:
-            raise ValueError("Input string has character with codepoint greater than 255")
-        result += hex(ord(ch)).replace("0x", "")
-
-    return result
+    return source.encode().hex()
 
 
 def str_from_hex(source: str) -> str:
     """
     Obtain and return the original string from its hex representation in *source*.
 
-    Be aware that this is of very limited use. It is obtained by extracting from *source*, two
-    characters at a time, the Unicode codepoints encoded in the hex representation of the original string.
-    Although codepoints have a range of U+0000-U+10FFFF (0-1,114,111), it is assumed that the original
-    string had characteres with codepoints in the range 0-255, only.
-    A *ValueError* exception is raised if the length of *source* is not an even value, or if *source*
-    has character not in the [0-9A-F] range.
-    To obtain the hex representation of a string to be used here, use *str_to_hex()*.
+    This is an encapsulation of the built-in methods *bytes.fromhex()* and *<bytes>.decode()*
 
     :param source: the hex representation of a string
     :return: the original string
-    :raises ValueError: if the length of the input string is not an even value,
-                        or if it contains character not in [0-9A-F] range
+    :raises ValueError: *source* is not a valid hexadecimal string
+    :raises TypeError: *source* is not a string
+    :raises UnicodeDecodeError: a UTF-8 decoding error occurred
     """
-    if len(source) % 2 > 0:
-        raise ValueError("Length of input string is not an even value")
-    return "".join([chr(int(source[inx:inx+2], 16)) for inx in range(0, len(source), 2)])
+    return bytes.fromhex(source).decode()
 
 
 def str_as_list(source: str | Any,
-                separator: str = ",") -> list:
+                separator: str = ",") -> list | Any:
     """
     Return *source* as a *list*, by splitting its contents separated by *separator*.
 
     The returned substrings are fully whitespace-trimmed.
-    If *source* is not a *str*, then it is itself returned.
+    If *source* is not a non-empty *str*, then it is itself returned.
 
     :param source: the string value to be worked on
     :param separator: the separator (defaults to ",")
     :return: a list built from the contents of *source*, or *source* itself, if is not a string
     """
-    result: list
-    if isinstance(source, str):
+    # declare the return variable
+    result: list | Any
+
+    if source and isinstance(source, str):
         result = [s.strip() for s in source.split(sep=separator)]
     else:
         result = source

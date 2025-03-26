@@ -1,22 +1,39 @@
 from datetime import date, datetime
 from dateutil import parser
 from dateutil.parser import ParserError
+from enum import StrEnum
 from typing import Final
 from zoneinfo import ZoneInfo
 
 from .env_pomes import APP_PREFIX, env_get_str
 
-# some useful date/datetime formats
-DATE_FORMAT_STD: Final[str] = "%m/%d/%Y"
-DATE_FORMAT_COMPACT: Final[str] = "%Y%m%d"
-DATE_FORMAT_INV: Final[str] = "%Y-%m-%d"
-DATETIME_FORMAT_STD: Final[str] = "%m/%d/%Y %H:%M:%S"
-DATETIME_FORMAT_COMPACT: Final[str] = "%Y%m%d%H%M%S"
-DATETIME_FORMAT_INV: Final[str] = "%Y-%m-%d %H:%M:%S"
-
 # HAZARD: requires 'tzdata' package installed to work
 TIMEZONE_LOCAL: Final[ZoneInfo] = ZoneInfo(key=env_get_str(key=f"{APP_PREFIX}_TIMEZONE_LOCAL",
                                                            def_value="America/Sao_Paulo"))
+
+
+class DateFormat(StrEnum):
+    """
+    Some useful date formats.
+    """
+    STD = "%m/%d/%Y"
+    COMPACT = "%Y%m%d"
+    INV = "%Y-%m-%d"
+
+    def __str__(self) -> str:  # noqa: D105
+        return self.name
+
+
+class DatetimeFormat(StrEnum):
+    """
+    Some useful datetime formats.
+    """
+    STD = "%m/%d/%Y %H:%M:%S"
+    COMPACT = "%Y%m%d%H%M%S"
+    INV = "%Y-%m-%d %H:%M:%S"
+
+    def __str__(self) -> str:  # noqa: D105
+        return self.name
 
 
 def date_reformat(dt_str: str,
