@@ -29,10 +29,6 @@ class DatetimeFormat(StrEnum):
     COMPACT = "%Y%m%d%H%M%S"
     INV = "%Y-%m-%d %H:%M:%S"
 
-    def __str__(self) -> str:  # noqa: D105
-        # noinspection PyTypeChecker
-        return self.value
-
 
 def date_reformat(dt_str: str,
                   to_format: str,
