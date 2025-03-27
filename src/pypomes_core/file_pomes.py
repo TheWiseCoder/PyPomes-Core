@@ -50,10 +50,6 @@ class Mimetype(StrEnum):
     XML = "application/xml"
     ZIP = "application/zip"
 
-    def __str__(self) -> str:  # noqa: D105
-        # noinspection PyTypeChecker
-        return self.value
-
 
 def file_from_request(request: Request,
                       file_name: str = None,

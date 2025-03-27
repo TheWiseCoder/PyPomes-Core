@@ -19,10 +19,6 @@ class EmailParam(StrEnum):
     HOST: auto()
     SECURITY: auto()
 
-    def __str__(self) -> str:  # noqa: D105
-        # noinspection PyTypeChecker
-        return self.value
-
 
 EMAIL_SERVER: Final[dict[EmailParam, Any]] = {
     EmailParam.HOST: env_get_str(key=f"{APP_PREFIX}_EMAIL_SERVER"),
