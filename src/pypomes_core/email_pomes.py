@@ -13,11 +13,11 @@ class EmailParam(StrEnum):
     """
     Parameters for connecting to email servers.
     """
-    ACCOUNT: auto()
-    PWD: auto()
-    HOST: auto()
-    PORT: auto()
-    SECURITY: auto()
+    ACCOUNT = auto()
+    PWD = auto()
+    HOST = auto()
+    PORT = auto()
+    SECURITY = auto()
 
 
 EMAIL_SERVER: Final[dict[EmailParam, Any]] = {
