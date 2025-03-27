@@ -1,32 +1,22 @@
 import sys
 from email.message import EmailMessage
-from enum import StrEnum, auto
+from enum import Enum
 from logging import Logger
 from smtplib import SMTP
-from typing import Any, Final
 
 from .file_pomes import Mimetype
 from .env_pomes import APP_PREFIX, env_get_str, env_get_int
 
 
-class EmailParam(StrEnum):
+class EmailConfig(Enum):
     """
-    Parameters for connecting to email servers.
+    Parameters for email.
     """
-    ACCOUNT = auto()
-    PWD = auto()
-    HOST = auto()
-    PORT = auto()
-    SECURITY = auto()
-
-
-EMAIL_SERVER: Final[dict[EmailParam, Any]] = {
-    EmailParam.HOST: env_get_str(key=f"{APP_PREFIX}_EMAIL_HOST"),
-    EmailParam.PORT: env_get_int(key=f"{APP_PREFIX}_EMAIL_PORT"),
-    EmailParam.ACCOUNT: env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT"),
-    EmailParam.PWD: env_get_str(key=f"{APP_PREFIX}_EMAIL_PWD"),
-    EmailParam.SECURITY: env_get_str(key=f"{APP_PREFIX}_EMAIL_SECURITY")
-}
+    HOST: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_HOST")
+    PORT: int = env_get_int(key=f"{APP_PREFIX}_EMAIL_PORT")
+    ACCOUNT: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT")
+    PWD: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_PWD")
+    SECURITY: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_SECURITY")
 
 
 def email_send(errors: list[str] | None,
@@ -50,7 +40,7 @@ def email_send(errors: list[str] | None,
 
     # build the email object
     email_msg = EmailMessage()
-    email_msg["From"] = EMAIL_SERVER.get(EmailParam.ACCOUNT)
+    email_msg["From"] = EmailConfig.ACCOUNT.value
     email_msg["To"] = user_email
     email_msg["Subject"] = subject
     if content_type == Mimetype.HTML:
@@ -62,13 +52,14 @@ def email_send(errors: list[str] | None,
 
     # send the message
     try:
-        # instanciate the email server, login and send the email
-        with SMTP(host=EMAIL_SERVER.get(EmailParam.HOST),
-                  port=EMAIL_SERVER.get(EmailParam.PORT)) as server:
-            if EMAIL_SERVER.get(EmailParam.SECURITY) == "tls":
+        # instantiate the email server, login and send the email
+        # noinspection PyTypeChecker
+        with SMTP(host=EmailConfig.HOST.value,
+                  port=EmailConfig.PORT.value) as server:
+            if EmailConfig.SECURITY.value == "tls":
                 server.starttls()
-            server.login(user=EMAIL_SERVER.get(EmailParam.ACCOUNT),
-                         password=EMAIL_SERVER.get(EmailParam.PWD))
+            server.login(user=EmailConfig.ACCOUNT.value,
+                         password=EmailConfig.PWD.value)
             server.send_message(msg=email_msg)
             if logger:
                 logger.debug(msg=f"Sent email '{subject}' to '{user_email}'")

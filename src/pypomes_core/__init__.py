@@ -9,7 +9,7 @@ from .dict_pomes import (
     dict_replace_value, dict_pop_value, dict_unique_values, dict_jsonify, dict_hexify
 )
 from .email_pomes import (
-    EmailParam, email_send
+    EmailConfig, email_send
 )
 from .encoding_pomes import (
     encode_ascii_hex, decode_ascii_hex
@@ -70,7 +70,7 @@ __all__ = [
     "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
     "dict_replace_value", "dict_pop_value", "dict_unique_values", "dict_jsonify", "dict_hexify",
     # email_pomes
-    "EmailParam", "email_send",
+    "EmailConfig", "email_send",
     # encoding_pomes
     "encode_ascii_hex", "decode_ascii_hex",
     # env_pomes
