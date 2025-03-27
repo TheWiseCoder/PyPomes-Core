@@ -13,15 +13,15 @@ class EmailParam(StrEnum):
     """
     Parameters for connecting to email servers.
     """
-    ACCOUNT = auto()
+    ACCOUNT: auto()
     PWD: auto()
-    PORT: auto()
     HOST: auto()
+    PORT: auto()
     SECURITY: auto()
 
 
 EMAIL_SERVER: Final[dict[EmailParam, Any]] = {
-    EmailParam.HOST: env_get_str(key=f"{APP_PREFIX}_EMAIL_SERVER"),
+    EmailParam.HOST: env_get_str(key=f"{APP_PREFIX}_EMAIL_HOST"),
     EmailParam.PORT: env_get_int(key=f"{APP_PREFIX}_EMAIL_PORT"),
     EmailParam.ACCOUNT: env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT"),
     EmailParam.PWD: env_get_str(key=f"{APP_PREFIX}_EMAIL_PWD"),
