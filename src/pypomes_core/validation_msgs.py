@@ -190,8 +190,8 @@ __ERR_MSGS: Final[dict[int, dict[str, str]]] = {
         "pt": "Usuário não fornecido",
     },
     234: {
-        "en": "Invalid user",
-        "pt": "Usuário inválido",
+        "en": "Invalid user {}",
+        "pt": "Usuário {} inválido",
     },
     235: {
         "en": "User/password not provided",

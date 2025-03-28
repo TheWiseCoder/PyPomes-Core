@@ -39,9 +39,9 @@ from .obj_pomes import (
 from .str_pomes import (
     str_to_hex, str_from_hex, str_to_lower, str_to_upper,
     str_as_list, str_sanitize, str_split_on_mark,
-    str_between, str_positional, str_random, str_find_char,
-    str_find_whitespace, str_rreplace, str_from_any,
-    str_to_bool, str_to_int, str_to_float
+    str_between, str_positional, str_random, str_splice,
+    str_find_char, str_find_whitespace, str_rreplace,
+    str_from_any, str_to_bool, str_to_int, str_to_float
 )
 from .validation_msgs import (
     validate_set_msgs, validate_update_msgs
@@ -93,9 +93,9 @@ __all__ = [
     # str_pomes
     "str_to_hex", "str_from_hex", "str_to_lower", "str_to_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",
-    "str_between", "str_positional", "str_random", "str_find_char",
-    "str_find_whitespace", "str_rreplace", "str_from_any",
-    "str_to_bool", "str_to_int", "str_to_float",
+    "str_between", "str_positional", "str_random", "str_splice",
+    "str_find_char", "str_find_whitespace", "str_rreplace",
+    "str_from_any", "str_to_bool", "str_to_int", "str_to_float",
     # validation_msgs
     "validate_set_msgs", "validate_update_msgs",
     # validation_pomes

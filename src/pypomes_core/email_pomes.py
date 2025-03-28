@@ -3,6 +3,7 @@ from email.message import EmailMessage
 from enum import Enum
 from logging import Logger
 from smtplib import SMTP
+from typing import cast
 
 from .file_pomes import Mimetype
 from .env_pomes import APP_PREFIX, env_get_str, env_get_int
@@ -53,9 +54,8 @@ def email_send(errors: list[str] | None,
     # send the message
     try:
         # instantiate the email server, login and send the email
-        # noinspection PyTypeChecker
         with SMTP(host=EmailConfig.HOST.value,
-                  port=EmailConfig.PORT.value) as server:
+                  port=cast("int", EmailConfig.PORT.value)) as server:
             if EmailConfig.SECURITY.value == "tls":
                 server.starttls()
             server.login(user=EmailConfig.ACCOUNT.value,

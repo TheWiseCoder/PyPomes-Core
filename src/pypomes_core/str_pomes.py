@@ -234,6 +234,57 @@ def str_rreplace(source: str,
     return source[::-1].replace(old[::-1], new[::-1], count)[::-1]
 
 
+def str_splice(source: str,
+               seps: list[str]) -> tuple:
+    """
+    Splice *source* into segments delmited by the ordered list of separators *seps*.
+
+    The number of segments returned is always the number of separators in *seps* plus 1.
+    An individual segment returned can be null or an empty string. If no separators are found,
+    the returned tuple will contain *source* as its last element, and *None* as the remaining elements.
+    Separators will no be part of their respective segments.
+
+    Separators in *seps* can not be *None* or empty strings. If no separators are provided
+    (*seps* itself is an empty list), then the returned tuple will contain *source* as its only element.
+    If *source* starts with the separator, then the return tuple's first element will be an empty string.
+    If *source* ends with the separator, then the return tuple's last element will be an empty string.
+
+    These examples illustrate the various possibilities (*source* = 'My string to be spliced'):
+      - [] ===> ('My string to be spliced',)
+      - ['tri'] ===> ('My s', 'ng to be spliced')
+      - ['iced'] ===> ('My string to be spl', '')
+      - ['X', 'B'] ===> (None, None, 'My string to be spliced')
+      - ['M', 'd'] ===> ('', 'y string to be splice', '')
+      - ['s', 's', 'd'] ===> ('My ', 'tring to be ', 'plice', '')
+      - ['X', 'ri', 'be'] ===> (None, 'My st', 'ng to ', ' spliced')
+
+    :param source: the source string
+    :param seps: the ordered list of separators
+    :return: tuple with the segments obtained, or *None* if *source* is not a string.
+
+    """
+    # initialize the return variable
+    result: tuple | None = None
+
+    if isinstance(source, str) and None not in seps and "" not in seps:
+        segments = []
+        for sep in seps:
+            pos: int = source.find(sep)
+            if pos < 0:
+                segments.append(None)
+            else:
+                segments.append(source[:pos])
+                source = source[pos+len(sep):]
+                if not source:
+                    break
+
+        segments.append(source)
+        segments.extend([None] * (len(seps) - len(segments)))
+        result = tuple(segments)
+
+    return result
+
+
 def str_to_lower(source: Any) -> str:
     """
     Safely convert *source* to lower-case.
