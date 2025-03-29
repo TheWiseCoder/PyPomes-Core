@@ -187,7 +187,7 @@ def file_get_mimetype(file_data: Path | str | bytes) -> Mimetype | str:
         # for unknown mimetypes, return its identifying string
         result = mimetype
         for mime in Mimetype:
-            if mimetype == mime.value:
+            if mimetype == mime:
                 result = mime
                 break
 

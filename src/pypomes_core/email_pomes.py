@@ -1,20 +1,19 @@
 import sys
 from email.message import EmailMessage
-from enum import Enum
+from enum import StrEnum
 from logging import Logger
 from smtplib import SMTP
-from typing import cast
 
 from .file_pomes import Mimetype
-from .env_pomes import APP_PREFIX, env_get_str, env_get_int
+from .env_pomes import APP_PREFIX, env_get_str
 
 
-class EmailConfig(Enum):
+class EmailConfig(StrEnum):
     """
     Parameters for email.
     """
     HOST: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_HOST")
-    PORT: int = env_get_int(key=f"{APP_PREFIX}_EMAIL_PORT")
+    PORT: int = env_get_str(key=f"{APP_PREFIX}_EMAIL_PORT")
     ACCOUNT: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT")
     PWD: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_PWD")
     SECURITY: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_SECURITY")
@@ -41,7 +40,7 @@ def email_send(errors: list[str] | None,
 
     # build the email object
     email_msg = EmailMessage()
-    email_msg["From"] = EmailConfig.ACCOUNT.value
+    email_msg["From"] = EmailConfig.ACCOUNT
     email_msg["To"] = user_email
     email_msg["Subject"] = subject
     if content_type == Mimetype.HTML:
@@ -54,12 +53,12 @@ def email_send(errors: list[str] | None,
     # send the message
     try:
         # instantiate the email server, login and send the email
-        with SMTP(host=EmailConfig.HOST.value,
-                  port=cast("int", EmailConfig.PORT.value)) as server:
-            if EmailConfig.SECURITY.value == "tls":
+        with SMTP(host=EmailConfig.HOST,
+                  port=int(EmailConfig.PORT)) as server:
+            if EmailConfig.SECURITY == "tls":
                 server.starttls()
-            server.login(user=EmailConfig.ACCOUNT.value,
-                         password=EmailConfig.PWD.value)
+            server.login(user=EmailConfig.ACCOUNT,
+                         password=EmailConfig.PWD)
             server.send_message(msg=email_msg)
             if logger:
                 logger.debug(msg=f"Sent email '{subject}' to '{user_email}'")
