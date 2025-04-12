@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import Final, Literal
 
 # the prefix for the names of the environment variables
-APP_PREFIX: Final[str] = os.getenv("PYPOMES_APP_PREFIX", "")
+APP_PREFIX: Final[str] = os.getenv(key="PYPOMES_APP_PREFIX",
+                                   default="")
 
 
 def env_get_str(key: str,

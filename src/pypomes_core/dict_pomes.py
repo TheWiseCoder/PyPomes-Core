@@ -67,7 +67,7 @@ def dict_get_value(source: dict,
     Return *None* if the sought after value is not found.
     Note that returning *None* might not be indicative of the absence of the element in *source*,
     since that element might exist therein with the value *None*. To determine whether this is the case,
-    use the operation *dict_has_value*.
+    use the operation *dict_has_key_chain*.
 
     :param source: the reference dict
     :param key_chain: the key chain
@@ -692,7 +692,8 @@ def dict_transform(source: dict,
 
 
 def dict_clone(source: dict,
-               from_to_keys: list) -> dict:
+               from_to_keys: list[tuple[str, str] | str],
+               omit_missing: bool = True) -> dict:
     """
     Build a new *dict*, according to the rules presented herein.
 
@@ -704,8 +705,9 @@ def dict_clone(source: dict,
     indicative of the value to be assigned is used. If the corresponding value is not found
     in *source*, *None* is assigned.
 
-    :param source: the source dict
+    :param source: the source *dict*
     :param from_to_keys: list of elements indicative of the source and target keys
+    :param omit_missing: omit the elements not found in the source *dict* (defaults to *True*)
     :return: the new *dict*
     """
     # import the needed function
@@ -718,8 +720,14 @@ def dict_clone(source: dict,
     for elem in from_to_keys:
         from_key: str = elem[0] if isinstance(elem, tuple) else elem
         to_key: str = (elem[1] if isinstance(elem, tuple) and len(elem) > 1 else None) or from_key
-        result[to_key] = dict_get_value(source=source,
-                                        key_chain=list_unflatten(from_key))
+        key_chain: list[str] = list_unflatten(source=from_key)
+        has_key: bool = dict_has_key_chain(source=source,
+                                           key_chain=key_chain)
+        if has_key or not omit_missing:
+            value: Any = dict_get_value(source=source,
+                                        key_chain=key_chain)
+            result[to_key] = value
+
     return result
 
 

@@ -72,13 +72,13 @@ def validate_value(attr: str,
 
 
 def validate_bool(errors: list[str] | None,
-                  scheme: dict[str, Any],
+                  source: dict[str, Any],
                   attr: str,
                   default: bool = None,
                   required: bool = False,
                   logger: Logger = None) -> bool:
     """
-    Validate the boolean value associated with *attr* in *scheme*.
+    Validate the boolean value associated with *attr* in *source*.
 
     If provided, this value must be on of:
         - a *bool*
@@ -87,7 +87,7 @@ def validate_bool(errors: list[str] | None,
         - the string *0*, *f*, or *false*, case disregarded
 
     :param errors: incidental error messages
-    :param scheme: dictionary containing the value to be validated
+    :param source: dictionary containing the value to be validated
     :param attr: the name of the attribute whose value is being validated
     :param default: default value, overrides *required*
     :param required: specifies whether a value must be provided
@@ -102,7 +102,7 @@ def validate_bool(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # retrieve the value
-    value = scheme.get(suffix)
+    value = source.get(suffix)
 
     # validate it
     if value is None or value == "":
@@ -133,7 +133,10 @@ def validate_bool(errors: list[str] | None,
         stat = validate_format_error(152, value, "bool", f"@{attr}")
 
     if stat:
-        __validate_log(errors, stat, logger)
+        if logger:
+            logger.error(msg=stat)
+        if isinstance(errors, list):
+            errors.append(stat)
     else:
         result = value
 
@@ -141,7 +144,7 @@ def validate_bool(errors: list[str] | None,
 
 
 def validate_int(errors: list[str] | None,
-                 scheme: dict[str, Any],
+                 source: dict[str, Any],
                  attr: str,
                  min_val: int = None,
                  max_val: int = None,
@@ -150,12 +153,12 @@ def validate_int(errors: list[str] | None,
                  required: bool = False,
                  logger: Logger = None) -> int:
     """
-    Validate the *int* value associated with *attr* in *scheme*.
+    Validate the *int* value associated with *attr* in *source*.
 
     If provided, this value must be a *int*, or a valid string representation of a *int*.
 
     :param errors: incidental error messages
-    :param scheme: dictionary containing the value to be validated
+    :param source: dictionary containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
@@ -173,7 +176,7 @@ def validate_int(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # retrieve the value
-    value: int = scheme.get(suffix)
+    value: int = source.get(suffix)
 
     # validate it ('bool' is subtype of 'int')
     if value is None and isinstance(default, int) and not isinstance(default, bool):
@@ -193,9 +196,10 @@ def validate_int(errors: list[str] | None,
                               values=values,
                               required=required)
     if stat:
-        __validate_log(errors=errors,
-                       err_msg=stat,
-                       logger=logger)
+        if logger:
+            logger.error(msg=stat)
+        if isinstance(errors, list):
+            errors.append(stat)
     else:
         result = value
 
@@ -203,7 +207,7 @@ def validate_int(errors: list[str] | None,
 
 
 def validate_float(errors: list[str] | None,
-                   scheme: dict[str, Any],
+                   source: dict[str, Any],
                    attr: str,
                    min_val: float = None,
                    max_val: float = None,
@@ -212,12 +216,12 @@ def validate_float(errors: list[str] | None,
                    default: int | float = None,
                    logger: Logger = None) -> float:
     """
-    Validate the *float* value associated with *attr* in *scheme*.
+    Validate the *float* value associated with *attr* in *source*.
 
     If provided, this value must be a *float*, or a valid string representation of a *float*.
 
     :param errors: incidental error messages
-    :param scheme: dictionary containing the value to be validated
+    :param source: dictionary containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
@@ -235,7 +239,7 @@ def validate_float(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # retrieve the value
-    value: float = scheme.get(suffix)
+    value: float = source.get(suffix)
 
     # validate it
     if value is None and isinstance(default, int | float):
@@ -256,9 +260,10 @@ def validate_float(errors: list[str] | None,
                               values=values,
                               required=required)
     if stat:
-        __validate_log(errors=errors,
-                       err_msg=stat,
-                       logger=logger)
+        if logger:
+            logger.error(msg=stat)
+        if isinstance(errors, list):
+            errors.append(stat)
     else:
         result = value
 
@@ -266,7 +271,7 @@ def validate_float(errors: list[str] | None,
 
 
 def validate_str(errors: list[str] | None,
-                 scheme: dict[str, Any],
+                 source: dict[str, Any],
                  attr: str,
                  min_length: int = None,
                  max_length: int = None,
@@ -275,12 +280,12 @@ def validate_str(errors: list[str] | None,
                  required: bool = False,
                  logger: Logger = None) -> str:
     """
-    Validate the *str* value associated with *attr* in *scheme*.
+    Validate the *str* value associated with *attr* in *source*.
 
     If provided, this value must be a *str*.
 
     :param errors: incidental error messages
-    :param scheme: dictionary containing the value to be validated
+    :param source: dictionary containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param min_length: optional minimum length accepted
     :param max_length:  optional maximum length accepted
@@ -298,7 +303,7 @@ def validate_str(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # obtain the value
-    value: str | None = scheme.get(suffix)
+    value: str | None = source.get(suffix)
 
     # validate it
     if value is None and isinstance(default, str):
@@ -314,9 +319,10 @@ def validate_str(errors: list[str] | None,
                               values=values,
                               required=required)
     if stat:
-        __validate_log(errors=errors,
-                       err_msg=stat,
-                       logger=logger)
+        if logger:
+            logger.error(msg=stat)
+        if isinstance(errors, list):
+            errors.append(stat)
     else:
         result = value
 
@@ -324,19 +330,19 @@ def validate_str(errors: list[str] | None,
 
 
 def validate_date(errors: list[str] | None,
-                  scheme: dict[str, Any],
+                  source: dict[str, Any],
                   attr: str,
                   day_first: bool = False,
                   default: date = None,
                   required: bool = False,
                   logger: Logger = None) -> date:
     """
-    Validate the *date* value associated with *attr* in *scheme*.
+    Validate the *date* value associated with *attr* in *source*.
 
     If provided, this value must be a *date*, or a valid string representation of a *date*.
 
     :param errors: incidental error messages
-    :param scheme: dictionary containing the value to be validated
+    :param source: dictionary containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param day_first: indicates that the day precedes the month in the string representing the date
     :param default: optional default value, overrides *required*
@@ -355,7 +361,7 @@ def validate_date(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # obtain the value
-    value: str = scheme.get(suffix)
+    value: str = source.get(suffix)
 
     # validate it
     if value:
@@ -375,26 +381,28 @@ def validate_date(errors: list[str] | None,
 
     if stat:
         result = None
-        __validate_log(errors=errors,
-                       err_msg=stat,
-                       logger=logger)
+        if logger:
+            logger.error(msg=stat)
+        if isinstance(errors, list):
+            errors.append(stat)
+
     return result
 
 
 def validate_datetime(errors: list[str] | None,
-                      scheme: dict[str, Any],
+                      source: dict[str, Any],
                       attr: str,
                       day_first: bool = True,
                       default: datetime = None,
                       required: bool = False,
                       logger: Logger = None) -> datetime:
     """
-    Validate the *datetime* value associated with *attr* in *scheme*.
+    Validate the *datetime* value associated with *attr* in *source*.
 
     If provided, this value must be a *date*, or a valid string representation of a *date*.
 
     :param errors: incidental error messages
-    :param scheme: dictionary containing the value to be validated
+    :param source: dictionary containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param day_first: indicates that the day precedes the month in the string representing the date
     :param default: optional default value, overrides *required*
@@ -413,7 +421,7 @@ def validate_datetime(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # obtain and validate the value
-    value: str = scheme.get(suffix)
+    value: str = source.get(suffix)
     if value:
         result = datetime_parse(dt_str=value,
                                 dayfirst=day_first)
@@ -430,26 +438,28 @@ def validate_datetime(errors: list[str] | None,
         stat = validate_format_error(121, f"@{attr}")
 
     if stat:
-        __validate_log(errors=errors,
-                       err_msg=stat,
-                       logger=logger)
+        if logger:
+            logger.error(msg=stat)
+        if isinstance(errors, list):
+            errors.append(stat)
+
     return result
 
 
 def validate_ints(errors: list[str] | None,
-                  scheme: dict[str, Any],
+                  source: dict[str, Any],
                   attr: str,
                   min_val: int = None,
                   max_val: int = None,
                   required: bool = False,
                   logger: Logger = None) -> list[int]:
     """
-    Validate the list of *int* values associated with *attr* in *scheme*.
+    Validate the list of *int* values associated with *attr* in *source*.
 
     If provided, this list must contain *int*s, or valid string representations of *int*s.
 
     :param errors: incidental error messages
-    :param scheme: dictionary containing the list of values to be validated
+    :param source: dictionary containing the list of values to be validated
     :param attr: the attribute associated with the list of values to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
@@ -465,7 +475,7 @@ def validate_ints(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # obtain the values
-    values: list = scheme.get(suffix)
+    values: list = source.get(suffix)
     if values:
         if isinstance(values, str):
             values = str_as_list(values)
@@ -493,28 +503,29 @@ def validate_ints(errors: list[str] | None,
         stat = validate_format_error(121, f"@{attr}")
 
     if stat:
-        __validate_log(errors=errors,
-                       err_msg=stat,
-                       logger=logger)
+        if logger:
+            logger.error(msg=stat)
+        if isinstance(errors, list):
+            errors.append(stat)
         result = None
 
     return result
 
 
 def validate_strs(errors: list[str] | None,
-                  scheme: dict[str, Any],
+                  source: dict[str, Any],
                   attr: str,
                   min_length: int = None,
                   max_length: int = None,
                   required: bool = False,
                   logger: Logger = None) -> list[str]:
     """
-    Validate the list of *str* values associated with *attr* in *scheme*.
+    Validate the list of *str* values associated with *attr* in *source*.
 
     If provided, this list must contain *str*s.
 
     :param errors: incidental error messages
-    :param scheme: dictionary containing the list of values to be validated
+    :param source: dictionary containing the list of values to be validated
     :param attr: the attribute associated with the list of values to be validated
     :param min_length: optional minimum length accepted
     :param max_length:  optional maximum length accepted
@@ -530,7 +541,7 @@ def validate_strs(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # obtain the values
-    values: list = scheme.get(suffix)
+    values: list = source.get(suffix)
     if values:
         if isinstance(values, str):
             values = str_as_list(values)
@@ -558,9 +569,10 @@ def validate_strs(errors: list[str] | None,
         stat = validate_format_error(121, f"@{attr}")
 
     if stat:
-        __validate_log(errors=errors,
-                       err_msg=stat,
-                       logger=logger)
+        if logger:
+            logger.error(msg=stat)
+        if isinstance(errors, list):
+            errors.append(stat)
         result = None
 
     return result
@@ -641,7 +653,7 @@ def validate_format_error(error_id: int,
 
 def validate_format_errors(errors: list[str]) -> list[dict[str, str]]:
     """
-    Build and return a list of dicts from the list of errors *errors*.
+    Build and return a list of dicts from the list of errors in *errors*.
 
     Each element in *errors* is encoded as a *dict*.
     This list is tipically used in a returning *JSON* string.
@@ -712,19 +724,3 @@ def validate_unformat_errors(errors: list[dict[str, str] | str]) -> list[str]:
             result.append(error)
 
     return result
-
-
-def __validate_log(errors: list[str],
-                   err_msg: str,
-                   logger: Logger) -> None:
-    """
-    LOg *err_msg* using *logger*, and add it to the error messages list *errors*.
-
-    :param errors: the error messages list
-    :param err_msg: the message to log
-    :param logger: the logger
-    """
-    if logger:
-        logger.error(err_msg)
-    if isinstance(errors, list):
-        errors.append(err_msg)

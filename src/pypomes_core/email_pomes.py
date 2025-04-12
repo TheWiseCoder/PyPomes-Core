@@ -12,11 +12,16 @@ class EmailConfig(StrEnum):
     """
     Parameters for email.
     """
-    HOST: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_HOST")
-    PORT: int = env_get_str(key=f"{APP_PREFIX}_EMAIL_PORT")
-    ACCOUNT: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT")
-    PWD: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_PWD")
-    SECURITY: str = env_get_str(key=f"{APP_PREFIX}_EMAIL_SECURITY")
+    HOST = env_get_str(key=f"{APP_PREFIX}_EMAIL_HOST",
+                       def_value="")
+    PORT = env_get_str(key=f"{APP_PREFIX}_EMAIL_PORT",
+                       def_value="")
+    ACCOUNT = env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT",
+                          def_value="")
+    PWD = env_get_str(key=f"{APP_PREFIX}_EMAIL_PWD",
+                      def_value="")
+    SECURITY = env_get_str(key=f"{APP_PREFIX}_EMAIL_SECURITY",
+                           def_value="")
 
 
 def email_send(errors: list[str] | None,
