@@ -6,7 +6,8 @@ from .dict_pomes import (
     dict_has_key_chain, dict_get_value, dict_set_value, dict_reduce,
     dict_listify, dict_transform, dict_merge, dict_coalesce, dict_clone,
     dict_get_key, dict_get_keys, dict_from_object, dict_from_list,
-    dict_replace_value, dict_pop_value, dict_unique_values, dict_jsonify, dict_hexify
+    dict_replace_value, dict_pop_value, dict_unique_values,
+    dict_jsonify, dict_hexify, dict_stringify
 )
 from .email_pomes import (
     EmailConfig, email_send
@@ -31,7 +32,7 @@ from .list_pomes import (
     list_compare, list_flatten, list_unflatten, list_get_coupled,
     list_elem_starting_with, list_elem_with_attr, list_transform,
     list_prune_duplicates, list_prune_in, list_prune_not_in,
-    list_jsonify, list_hexify, list_hierarchize
+    list_jsonify, list_hexify, list_hierarchize, list_stringify
 )
 from .obj_pomes import (
     obj_is_serializable
@@ -49,9 +50,10 @@ from .validation_msgs import (
 from .validation_pomes import (
     VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
     validate_value, validate_bool, validate_int, validate_float,
-    validate_str, validate_date, validate_datetime,
-    validate_ints, validate_strs, validate_build_response,
-    validate_format_error, validate_format_errors, validate_unformat_errors
+    validate_str, validate_date, validate_datetime, validate_enum,
+    validate_email, validate_pwd, validate_ints, validate_strs,
+    validate_format_error, validate_format_errors,
+    validate_unformat_errors, validate_build_response
 )
 from .xml_pomes import (
     XML_FILE_HEADER,
@@ -68,7 +70,8 @@ __all__ = [
     "dict_has_key_chain", "dict_get_value", "dict_set_value", "dict_reduce",
     "dict_listify", "dict_transform", "dict_merge", "dict_coalesce", "dict_clone",
     "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
-    "dict_replace_value", "dict_pop_value", "dict_unique_values", "dict_jsonify", "dict_hexify",
+    "dict_replace_value", "dict_pop_value", "dict_unique_values",
+    "dict_jsonify", "dict_hexify", "dict_stringify",
     # email_pomes
     "EmailConfig", "email_send",
     # encoding_pomes
@@ -87,7 +90,7 @@ __all__ = [
     "list_compare", "list_flatten", "list_unflatten", "list_get_coupled",
     "list_elem_starting_with", "list_elem_with_attr", "list_transform",
     "list_prune_duplicates", "list_prune_in", "list_prune_not_in",
-    "list_jsonify", "list_hexify", "list_hierarchize",
+    "list_jsonify", "list_hexify", "list_hierarchize", "list_stringify",
     # obj_pomes
     "obj_is_serializable",
     # str_pomes
@@ -101,9 +104,10 @@ __all__ = [
     # validation_pomes
     "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX",
     "validate_value", "validate_bool", "validate_int", "validate_float",
-    "validate_str", "validate_date", "validate_datetime",
-    "validate_ints", "validate_strs", "validate_build_response",
-    "validate_format_error", "validate_format_errors", "validate_unformat_errors",
+    "validate_str", "validate_date", "validate_datetime", "validate_enum",
+    "validate_email", "validate_pwd", "validate_ints", "validate_strs",
+    "validate_format_error", "validate_format_errors",
+    "validate_unformat_errors", "validate_build_response",
     # xml_pomes
     "XML_FILE_HEADER",
     "xml_to_dict", "xml_normalize_keys"

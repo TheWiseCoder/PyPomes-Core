@@ -932,6 +932,37 @@ def dict_hexify(source: dict,
     return source
 
 
+def dict_stringify(source: dict[Any, Any]) -> str:
+    """
+    Return a string with the key-value pairs from *source* listed as *{<k1> = <v1>, ..., <kn = <vn>}*.
+
+    The *stringification* is done recursively, with *dict* and *list* as values handled accordingly.
+
+    :param source: the source *dict*
+    :return: the string listing the *key-value* pairs in *source*
+    """
+    from .list_pomes import list_stringify
+    # initialize the return variable
+    result: str = "{"
+
+    if source:
+        # traverse the source 'dict'
+        for key, value in source.items():
+            result += f"{key} = "
+            if isinstance(value, dict):
+                result += f"{dict_stringify(source=value)}"
+            elif isinstance(value, list):
+                result += f"{list_stringify(source=value)}"
+            elif isinstance(value, str):
+                result += f"'{value}'"
+            else:
+                result += f"{value}"
+            result += ", "
+        result = result[:-2]
+
+    return result + "}"
+
+
 if __name__ == "__main__":
 
     s1 = {

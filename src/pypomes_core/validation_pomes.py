@@ -1,10 +1,16 @@
+import re
+import string
 from datetime import date, datetime
+from enum import IntEnum, StrEnum
 from flask import jsonify, Response
 from logging import Logger
 from typing import Any, Final
+
 from .datetime_pomes import TIMEZONE_LOCAL
 from .env_pomes import APP_PREFIX, env_get_str
-from .str_pomes import str_as_list, str_sanitize, str_find_whitespace
+from .str_pomes import (
+    str_as_list, str_sanitize, str_find_char, str_find_whitespace
+)
 
 VALIDATION_MSG_LANGUAGE: Final[str] = env_get_str(key=f"{APP_PREFIX}_VALIDATION_MSG_LANGUAGE",
                                                   def_value="en")
@@ -17,7 +23,7 @@ def validate_value(attr: str,
                    min_val: int = None,
                    max_val: int = None,
                    values: list = None,
-                   required: bool = False) -> str:
+                   required: bool = False) -> str | None:
     """
     Validate *val* according to value, range, or membership in values list, as specified.
 
@@ -76,7 +82,7 @@ def validate_bool(errors: list[str] | None,
                   attr: str,
                   default: bool = None,
                   required: bool = False,
-                  logger: Logger = None) -> bool:
+                  logger: Logger = None) -> bool | None:
     """
     Validate the boolean value associated with *attr* in *source*.
 
@@ -87,7 +93,7 @@ def validate_bool(errors: list[str] | None,
         - the string *0*, *f*, or *false*, case disregarded
 
     :param errors: incidental error messages
-    :param source: dictionary containing the value to be validated
+    :param source: *dict* containing the value to be validated
     :param attr: the name of the attribute whose value is being validated
     :param default: default value, overrides *required*
     :param required: specifies whether a value must be provided
@@ -151,14 +157,14 @@ def validate_int(errors: list[str] | None,
                  values: list[int] = None,
                  default: int = None,
                  required: bool = False,
-                 logger: Logger = None) -> int:
+                 logger: Logger = None) -> int | None:
     """
     Validate the *int* value associated with *attr* in *source*.
 
     If provided, this value must be a *int*, or a valid string representation of a *int*.
 
     :param errors: incidental error messages
-    :param source: dictionary containing the value to be validated
+    :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
@@ -214,14 +220,14 @@ def validate_float(errors: list[str] | None,
                    required: bool = False,
                    values: list[float | int] = None,
                    default: int | float = None,
-                   logger: Logger = None) -> float:
+                   logger: Logger = None) -> float | None:
     """
     Validate the *float* value associated with *attr* in *source*.
 
     If provided, this value must be a *float*, or a valid string representation of a *float*.
 
     :param errors: incidental error messages
-    :param source: dictionary containing the value to be validated
+    :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
@@ -278,14 +284,14 @@ def validate_str(errors: list[str] | None,
                  values: list[str] = None,
                  default: str = None,
                  required: bool = False,
-                 logger: Logger = None) -> str:
+                 logger: Logger = None) -> str | None:
     """
     Validate the *str* value associated with *attr* in *source*.
 
     If provided, this value must be a *str*.
 
     :param errors: incidental error messages
-    :param source: dictionary containing the value to be validated
+    :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param min_length: optional minimum length accepted
     :param max_length:  optional maximum length accepted
@@ -335,14 +341,14 @@ def validate_date(errors: list[str] | None,
                   day_first: bool = False,
                   default: date = None,
                   required: bool = False,
-                  logger: Logger = None) -> date:
+                  logger: Logger = None) -> date | None:
     """
     Validate the *date* value associated with *attr* in *source*.
 
     If provided, this value must be a *date*, or a valid string representation of a *date*.
 
     :param errors: incidental error messages
-    :param source: dictionary containing the value to be validated
+    :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param day_first: indicates that the day precedes the month in the string representing the date
     :param default: optional default value, overrides *required*
@@ -395,14 +401,14 @@ def validate_datetime(errors: list[str] | None,
                       day_first: bool = True,
                       default: datetime = None,
                       required: bool = False,
-                      logger: Logger = None) -> datetime:
+                      logger: Logger = None) -> datetime | None:
     """
     Validate the *datetime* value associated with *attr* in *source*.
 
     If provided, this value must be a *date*, or a valid string representation of a *date*.
 
     :param errors: incidental error messages
-    :param source: dictionary containing the value to be validated
+    :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param day_first: indicates that the day precedes the month in the string representing the date
     :param default: optional default value, overrides *required*
@@ -446,20 +452,175 @@ def validate_datetime(errors: list[str] | None,
     return result
 
 
+def validate_enum(errors: list[str] | None,
+                  source: dict[str, Any],
+                  attr: str,
+                  enum_class: type[IntEnum | StrEnum],
+                  use_names: bool = True,
+                  values: list[IntEnum | StrEnum] = None,
+                  default: IntEnum | StrEnum = None,
+                  required: bool = False,
+                  logger: Logger = None) -> IntEnum | StrEnum | None:
+    """
+    Validate the *enum* value associated with *attr* in *source*.
+
+    If provided, this value must be a name or a value corresponding to an instance of *enum_class*.
+
+    The only accepted values for *enum_class* are *StrEnum* and *IntEnum*. The parameter *use_names*
+    determines whether the names or the values of the *enum_class*'s elements should be used
+    (defaults to names should be used).
+
+    :param errors: incidental error messages
+    :param source: *dict* containing the value to be validated
+    :param attr: the attribute associated with the value to be validated
+    :param enum_class: the *enum* class to consider
+    :param use_names: specifies whether *enum*'s names, not *enum*'s values, should be used (defauls to *True*)
+    :param default: optional default value, overrides *required*
+    :param values: optional list of allowed values (defaults to all elements of *enum_class*)
+    :param required: specifies whether a value must be provided
+    :param logger: optional logger
+    :return: the validated value, or *None* if validation failed
+    """
+    # initialize the return variable
+    result: IntEnum | StrEnum | None = None
+
+    if use_names:
+        vals: list[str] = [e.name for e in (values or [])] or enum_class._member_names_
+        name: str = validate_str(errors=errors,
+                                 source=source,
+                                 attr=attr,
+                                 values=vals,
+                                 default=default.name if default else None,
+                                 required=required,
+                                 logger=logger)
+        if name:
+            result = enum_class[name]
+    else:
+        value: Any = None
+        if enum_class is StrEnum:
+            vals: list[str] = [e.value for e in (values or [])] or list(map(str, enum_class))
+            value: str = validate_str(errors=errors,
+                                      source=source,
+                                      attr=attr,
+                                      values=vals,
+                                      default=default.value if default else None,
+                                      required=required,
+                                      logger=logger)
+        elif enum_class is IntEnum:
+            vals: list[int] = [e.value for e in (values or [])] or list(map(int, enum_class))
+            value: int = validate_int(errors=errors,
+                                      source=source,
+                                      attr=attr,
+                                      values=vals,
+                                      default=default.value if default else None,
+                                      required=required,
+                                      logger=logger)
+        if value:
+            result = enum_class(value)
+
+    return result
+
+
+def validate_email(errors: list[str] | None,
+                   source: dict[str, Any],
+                   attr: str,
+                   default: str = None,
+                   required: bool = False,
+                   logger: Logger = None) -> IntEnum | StrEnum | None:
+    """
+    Validate the email value associated with *attr* in *source*.
+
+    If provided, this value must be a syntactically correct email.
+
+    :param errors: incidental error messages
+    :param source: *dict* containing the value to be validated
+    :param attr: the attribute associated with the value to be validated
+    :param default: optional default value, overrides *required*
+    :param required: specifies whether a value must be provided
+    :param logger: optional logger
+    :return: the validated value, or *None* if validation failed
+    """
+    # initialize the return variable
+    result: str | None = None
+
+    value: str = validate_str(errors=errors,
+                              source=source,
+                              attr=attr,
+                              default=default,
+                              required=required,
+                              logger=logger)
+    if value:
+        email_pattern: str = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+        if re.match(email_pattern, value):
+            result = value
+        elif isinstance(errors, list):
+            # 141: Invalid value {}
+            errors.append(validate_format_error(141, value, f"@{attr}"))
+
+    return result
+
+
+def validate_pwd(errors: list[str] | None,
+                 source: dict[str, Any],
+                 attr: str,
+                 required: bool = False,
+                 logger: Logger = None) -> IntEnum | StrEnum | None:
+    r"""
+    Validate the password value associated with *attr* in *source*.
+
+    If provided, this value must abide by the following rules:
+      - length >= 8
+      - at least 1 digit (in range [0-9])
+      - at least 1 lower-case letter (in range [a-z])
+      - at least 1 uppercase letter (in renge [A-Z])
+      - at least 1 special character (#$%&"'()*+,-./:;<=>?@[\]^_`{|}~!)
+
+    :param errors: incidental error messages
+    :param source: *dict* containing the value to be validated
+    :param attr: the attribute associated with the value to be validated
+    :param required: specifies whether a value must be provided
+    :param logger: optional logger
+    :return: the validated value, or *None* if validation failed
+    """
+    # initialize the return variable
+    result: str | None = None
+
+    value: str = validate_str(errors=errors,
+                              source=source,
+                              attr=attr,
+                              required=required,
+                              logger=logger)
+    if (value and len(value) >= 8 and
+        str_find_char(source=value,
+                      chars=string.digits) >= 0 and
+        str_find_char(source=value,
+                      chars=string.ascii_uppercase) >= 0 and
+        str_find_char(source=value,
+                      chars=string.ascii_lowercase) >= 0 and
+        str_find_char(source=value,
+                      chars=string.punctuation) >= 0):
+        result = value
+    elif not errors and isinstance(errors, list):
+        # 141: Invalid value {}
+        errors.append(validate_format_error(141, value, f"@{attr}"))
+
+    return result
+
+
 def validate_ints(errors: list[str] | None,
                   source: dict[str, Any],
                   attr: str,
                   min_val: int = None,
                   max_val: int = None,
                   required: bool = False,
-                  logger: Logger = None) -> list[int]:
+                  logger: Logger = None) -> list[int] | None:
     """
     Validate the list of *int* values associated with *attr* in *source*.
 
     If provided, this list must contain *int*s, or valid string representations of *int*s.
 
     :param errors: incidental error messages
-    :param source: dictionary containing the list of values to be validated
+    :param source: *dict* containing the list of values to be validated
     :param attr: the attribute associated with the list of values to be validated
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
@@ -518,14 +679,14 @@ def validate_strs(errors: list[str] | None,
                   min_length: int = None,
                   max_length: int = None,
                   required: bool = False,
-                  logger: Logger = None) -> list[str]:
+                  logger: Logger = None) -> list[str] | None:
     """
     Validate the list of *str* values associated with *attr* in *source*.
 
     If provided, this list must contain *str*s.
 
     :param errors: incidental error messages
-    :param source: dictionary containing the list of values to be validated
+    :param source: *dict* containing the list of values to be validated
     :param attr: the attribute associated with the list of values to be validated
     :param min_length: optional minimum length accepted
     :param max_length:  optional maximum length accepted
@@ -609,7 +770,8 @@ def validate_format_error(error_id: int,
     Format and return the error message identified by *err_id* in the standard messages list.
 
     The message is built from the message element in the standard messages list, identified by *err_id*.
-    The occurrences of '{}' in the element are sequentially replaced by the given *args*.
+    The occurrences of *{}* in the element are sequentially replaced by the given *args*.
+    When replacing, an instance of *args* is surrounded by single quotes if it contains no blankspaces.
 
     :param error_id: the identification of the message element
     :param args: optional arguments to format the error message with

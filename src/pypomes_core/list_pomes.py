@@ -457,3 +457,33 @@ def list_hierarchize(source: list[list | tuple]) -> list:
                          value=item[-1])
 
     return convert_to_list(item=hierarchy)
+
+
+def list_stringify(source: list) -> str:
+    """
+    Return a string with the items from *source* listed as *[<i1>, ..., <in>]*.
+
+    The *stringification* is done recursively, with *dict* and *list* as values handled accordingly.
+
+    :param source: the source *list*
+    :return: the string listing the items in *source*
+    """
+    from .dict_pomes import dict_stringify
+    # initialize the return variable
+    result: str = "["
+
+    if source:
+        # traverse the source 'list'
+        for item in source:
+            if isinstance(item, dict):
+                result += f"{dict_stringify(source=item)}"
+            elif isinstance(item, list):
+                result += f"{list_stringify(source=item)}"
+            elif isinstance(item, str):
+                result += f"'{item}'"
+            else:
+                result += f"{item}"
+            result += ", "
+        result = result[:-2]
+
+    return result + "]"

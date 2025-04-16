@@ -229,6 +229,10 @@ __ERR_MSGS: Final[dict[int, dict[str, str]]] = {
         "en": "Document {} has invalid digest",
         "pt": "Digesto do documento {} inválido",
     },
+    248: {
+        "en": "Document {} has already been filed: {}",
+        "pt": "Documento {} já cadastrado: {}",
+    }
 }
 
 _ERR_MSGS_EN: dict[int, str] = {}
