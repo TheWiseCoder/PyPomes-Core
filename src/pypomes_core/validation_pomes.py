@@ -1,19 +1,29 @@
 import re
 import string
 from datetime import date, datetime
-from enum import IntEnum, StrEnum
+from enum import IntEnum, StrEnum, auto
 from flask import jsonify, Response
 from logging import Logger
 from typing import Any, Final
 
 from .datetime_pomes import TIMEZONE_LOCAL
-from .env_pomes import APP_PREFIX, env_get_str
+from .env_pomes import APP_PREFIX, env_get_str, env_get_enum
 from .str_pomes import (
     str_as_list, str_sanitize, str_find_char, str_find_whitespace
 )
 
-VALIDATION_MSG_LANGUAGE: Final[str] = env_get_str(key=f"{APP_PREFIX}_VALIDATION_MSG_LANGUAGE",
-                                                  def_value="en")
+
+class MsgLang(StrEnum):
+    """
+    Possible languages for error reporting.
+    """
+    EN: auto()
+    PT: auto()
+
+
+VALIDATION_MSG_LANGUAGE: Final[MsgLang] = env_get_enum(key=f"{APP_PREFIX}_VALIDATION_MSG_LANGUAGE",
+                                                       enum_class=MsgLang,
+                                                       def_value=MsgLang.EN)
 VALIDATION_MSG_PREFIX: Final[str] = env_get_str(key=f"{APP_PREFIX}_VALIDATION_MSG_PREFIX",
                                                 def_value=APP_PREFIX)
 
@@ -460,29 +470,28 @@ def validate_enum(errors: list[str] | None,
                   values: list[IntEnum | StrEnum] = None,
                   default: IntEnum | StrEnum = None,
                   required: bool = False,
-                  logger: Logger = None) -> IntEnum | StrEnum | None:
+                  logger: Logger = None) -> Any:
     """
     Validate the *enum* value associated with *attr* in *source*.
 
-    If provided, this value must be a name or a value corresponding to an instance of *enum_class*.
-
-    The only accepted values for *enum_class* are *StrEnum* and *IntEnum*. The parameter *use_names*
-    determines whether the names or the values of the *enum_class*'s elements should be used
-    (defaults to names should be used).
+    If provided, this value must be a name or a value corresponding to an instance of a subclass of *enum_class*.
+    The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*. The parameter
+    *use_names* determines whether the names or the values of the *enum_class*'s elements should be used
+    (defaults to names).
 
     :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
-    :param enum_class: the *enum* class to consider
-    :param use_names: specifies whether *enum*'s names, not *enum*'s values, should be used (defauls to *True*)
+    :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
+    :param use_names: specifies whether *enum*'s names (the default), not *enum*'s values, should be used
     :param default: optional default value, overrides *required*
     :param values: optional list of allowed values (defaults to all elements of *enum_class*)
     :param required: specifies whether a value must be provided
     :param logger: optional logger
-    :return: the validated value, or *None* if validation failed
+    :return: the validated value as an instance of *enum_class*, or *None* if validation failed
     """
     # initialize the return variable
-    result: IntEnum | StrEnum | None = None
+    result: Any = None
 
     if use_names:
         vals: list[str] = [e.name for e in (values or [])] or enum_class._member_names_
@@ -765,24 +774,44 @@ def validate_build_response(errors: list[str],
 
 
 def validate_format_error(error_id: int,
-                          *args: Any) -> str:
+                          *args: Any,
+                          **kwargs: dict) -> str:
     """
     Format and return the error message identified by *err_id* in the standard messages list.
 
-    The message is built from the message element in the standard messages list, identified by *err_id*.
+    The message is built from the message element in the standard messages list, identified by *error_id*.
     The occurrences of *{}* in the element are sequentially replaced by the given *args*.
     When replacing, an instance of *args* is surrounded by single quotes if it contains no blankspaces.
+    The element in *args* prefixed with *@*, if present, is appended to the end of the message.
+
+    Optional custom language and prefix, replacing those defined respectively by the environment variables
+    *VALIDATION_MSG_LANGUAGE* and *VALIDATION_MSG_PREFIX*, may be provided in *kwargs*, with the corresponding
+    keys *msg_lang*, and *msg_prefix*.
+
+    Suppose this function is invoked with:
+      - *error_id*: 147 (defined as: Invalid value {}: length shorter than {})
+      - *args*: 'my_value', 10, '@my_attr'
+    The formatted error message will be (*<VMP>* is the validation message prefix):
+      - <VMP>147: Invalid value 'my_value': length shorter than 10 @my_attr
 
     :param error_id: the identification of the message element
-    :param args: optional arguments to format the error message with
+    :param args: optional non-keyworded arguments to format the error message with
+    :param kwargs: optional keyworded arguments to define language and prefix
     :return: the formatted error message
     """
-    # retrieve the standard validation messages list
-    match VALIDATION_MSG_LANGUAGE:
-        case "en":
+    # obtain definitions for prefix and language
+    msg_prefix: str = kwargs.get("msg_prefix") if "msg_prefix" in kwargs else VALIDATION_MSG_PREFIX
+    msg_lang: MsgLang = validate_enum(errors=None,
+                                      source=kwargs or {},
+                                      attr="msg_lang",
+                                      enum_class=MsgLang,
+                                      default=VALIDATION_MSG_LANGUAGE)
+    # retrieve the messages list
+    match msg_lang:
+        case MsgLang.EN:
             from .validation_msgs import _ERR_MSGS_EN
             err_msgs = _ERR_MSGS_EN
-        case "pt":
+        case MsgLang.PT:
             from .validation_msgs import _ERR_MSGS_PT
             err_msgs = _ERR_MSGS_PT
         case _:
@@ -790,8 +819,8 @@ def validate_format_error(error_id: int,
 
     # initialize the return variable
     result: str = ""
-    if VALIDATION_MSG_PREFIX:
-        result += VALIDATION_MSG_PREFIX + str(error_id) + ": "
+    if msg_prefix:
+        result += msg_prefix + str(error_id) + ": "
     result += err_msgs.get(error_id) or ""
 
     # apply the provided arguments
@@ -813,16 +842,38 @@ def validate_format_error(error_id: int,
     return result
 
 
-def validate_format_errors(errors: list[str]) -> list[dict[str, str]]:
+def validate_format_errors(errors: list[str],
+                           **kwargs: dict) -> list[dict[str, str]]:
     """
-    Build and return a list of dicts from the list of errors in *errors*.
+    Build and return a list of *dicts* from the list of errors in *errors*.
 
     Each element in *errors* is encoded as a *dict*.
     This list is tipically used in a returning *JSON* string.
 
-    :param errors: the list of errors to build the list of dicts with
-    :return: the built list
+    Optional custom language and prefix, replacing those defined respectively by the environment variables
+    *VALIDATION_MSG_LANGUAGE* and *VALIDATION_MSG_PREFIX*, may be provided in *kwargs*, with the corresponding
+    keys *msg_lang*, and *msg_prefix*.
+
+    Suppose *errors* contains (*<VMP>* is the validation message prefix):
+      - <VMP>147: Invalid value 'my_value': length shorter than 10 @my_attr
+    The returned list will contain the *dict*:
+      - {
+      -   "attribute": "my_attr",
+      -   "code": <VMP>147,
+      -   "description": Invalid value 'my_value': length shorter than 10
+      - }
+
+    :param errors: the list of errors to build the list of *dicts* with
+    :param kwargs: optional keyworded arguments to define formatting language and prefix
+    :return: the built list of *dicts*
     """
+    # obtain definitions for prefix and language
+    msg_prefix: str = kwargs.get("msg_prefix") if "msg_prefix" in kwargs else VALIDATION_MSG_PREFIX
+    msg_lang: MsgLang = validate_enum(errors=None,
+                                      source=kwargs or {},
+                                      attr="msg_lang",
+                                      enum_class=MsgLang,
+                                      default=VALIDATION_MSG_LANGUAGE)
     # initialize the return variable
     result: list[dict[str, str]] = []
 
@@ -844,38 +895,49 @@ def validate_format_errors(errors: list[str]) -> list[dict[str, str]]:
             desc: str = error
         else:
             # yes
-            term: str = "attribute" if VALIDATION_MSG_LANGUAGE == "en" else "atributo"
+            term: str = "attribute" if msg_lang == MsgLang.EN else "atributo"
             out_error: dict[str, str] = {term: error[pos + 1:]}
             desc: str = error[:pos - 1]
 
         # does the text contain an error code ?
-        if VALIDATION_MSG_PREFIX and desc.startswith(VALIDATION_MSG_PREFIX):
+        if msg_prefix and desc.startswith(msg_prefix):
             # yes
-            term: str = "code" if VALIDATION_MSG_LANGUAGE == "en" else "codigo"
+            term: str = "code" if msg_lang == MsgLang.EN else "codigo"
             pos: int = desc.find(":")
             out_error[term] = desc[0:pos]
             desc = desc[pos+2:]
 
-        term: str = "description" if VALIDATION_MSG_LANGUAGE == "en" else "descricao"
+        term: str = "description" if msg_lang == MsgLang.EN else "descricao"
         out_error[term] = desc
         result.append(out_error)
 
     return result
 
 
-def validate_unformat_errors(errors: list[dict[str, str] | str]) -> list[str]:
+def validate_unformat_errors(errors: list[dict[str, str] | str],
+                             **kwargs: dict) -> list[str]:
     """
     Extract and return the list of errors used to build the list of dicts *errors*.
 
+    Optional custom language, replacing the one defined by the environment variable
+    *VALIDATION_MSG_LANGUAGE*, may be provided in *kwargs*, with the key *msg_lang*.
+
     :param errors: the list of dicts to extract the errors from
-    :return: the built list
+    :param kwargs: optional keyworded arguments to define formatting language
+    :return: the built list of errors
     """
+    # obtain definitions for language and prefix
+    msg_lang: MsgLang = validate_enum(errors=None,
+                                      source=kwargs or {},
+                                      attr="msg_lang",
+                                      enum_class=MsgLang,
+                                      default=VALIDATION_MSG_LANGUAGE)
     # initialize the return variable
     result: list[str] = []
 
     # define the dictionary keys
-    name: str = "code" if VALIDATION_MSG_LANGUAGE == "en" else "codigo"
-    desc: str = "description" if VALIDATION_MSG_LANGUAGE == "en" else "descricao"
+    name: str = "code" if msg_lang == MsgLang.EN else "codigo"
+    desc: str = "description" if msg_lang == MsgLang.EN else "descricao"
 
     # traverse the list of dicts
     for error in errors:

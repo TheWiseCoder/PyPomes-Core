@@ -4,8 +4,9 @@ from contextlib import suppress
 from datetime import date
 from dateutil import parser
 from dateutil.parser import ParserError
+from enum import IntEnum, StrEnum
 from pathlib import Path
-from typing import Final, Literal
+from typing import Any, Final, Literal
 
 # the prefix for the names of the environment variables
 APP_PREFIX: Final[str] = os.getenv(key="PYPOMES_APP_PREFIX",
@@ -20,7 +21,7 @@ def env_get_str(key: str,
 
     If *values* is specified, the value obtained is checked for occurrence therein.
 
-    :param key: the key the value is associated with
+    :param key: the key which the value is associated with
     :param values: optional list of valid values
     :param def_value: the default value to return, if the key has not been defined
     :return: the string value associated with the key
@@ -42,7 +43,7 @@ def env_get_int(key: str,
 
     If *values* is specified, the value obtained is checked for occurrence therein.
 
-    :param key: the key the value is associated with
+    :param key: the key which the value is associated with
     :param values: optional list of valid values
     :param def_value: the default value to return, if the key has not been defined
     :return: the integer value associated with the key
@@ -66,7 +67,7 @@ def env_get_float(key: str,
 
     If *values* is specified, the value obtained is checked for occurrence therein.
 
-    :param key: the key the value is associated with
+    :param key: the key which the value is associated with
     :param values: optional list of valid values
     :param def_value: the default value to return, if the key has not been defined
     :return: the float value associated with the key
@@ -89,7 +90,7 @@ def env_get_strs(key: str,
 
     The values must be provided as a comma-separated list of strings.
     If *values* is specified, the values obtained are checked for occurrence therein.
-    On failure, 'None' is returned.
+    On failure, *None* is returned.
 
     :param key: the key the values ares associated with
     :param values: optional list of valid values
@@ -114,7 +115,7 @@ def env_get_ints(key: str,
 
     The values must be provided as a comma-separated list of integers.
     If *values* is specified, the values obtained are checked for occurrence therein.
-    On failure, 'None' is returned.
+    On failure, *None* is returned.
 
     :param key: the key the values ares associated with
     :param values: optional list of valid values
@@ -141,7 +142,7 @@ def env_get_floats(key: str,
 
     The values must be provided as a comma-separated list of floats.
     If *values* is specified, the values obtained are checked for occurrence therein.
-    On failure, 'None' is returned.
+    On failure, *None* is returned.
 
     :param key: the key the values ares associated with
     :param values: optional list of valid values
@@ -170,8 +171,9 @@ def env_get_bytes(key: str,
 
     The string defined in the environment must contain the *bytes* value encoded as defined in *encoding*.
     If *values* is specified, the value obtained is checked for occurrence therein.
+    On failure, *None* is returned.
 
-    :param key: the key the value is associated with
+    :param key: the key which the value is associated with
     :param encoding: the representation of the *bytes* value
     :param values: optional list of valid values
     :param def_value: the default value to return, if the key has not been defined
@@ -208,9 +210,9 @@ def env_get_bool(key: str,
         - the string values accepted to stand for *False* are *0*, *f*, or *false*
         - all other values causes *None* to be returned
 
-    :param key: the key the value is associated with
+    :param key: the key which the value is associated with
     :param def_value: the default value to return, if the key has not been defined
-    :return: the boolean value associated with the key, or 'None' if a boolean value could not be established
+    :return: the boolean value associated with the key, or *None* if a boolean value could not be established
     """
     result: bool | None
     try:
@@ -226,12 +228,61 @@ def env_get_bool(key: str,
     return result
 
 
+def env_get_enum(key: str,
+                 enum_class: type[IntEnum | StrEnum],
+                 use_names: bool = True,
+                 values: list[IntEnum | StrEnum] = None,
+                 def_value: IntEnum | StrEnum = None) -> Any:
+    """
+    Retrieve and return the enum value defined for *key* in the current operating environment.
+
+    If provided, this value must be a name or a value corresponding to an instance of a subclass of *enum_class*.
+    The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*. The parameter
+    *use_names* determines whether the names or the values of the *enum_class*'s elements should be used
+    (defaults to names). If *values* is specified, the value obtained is checked for occurrence therein.
+    On failure, *None* is returned.
+
+    :param key: the key which the value is associated with
+    :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
+    :param use_names: specifies whether *enum*'s names (the default), not *enum*'s values, should be used
+    :param values: optional list of allowed values (defaults to all elements of *enum_class*)
+    :param def_value: the default value to return, if the key has not been defined
+    :return: the string value associated with the key, as an instance of *enum_class*
+    """
+    # initialize the return variable
+    result: Any = None
+
+    if use_names:
+        vals: list[str] = [e.name for e in (values or [])] or enum_class._member_names_
+        name: str = env_get_str(key=key,
+                                values=vals,
+                                def_value=def_value.name if def_value else None)
+        if name:
+            result = enum_class[name]
+    else:
+        value: Any = None
+        if enum_class is StrEnum:
+            vals: list[str] = [e.value for e in (values or [])] or list(map(str, enum_class))
+            value: str = env_get_str(key=key,
+                                     values=vals,
+                                     def_value=def_value.name if def_value else None)
+        elif enum_class is IntEnum:
+            vals: list[int] = [e.value for e in (values or [])] or list(map(int, enum_class))
+            value: int = env_get_int(key=key,
+                                     values=vals,
+                                     def_value=def_value.name if def_value else None)
+        if value:
+            result = enum_class(value)
+
+    return result
+
+
 def env_get_date(key: str,
                  def_value: date = None) -> date:
     """
     Retrieve and return the date value defined for *key* in the current operating environment.
 
-    :param key: the key the value is associated with
+    :param key: the key which the value is associated with
     :param def_value: the default value to return, if the key has not been defined
     :return: the date value associated with the key
     """
@@ -249,7 +300,7 @@ def env_get_path(key: str,
     """
     Retrieve and return the path value defined for *key* in the current operating environment.
 
-    :param key: the key the value is associated with
+    :param key: the key which the value is associated with
     :param def_value: the default value to return, if the key has not been defined
     :return: the path value associated with the key
     """

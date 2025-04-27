@@ -19,7 +19,8 @@ from .env_pomes import (
     APP_PREFIX,
     env_get_str, env_get_int, env_get_float,
     env_get_strs, env_get_ints, env_get_floats,
-    env_get_bytes, env_get_bool, env_get_date, env_get_path, env_is_docker
+    env_get_bytes, env_get_bool, env_get_enum,
+    env_get_date, env_get_path, env_is_docker
 )
 from .exception_pomes import (
     exc_format,
@@ -48,7 +49,7 @@ from .validation_msgs import (
     validate_set_msgs, validate_update_msgs
 )
 from .validation_pomes import (
-    VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
+    MsgLang, VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX,
     validate_value, validate_bool, validate_int, validate_float,
     validate_str, validate_date, validate_datetime, validate_enum,
     validate_email, validate_pwd, validate_ints, validate_strs,
@@ -80,7 +81,8 @@ __all__ = [
     "APP_PREFIX",
     "env_get_str", "env_get_int", "env_get_float",
     "env_get_strs", "env_get_ints", "env_get_floats",
-    "env_get_bytes", "env_get_bool", "env_get_date", "env_get_path", "env_is_docker",
+    "env_get_bytes", "env_get_bool", "env_get_enum",
+    "env_get_date", "env_get_path", "env_is_docker",
     # exception_pomes
     "exc_format",
     # file_pomes
@@ -102,7 +104,7 @@ __all__ = [
     # validation_msgs
     "validate_set_msgs", "validate_update_msgs",
     # validation_pomes
-    "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX",
+    "MsgLang", "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX",
     "validate_value", "validate_bool", "validate_int", "validate_float",
     "validate_str", "validate_date", "validate_datetime", "validate_enum",
     "validate_email", "validate_pwd", "validate_ints", "validate_strs",
