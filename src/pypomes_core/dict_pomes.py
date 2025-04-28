@@ -325,7 +325,7 @@ def dict_get_key(source: dict,
 
 
 def dict_get_keys(source: dict,
-                  value: Any) -> list:
+                  value: Any) -> list[str]:
     """
     Return all keys in *source*, mapping the value *value*.
 
@@ -338,7 +338,7 @@ def dict_get_keys(source: dict,
     :return: list containing all keys mapping the reference value
     """
     # initialize the return variable
-    result: list = []
+    result: list[str] = []
     for item_key, item_value in source.items():
         if item_value == value:
             result.append(item_key)
@@ -621,7 +621,8 @@ def dict_from_object(source: object) -> dict:
 def dict_transform(source: dict,
                    from_to_keys: list[tuple[str, Any]],
                    prefix_from: str = None,
-                   prefix_to: str = None) -> dict:
+                   prefix_to: str = None,
+                   add_missing: bool = False) -> dict:
     """
     Build a new *dict*, according to the rules presented herein.
 
@@ -629,14 +630,17 @@ def dict_transform(source: dict,
     *from_to_keys*, the element indicated by the second term of the tuple, assigning to it
     the value of the *source* element indicated by the first term of the tuple. Both terms
     of the tuples are represented by a chain of nested keys.
-    The prefixes for the source and destination keys, if defined, have different treatments.
-    They are added when searching for values in *Source*, and removed when assigning values
-    to the return *dict*.
+    If defined, the prefixes *prefix_from* and *prefix_to*, respectively for the source and
+    destination keys, have different treatments. They are added when searching for values
+    in *source*, and removed when assigning values to the return *dict*.
+    If *add_missing* is *True*, the entries in *source* whose keys are missing in *from_to_keys*
+    are added to the new *dict*.
 
     :param source: the source 'dict' of the values
     :param from_to_keys: the list of tuples containing the source and destination key sequences
     :param prefix_from: prefix to be added to source keys
     :param prefix_to: prefix to be removed from target keys
+    :param add_missing: whether to add entries in *source* missing in *from_to_keys* (defaults to *False*)
     :return: the new *dict*
     """
     # import the needed functions
@@ -656,7 +660,8 @@ def dict_transform(source: dict,
 
         # get the target key chain
         to_keys: str = list_get_coupled(coupled_elements=from_to_keys,
-                                        primary_element=from_keys)
+                                        primary_element=from_keys,
+                                        couple_to_same=add_missing)
 
         # has the destination been defined ?
         if to_keys:
@@ -666,13 +671,15 @@ def dict_transform(source: dict,
                 to_value: dict = dict_transform(source=value,
                                                 from_to_keys=from_to_keys,
                                                 prefix_from=from_keys,
-                                                prefix_to=to_keys)
+                                                prefix_to=to_keys,
+                                                add_missing=add_missing)
             elif isinstance(value, list):
                 # 'value' is a list, transform it
                 to_value: list = list_transform(source=value,
                                                 from_to_keys=from_to_keys,
                                                 prefix_from=from_keys,
-                                                prefix_to=to_keys)
+                                                prefix_to=to_keys,
+                                                add_missing=add_missing)
             else:
                 # 'value' is neither a dictionary nor a list
                 to_value: Any = value
@@ -687,7 +694,6 @@ def dict_transform(source: dict,
             dict_set_value(target=result,
                            key_chain=to_keys_deep,
                            value=to_value)
-
     return result
 
 
@@ -760,8 +766,8 @@ def dict_listify(target: dict,
                 items_listify(in_targets=in_target,
                               in_keys=in_keys)
 
-    parent: Any = target
     # traverse the chain up to its penultimate key
+    parent: Any = target
     for inx, key in enumerate(key_chain[:-1]):
         parent = parent.get(key)
         # is the item a list ?

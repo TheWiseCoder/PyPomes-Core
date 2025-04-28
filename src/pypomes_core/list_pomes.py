@@ -77,7 +77,8 @@ def list_unflatten(source: str) -> list[str]:
 
 
 def list_get_coupled(coupled_elements: list[tuple[str, Any]],
-                     primary_element: str) -> Any:
+                     primary_element: str,
+                     couple_to_same: bool = False) -> Any:
     """
     Retrieve from *coupled_elements*, and return, the element coupled to *primary_element*.
 
@@ -87,9 +88,14 @@ def list_get_coupled(coupled_elements: list[tuple[str, Any]],
     This function is used in the transformation of *dicts* (*dict_transform*) and *lists* (*list_transform*),
     from sequences of key pairs.
 
+    If *couple_to_same* is *True* and *primary_element* is missing from *coupled_elements*, then
+    it is coupled to itself. Note that *primary_element* may be coupled to *None* in *coupled_elements*,
+    in which case it is not considered to be missing.
+
     :param coupled_elements: list of tuples containing the pairs of elements
     :param primary_element: the primary element
-    :return: the couple element, or 'None' if it is not foundo
+    :param couple_to_same: whether to couple *primary_element* to itself if missing in *coupled_elements*
+    :return: the coupled element, or *None* if it is not found and *couple_to_same* is *False*
     """
     # initialize the return variable
     result: Any | None = None
@@ -102,12 +108,16 @@ def list_get_coupled(coupled_elements: list[tuple[str, Any]],
         pos1 = primary_element.find("[")
 
     # traverse the list of coupled elements
+    is_coupled: bool = False
     for coupled_element in coupled_elements:
         # has the primary element been found ?
         if coupled_element[0] == primary_element:
             # yes, return the corresponding coupled element
             result = coupled_element[1]
+            is_coupled = True
             break
+    if couple_to_same and not is_coupled:
+        result = primary_element
 
     return result
 
@@ -115,20 +125,24 @@ def list_get_coupled(coupled_elements: list[tuple[str, Any]],
 def list_transform(source: list,
                    from_to_keys: list[tuple[str, Any]],
                    prefix_from: str = None,
-                   prefix_to: str = None) -> list:
+                   prefix_to: str = None,
+                   add_missing: bool = False) -> list:
     """
-    Construct a new *list*, transforming elements of type *list* and *dict* found in *source*.
+    Construct a new *list*, recursively transforming elements of type *list* and *dict* found in *source*.
 
     The conversion of *dict* type elements is documented in the *dict_transform* function.
 
     The prefixes for the source and destination keys, if defined, have different treatments.
     They are added when searching for values in *Source*, and removed when assigning values
     to the return *dict*.
+    If *add_missing* is *True*, the entries in *source* whose keys are missing in *from_to_keys*
+    are added to the new *list*.
 
-    :param source: the source 'dict' of the values
+    :param source: the source *dict* of the values
     :param from_to_keys: the list of tuples containing the source and destination key sequences
     :param prefix_from: prefix to be added to the source keys
     :param prefix_to: prefix to be removed from the target keys
+    :param add_missing: whether to add entries in *source* missing in *from_to_keys* (defaults to *False*)
     :return: the new list
     """
     # import the needed function
@@ -139,9 +153,8 @@ def list_transform(source: list,
 
     # traverse the source list
     for inx, value in enumerate(source):
-        if prefix_from is None:
-            from_keys: None = None
-        else:
+        from_keys: str | None = None
+        if prefix_from:
             from_keys: str = f"{prefix_from}[{inx}]"
 
         # obtain the target value
@@ -149,12 +162,14 @@ def list_transform(source: list,
             to_value: dict = dict_transform(source=value,
                                             from_to_keys=from_to_keys,
                                             prefix_from=from_keys,
-                                            prefix_to=prefix_to)
+                                            prefix_to=prefix_to,
+                                            add_missing=add_missing)
         elif isinstance(value, list):
             to_value: list = list_transform(source=value,
                                             from_to_keys=from_to_keys,
                                             prefix_from=from_keys,
-                                            prefix_to=prefix_to)
+                                            prefix_to=prefix_to,
+                                            add_missing=add_missing)
         else:
             to_value: Any = value
 

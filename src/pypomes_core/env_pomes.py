@@ -261,12 +261,12 @@ def env_get_enum(key: str,
             result = enum_class[name]
     else:
         value: Any = None
-        if enum_class is StrEnum:
+        if issubclass(enum_class, StrEnum):
             vals: list[str] = [e.value for e in (values or [])] or list(map(str, enum_class))
             value: str = env_get_str(key=key,
                                      values=vals,
                                      def_value=def_value.name if def_value else None)
-        elif enum_class is IntEnum:
+        elif issubclass(enum_class, IntEnum):
             vals: list[int] = [e.value for e in (values or [])] or list(map(int, enum_class))
             value: int = env_get_int(key=key,
                                      values=vals,
