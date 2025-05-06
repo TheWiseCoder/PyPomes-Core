@@ -35,6 +35,7 @@ def validate_value(attr: str,
                    min_val: int = None,
                    max_val: int = None,
                    values: list = None,
+                   ignore_case: bool = False,
                    required: bool = False) -> str | None:
     """
     Validate *val* according to value, range, or membership in values list, as specified.
@@ -44,6 +45,7 @@ def validate_value(attr: str,
     :param min_val: if *val* is a string, specifies its minimum length; otherwise, specifies its minimum value
     :param max_val: if *val* is a string, specifies its maximum length; otherwise, specifies its maximum value
     :param values: if provided, requires *val* to be contained therein
+    :param ignore_case: specifies whether to ignore capitalization when handling string values
     :param required:  requires *val* to be specified
     :return: *None* if *val* passes validation, or the corresponding error message otherwise
     """
@@ -56,6 +58,9 @@ def validate_value(attr: str,
             result = validate_format_error(121,
                                            f"@{attr}")
     elif isinstance(values, list):
+        if ignore_case:
+            val = val.lower() if isinstance(val, str) else val
+            values = [v.lower() if isinstance(v, str) else v for v in values]
         if val not in values:
             length: int = len(values)
             if length == 1:
@@ -333,6 +338,7 @@ def validate_str(errors: list[str] | None,
                  max_length: int = None,
                  values: list[str] = None,
                  default: str = None,
+                 ignore_case: bool = False,
                  required: bool = False,
                  logger: Logger = None) -> str | None:
     """
@@ -347,6 +353,7 @@ def validate_str(errors: list[str] | None,
     :param max_length:  optional maximum length accepted
     :param values: optional list of allowed values
     :param default: optional default value, overrides *required*
+    :param ignore_case: specifies whether to ignore capitalization
     :param required: specifies whether a value must be provided
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
@@ -376,6 +383,7 @@ def validate_str(errors: list[str] | None,
                               min_val=min_length,
                               max_val=max_length,
                               values=values,
+                              ignore_case=ignore_case,
                               required=required)
     if stat:
         if logger:
@@ -535,7 +543,7 @@ def validate_enum(errors: list[str] | None,
                   source: dict[str, Any],
                   attr: str,
                   enum_class: type[IntEnum | StrEnum],
-                  use_names: bool = True,
+                  use_names: bool = False,
                   values: list[IntEnum | StrEnum] = None,
                   default: IntEnum | StrEnum = None,
                   required: bool = False,
@@ -544,15 +552,16 @@ def validate_enum(errors: list[str] | None,
     Validate the *enum* value associated with *attr* in *source*.
 
     If provided, this value must be a name or a value corresponding to an instance of a subclass of *enum_class*.
-    The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*. The parameter
-    *use_names* determines whether the names or the values of the *enum_class*'s elements should be used
-    (defaults to names).
+    The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*.
+    The parameter *use_names* determines whether the names of the elements in the *enum_class* should be used,
+    ignoring capitalization. If not specified, the values of the elements are used (the default).
+    If *values* is specified, the value obtained is checked for occurrence therein.
 
     :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
-    :param use_names: specifies whether *enum*'s names (the default), not *enum*'s values, should be used
+    :param use_names: specifies whether *enum*'s names should be used (defaults to using *enum*'s values)
     :param default: optional default value, overrides *required*
     :param values: optional list of allowed values (defaults to all elements of *enum_class*)
     :param required: specifies whether a value must be provided
@@ -563,34 +572,36 @@ def validate_enum(errors: list[str] | None,
     result: Any = None
 
     if use_names:
-        vals: list[str] = [e.name for e in (values or [])] or enum_class._member_names_
         name: str = validate_str(errors=errors,
                                  source=source,
                                  attr=attr,
-                                 values=vals,
+                                 values=[e.name for e in (values or enum_class)],
                                  default=default.name if default else None,
+                                 ignore_case=True,
                                  required=required,
                                  logger=logger)
         if name:
-            result = enum_class[name]
+            for e in enum_class:
+                if e.name.lower() == name.lower():
+                    result = e
+                    break
     else:
         value: Any = None
+        vals: list = [e.value for e in (values or enum_class)]
         if issubclass(enum_class, StrEnum):
-            vals: list[str] = [e.value for e in (values or [])] or list(map(str, enum_class))
             value: str = validate_str(errors=errors,
                                       source=source,
                                       attr=attr,
                                       values=vals,
-                                      default=default.value if default else None,
+                                      default=default,
                                       required=required,
                                       logger=logger)
         elif issubclass(enum_class, IntEnum):
-            vals: list[int] = [e.value for e in (values or [])] or list(map(int, enum_class))
             value: int = validate_int(errors=errors,
                                       source=source,
                                       attr=attr,
                                       values=vals,
-                                      default=default.value if default else None,
+                                      default=default,
                                       required=required,
                                       logger=logger)
         if value:

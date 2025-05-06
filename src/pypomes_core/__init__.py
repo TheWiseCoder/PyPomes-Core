@@ -27,7 +27,8 @@ from .exception_pomes import (
 )
 from .file_pomes import (
     TEMP_FOLDER, Mimetype,
-    file_from_request, file_get_data, file_get_mimetype, file_is_binary
+    file_from_request, file_get_data, file_get_mimetype,
+    file_is_binary, file_is_pdf
 )
 from .list_pomes import (
     list_compare, list_flatten, list_unflatten, list_get_coupled,
@@ -87,7 +88,8 @@ __all__ = [
     "exc_format",
     # file_pomes
     "TEMP_FOLDER", "Mimetype",
-    "file_from_request", "file_get_data", "file_get_mimetype", "file_is_binary",
+    "file_from_request", "file_get_data", "file_get_mimetype",
+    "file_is_binary", "file_is_pdf",
     # list_pomes
     "list_compare", "list_flatten", "list_unflatten", "list_get_coupled",
     "list_elem_starting_with", "list_elem_with_attr", "list_transform",

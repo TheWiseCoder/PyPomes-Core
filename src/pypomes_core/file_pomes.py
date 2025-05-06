@@ -154,9 +154,9 @@ def file_get_mimetype(file_data: Path | str | bytes) -> Mimetype | str:
     """
     Heuristics to determine the mimetype for *file_data*.
 
-    The type of *file_data* determines where the file data is:
-        - type *bytes*: *file_data* holds the data (used as is)
-        - type *str*: *file_data* holds the data (used as utf8-encoded)
+    The content is retrieved for analysis according to *file_data*'s type:
+        - type *bytes*: *file_data* holds the data
+        - type *str*: *file_data* holds the data as utf8-encoded
         - type *Path*: *file_data* is a path to a file holding the data
 
     The heuristics used, as heuristics go, provides an educated guess, not an accurate result.
@@ -176,13 +176,14 @@ def file_get_mimetype(file_data: Path | str | bytes) -> Mimetype | str:
 
     if not mimetype:
         if isinstance(file_data, str):
-            # argument is type 'str'
             file_data = file_data.encode()
-        with suppress(TypeError):
-            kind: filetype.Type = filetype.guess(obj=file_data)
-            if kind:
-                mimetype = kind.mime
-
+        if file_is_pdf(file_data=file_data):
+            mimetype = Mimetype.PDF
+        else:
+            with suppress(TypeError):
+                kind: filetype.Type = filetype.guess(obj=file_data)
+                if kind:
+                    mimetype = kind.mime
     if mimetype:
         # for unknown mimetypes, return its identifying string
         result = mimetype
@@ -198,7 +199,11 @@ def file_is_binary(file_data: Path | str | bytes) -> bool:
     """
     Heuristics to determine whether the content of *file_data* is binary.
 
-    The parameter *file_data* might be the data itself (type *bytes*), or a filepath (type *Path* or *str*).
+    The content is retrieved for analysis according to *file_data*'s type:
+        - type *bytes*: *file_data* holds the data
+        - type *str*: *file_data* holds the data as utf8-encoded
+        - type *Path*: *file_data* is a path to a file holding the data
+
     The heuristics used, as heuristics go, provide an educated guess, not an accurate result.
     Empty or null content is considered to be non-binary.
 
@@ -226,3 +231,21 @@ def file_is_binary(file_data: Path | str | bytes) -> bool:
         result = bool(chunk.translate(None,
                                       delete=text_characters))
     return result
+
+
+def file_is_pdf(file_data: Path | str | bytes) -> bool:
+    """
+    Heuristics to determine whether *file_data* is a PDF file.
+
+    The content is retrieved for analysis according to *file_data*'s type:
+        - type *bytes*: *file_data* holds the data
+        - type *str*: *file_data* holds the data as utf8-encoded
+        - type *Path*: *file_data* is a path to a file holding the data
+
+    :param file_data: file data, or the path to locate the file
+    :return: *True* if the determination resulted positive, *False* otherwise
+    """
+    # obtain the first 4 bytes of content for analysis
+    chunk: bytes = file_get_data(file_data=file_data,
+                                 max_len=4) or b""
+    return chunk == b"%PDF"

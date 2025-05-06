@@ -15,6 +15,7 @@ APP_PREFIX: Final[str] = os.getenv(key="PYPOMES_APP_PREFIX",
 
 def env_get_str(key: str,
                 values: list[str] = None,
+                ignore_case: bool = False,
                 def_value: str = None) -> str | None:
     """
     Retrieve and return the string value defined for *key* in the current operating environment.
@@ -23,14 +24,23 @@ def env_get_str(key: str,
 
     :param key: the key which the value is associated with
     :param values: optional list of valid values
+    :param ignore_case: specifies whether to ignore capitalization
     :param def_value: the default value to return, if the key has not been defined
     :return: the string value associated with the key
     """
-    result: str | None = os.getenv(key)
-    if result is None:
+    # initialize the return variable
+    result: str | None = None
+
+    value: str = os.getenv(key)
+    if not value:
         result = def_value
-    elif values and result not in values:
-        result = None
+    elif values:
+        val: str = value
+        if ignore_case:
+            val = value.lower() if isinstance(value, str) else value
+            values = [v.lower() if isinstance(v, str) else v for v in values]
+        if val in values:
+            result = value
 
     return result
 
@@ -84,24 +94,31 @@ def env_get_float(key: str,
 
 
 def env_get_strs(key: str,
-                 values: list[str] = None) -> list[str] | None:
+                 values: list[str] = None,
+                 ignore_case: bool = False) -> list[str] | None:
     """
     Retrieve and return the string values defined for *key* in the current operating environment.
 
     The values must be provided as a comma-separated list of strings.
-    If *values* is specified, the values obtained are checked for occurrence therein.
-    On failure, *None* is returned.
+    If *values* is specified, the values obtained are checked for occurrence therein, with *ignore_case*
+    determining whether to ignore capitalization. On failure, *None* is returned.
 
     :param key: the key the values ares associated with
     :param values: optional list of valid values
+    :param ignore_case: specifies whether to ignore capitalization when checking with *values*
     :return: the string values associated with the key
     """
+    # initialize the return variable
     result: list[str] | None = None
+
     vals: str = os.getenv(key)
     if vals:
         result = vals.split(",")
         if values:
-            for val in result:
+            if ignore_case:
+                vals = vals.lower()
+                values = [v.lower() if isinstance(v, str) else v for v in values]
+            for val in vals.split(","):
                 if val not in values:
                     result = None
                     break
@@ -230,21 +247,22 @@ def env_get_bool(key: str,
 
 def env_get_enum(key: str,
                  enum_class: type[IntEnum | StrEnum],
-                 use_names: bool = True,
+                 use_names: bool = False,
                  values: list[IntEnum | StrEnum] = None,
                  def_value: IntEnum | StrEnum = None) -> Any:
     """
     Retrieve and return the enum value defined for *key* in the current operating environment.
 
     If provided, this value must be a name or a value corresponding to an instance of a subclass of *enum_class*.
-    The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*. The parameter
-    *use_names* determines whether the names or the values of the *enum_class*'s elements should be used
-    (defaults to names). If *values* is specified, the value obtained is checked for occurrence therein.
+    The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*.
+    The parameter *use_names* determines whether the names of the elements in the *enum_class* should be used,
+    ignoring capitalization. If not specified, the values of the elements are used (the default).
+    If *values* is specified, the value obtained is checked for occurrence therein.
     On failure, *None* is returned.
 
     :param key: the key which the value is associated with
     :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
-    :param use_names: specifies whether *enum*'s names (the default), not *enum*'s values, should be used
+    :param use_names: specifies whether *enum*'s names should be used (defaults to using *enum*'s values)
     :param values: optional list of allowed values (defaults to all elements of *enum_class*)
     :param def_value: the default value to return, if the key has not been defined
     :return: the string value associated with the key, as an instance of *enum_class*
@@ -253,24 +271,26 @@ def env_get_enum(key: str,
     result: Any = None
 
     if use_names:
-        vals: list[str] = [e.name for e in (values or [])] or enum_class._member_names_
         name: str = env_get_str(key=key,
-                                values=vals,
+                                values=[e.name for e in (values or enum_class)],
+                                ignore_case=True,
                                 def_value=def_value.name if def_value else None)
-        if name:
-            result = enum_class[name]
+        if isinstance(name, str):
+            for e in enum_class:
+                if e.name.lower() == name.lower():
+                    result = e
+                    break
     else:
         value: Any = None
+        vals: list = [e.value for e in (values or enum_class)]
         if issubclass(enum_class, StrEnum):
-            vals: list[str] = [e.value for e in (values or [])] or list(map(str, enum_class))
             value: str = env_get_str(key=key,
                                      values=vals,
-                                     def_value=def_value.name if def_value else None)
+                                     def_value=def_value)
         elif issubclass(enum_class, IntEnum):
-            vals: list[int] = [e.value for e in (values or [])] or list(map(int, enum_class))
             value: int = env_get_int(key=key,
                                      values=vals,
-                                     def_value=def_value.name if def_value else None)
+                                     def_value=def_value)
         if value:
             result = enum_class(value)
 
