@@ -36,22 +36,22 @@ def str_from_hex(source: str) -> str:
 
 
 def str_as_list(source: str | Any,
-                separator: str = ",") -> list | Any:
+                sep: str = ",") -> list | Any:
     """
-    Return *source* as a *list*, by splitting its contents separated by *separator*.
+    Return *source* as a *list*, by splitting its contents separated by *sep*.
 
     The returned substrings are fully whitespace-trimmed.
     If *source* is not a non-empty *str*, then it is itself returned.
 
     :param source: the string value to be worked on
-    :param separator: the separator (defaults to ",")
+    :param sep: the separator (defaults to ",")
     :return: a list built from the contents of *source*, or *source* itself, if is not a string
     """
     # declare the return variable
     result: list | Any
 
     if source and isinstance(source, str):
-        result = [s.strip() for s in source.split(sep=separator)]
+        result = [s.strip() for s in source.split(sep=sep)]
     else:
         result = source
 
@@ -242,7 +242,7 @@ def str_splice(source: str,
     The number of segments returned is always the number of separators in *seps* plus 1.
     An individual segment returned can be null or an empty string. If no separators are found,
     the returned tuple will contain *source* as its last element, and *None* as the remaining elements.
-    Separators will no be part of their respective segments.
+    Separators will not be part of their respective segments.
 
     Separators in *seps* can not be *None* or empty strings. If no separators are provided
     (*seps* itself is an empty list), then the returned tuple will contain *source* as its only element.

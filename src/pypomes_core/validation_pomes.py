@@ -700,6 +700,7 @@ def validate_pwd(errors: list[str] | None,
 def validate_ints(errors: list[str] | None,
                   source: dict[str, Any],
                   attr: str,
+                  sep: str = ",",
                   min_val: int = None,
                   max_val: int = None,
                   required: bool = False,
@@ -707,11 +708,13 @@ def validate_ints(errors: list[str] | None,
     """
     Validate the list of *int* values associated with *attr* in *source*.
 
-    If provided, this list must contain *int*s, or valid string representations of *int*s.
+    If provided as a string, the elements therein must be valid string representations of *ints*,
+    separated by *sep* (which defaults to a *comma*).
 
     :param errors: incidental error messages
     :param source: *dict* containing the list of values to be validated
     :param attr: the attribute associated with the list of values to be validated
+    :param sep: the separator in the list of values
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
     :param required: whether the list of values must be provided
@@ -729,7 +732,8 @@ def validate_ints(errors: list[str] | None,
     values: list = source.get(suffix)
     if values:
         if isinstance(values, str):
-            values = str_as_list(values)
+            values = str_as_list(source=values,
+                                 sep=sep)
         if isinstance(values, list):
             result = []
             if len(values) > 0:
@@ -773,6 +777,7 @@ def validate_ints(errors: list[str] | None,
 def validate_strs(errors: list[str] | None,
                   source: dict[str, Any],
                   attr: str,
+                  sep: str = ",",
                   min_length: int = None,
                   max_length: int = None,
                   required: bool = False,
@@ -780,11 +785,12 @@ def validate_strs(errors: list[str] | None,
     """
     Validate the list of *str* values associated with *attr* in *source*.
 
-    If provided, this list must contain *str*s.
+    If provided as a string, the elements therein must be separated by *sep* (which defaults to a *comma*).
 
     :param errors: incidental error messages
     :param source: *dict* containing the list of values to be validated
     :param attr: the attribute associated with the list of values to be validated
+    :param sep: the separator in the list of values
     :param min_length: optional minimum length accepted
     :param max_length:  optional maximum length accepted
     :param required: whether the list of values must be provided
@@ -802,7 +808,8 @@ def validate_strs(errors: list[str] | None,
     values: list = source.get(suffix)
     if values:
         if isinstance(values, str):
-            values = str_as_list(values)
+            values = str_as_list(source=values,
+                                 sep=sep)
         if isinstance(values, list):
             result = []
             if len(values) > 0:
