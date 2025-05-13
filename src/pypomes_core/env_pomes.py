@@ -41,6 +41,8 @@ def env_get_str(key: str,
             values = [v.lower() if isinstance(v, str) else v for v in values]
         if val in values:
             result = value
+    else:
+        result = value
 
     return result
 
