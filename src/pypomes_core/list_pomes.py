@@ -3,7 +3,7 @@ from collections import defaultdict
 from datetime import date
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 
 def list_compare(list1: list,
@@ -292,12 +292,13 @@ def list_prune_not_in(target: list,
     return result
 
 
-def list_jsonify(source: list) -> list:
+def list_jsonify(source: list,
+                 jsonify_enums: Literal["names", "values"] | None = "values") -> list:
     """
     Return a new *list* containing the values in *source*, made serializable if necessary.
 
     Possible transformations:
-      - *Enum* is changed with to its value
+      - *Enum* is changed to its name or value, as per *jsonify_enums* (defaults to values)
       - *bytes* and *bytearray* are changed with *str()*
       - *date* and *datetime* are changed to their *ISO* representations
       - *Path* is changed to its *POSIX* representation
@@ -309,10 +310,12 @@ def list_jsonify(source: list) -> list:
     The transformation is recursively carried out, that is, any *dict* or *list* set as a list item
     will be *jsonified* accordingly.
 
-    HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
+    *HAZARD*: depending on the type of object contained in *source*, the final result may still
+    not be fully serializable.
 
     :param source: the *dict* to be *jasonified*
-    :return: a list with *jsonified* values
+    :param jsonify_enums: whether to *jsonify* enums, using their values (the default) or names
+    :return: a new *jsonified* list
     """
     # initialize the return variable
     result: list = []
@@ -327,7 +330,10 @@ def list_jsonify(source: list) -> list:
         elif isinstance(value, list):
             result.append(list_jsonify(source=value))
         elif isinstance(value, Enum):
-            result.append(value.value)
+            if jsonify_enums == "values":
+                result.append(value.value)
+            elif jsonify_enums == "names":
+                result.append(value.name)
         elif isinstance(value, bytes | bytearray):
             result.append(str(value))
         elif isinstance(value, date):

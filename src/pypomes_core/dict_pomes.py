@@ -3,7 +3,7 @@ import types
 from datetime import date
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 
 def dict_has_key_chain(source: dict,
@@ -794,17 +794,21 @@ def dict_listify(target: dict,
 
 
 def dict_jsonify(source: dict,
-                 jsonify_keys: bool = True,
-                 jsonify_values: bool = True) -> dict:
+                 jsonify_keys: Literal["names", "values"] | None = "values",
+                 jsonify_values: Literal["names", "values"] | None = "values") -> dict:
     """
-    Convert the *[key, value]* pairs in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
+    Convert the *(key, value)* pairs in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
 
-    The parameters *jsonify_keys* and *jsonify_values* specify whether keys and values are to be *jsonified*,
-    respectively. It is expected that either *jsonify_keys* or *jsonify_values*, or both, is set to *True*.
+    The parameters *jsonify_keys* and *jsonify_values* specify how keys and values of *enum* instances
+    are to be *jsonified*, respectively:
+      - *None*: do not jsonify them
+      - *names*: use names
+      - *value*: use values (default for both *jsonify_keys* and *jsonify_values*)
+     No action is taken if both *jsonify_keys* and *jsonify_values* are set to *None*.
 
     Possible transformations of keys and values:
-      - *Enum* keys are changed to their names
-      - *Enum* values are changed to their values
+      - *Enum* keys are changed to their values or names (as per *jsonify_keys*)
+      - *Enum* values are changed to their values or names (as per *jsonify_values*)
       - *bytes* and *bytearray* values are changed with *str()*
       - *date* and *datetime* are changed to their *ISO* representations
       - *Path* is changed to its *POSIX* representation
@@ -812,11 +816,15 @@ def dict_jsonify(source: dict,
       - *list* is recursively *jsonified* with *list_jsonify()* (values, only)
       - all other types are left unchanged
 
+    When recursively *jsonifying* lists, the parameter *Jsonify_enums* is conditionally set to
+    the value of *jsonify_values* (if defined), or to the value of *jsonify_keys* (if defined),
+    or to *None*, in this sequence.
+
     Note that retrieving the original values through a reversal of this process is not deterministic.
     The transformation is recursively carried out, that is, any *dict* or *list* set as value will be
     *jsonified* accordingly. For convenience, the possibly modified *source* itself is returned.
 
-    HAZARD: depending on the type of object contained in *source*, the final result may still
+    *HAZARD*: depending on the type of object contained in *source*, the final result may still
     not be fully serializable.
 
     :param source: the dict to be made serializable
@@ -830,23 +838,23 @@ def dict_jsonify(source: dict,
 
         # values transformations
         if jsonify_values:
-            if isinstance(value, dict):
-                dict_jsonify(source=value,
-                             jsonify_keys=jsonify_keys,
-                             jsonify_values=jsonify_values)
-            elif isinstance(value, list):
-                from .list_pomes import list_jsonify
-                source[key] = list_jsonify(source=value)
-            elif isinstance(value, Enum):
-                source[key] = value.value
+            if isinstance(value, Enum):
+                source[key] = value.value if jsonify_values == "values" else value.name
             elif isinstance(value, bytes | bytearray):
                 source[key] = str(value)
             elif isinstance(value, date):
                 source[key] = value.isoformat()
             elif isinstance(value, Path):
                 source[key] = value.as_posix()
-
-        # key transformations
+            elif isinstance(value, dict):
+                dict_jsonify(source=value,
+                             jsonify_keys=jsonify_keys,
+                             jsonify_values=jsonify_values)
+            elif isinstance(value, list):
+                from .list_pomes import list_jsonify
+                source[key] = list_jsonify(source=value,
+                                           jsonify_enums=jsonify_values or jsonify_keys or None)
+        # mark for key transformation
         if jsonify_keys and \
                 isinstance(key, Enum | Path | bytes | bytearray | date):
             keys.append(key)
@@ -854,7 +862,7 @@ def dict_jsonify(source: dict,
     # transform the keys
     for key in keys:
         if isinstance(key, Enum):
-            source[key.name] = source.pop(key)
+            source[key.value if jsonify_keys == "values" else key.name] = source.pop(key)
         elif isinstance(key, bytes | bytearray):
             source[str(key)] = source.pop(key)
         elif isinstance(key, date):
