@@ -1,7 +1,7 @@
 # environment
 cache-dir = "~/.cache/ruff"
 force-exclude = true
-required-version = ">=0.11.5"
+required-version = ">=0.11.10"
 respect-gitignore = true
 lint.task-tags = ["TODO", "FIXME", "HACK", "HAZARD"]
 lint.select = [
@@ -77,6 +77,7 @@ lint.ignore = [
     "D100",     # missing docstring in public module
     "D104",     # missing docstring in public package
     "D200",     # one-line docstring should fit on one line
+    "D203",     # 1 blank line required before class docstring
     "D204",     # 1 blank line required after class docstring
     "D210",     # whitespaces surrounding docstring text
     "D212",     # multi-line docstring summary to start at the second line

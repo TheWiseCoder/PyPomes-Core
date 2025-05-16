@@ -1,7 +1,7 @@
 import inspect
 import types
 from datetime import date
-from enum import Enum, IntEnum
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -794,7 +794,7 @@ def dict_listify(target: dict,
 
 
 def dict_jsonify(source: dict,
-                 jsonify_keys: bool = False,
+                 jsonify_keys: bool = True,
                  jsonify_values: bool = True) -> dict:
     """
     Convert the *[key, value]* pairs in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
@@ -803,8 +803,9 @@ def dict_jsonify(source: dict,
     respectively. It is expected that either *jsonify_keys* or *jsonify_values*, or both, is set to *True*.
 
     Possible transformations of keys and values:
-      - *IntEnum* is changed with *int()*
-      - *bytes*, *bytearray*, and generic *Enum* are changed with *str()*
+      - *Enum* keys are changed to their names
+      - *Enum* values are changed to their values
+      - *bytes* and *bytearray* values are changed with *str()*
       - *date* and *datetime* are changed to their *ISO* representations
       - *Path* is changed to its *POSIX* representation
       - *dict* is recursively *jsonified* with *dict_jsonify()* (values, only)
@@ -815,10 +816,11 @@ def dict_jsonify(source: dict,
     The transformation is recursively carried out, that is, any *dict* or *list* set as value will be
     *jsonified* accordingly. For convenience, the possibly modified *source* itself is returned.
 
-    HAZARD: depending on the type of object contained in *source*, the final result may not be serializable.
+    HAZARD: depending on the type of object contained in *source*, the final result may still
+    not be fully serializable.
 
     :param source: the dict to be made serializable
-    :param jsonify_keys: whether the keys in *source* should be *jsonified* (defaults to *False*)
+    :param jsonify_keys: whether the keys in *source* should be *jsonified* (defaults to *True*)
     :param jsonify_values: whether the values in *source* should be *jsonified* (defaults to *True*)
     :return: the modified input *dict*
     """
@@ -835,9 +837,9 @@ def dict_jsonify(source: dict,
             elif isinstance(value, list):
                 from .list_pomes import list_jsonify
                 source[key] = list_jsonify(source=value)
-            elif isinstance(value, IntEnum):
-                source[key] = int(value)
-            elif isinstance(value, bytes | bytearray | Enum):
+            elif isinstance(value, Enum):
+                source[key] = value.value
+            elif isinstance(value, bytes | bytearray):
                 source[key] = str(value)
             elif isinstance(value, date):
                 source[key] = value.isoformat()
@@ -851,9 +853,9 @@ def dict_jsonify(source: dict,
 
     # transform the keys
     for key in keys:
-        if isinstance(key, IntEnum):
-            source[int(key)] = source.pop(key)
-        elif isinstance(key, bytes | bytearray | Enum):
+        if isinstance(key, Enum):
+            source[key.name] = source.pop(key)
+        elif isinstance(key, bytes | bytearray):
             source[str(key)] = source.pop(key)
         elif isinstance(key, date):
             source[key.isoformat()] = source.pop(key)

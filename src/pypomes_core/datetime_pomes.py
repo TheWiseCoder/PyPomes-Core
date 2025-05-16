@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from dateutil import parser
 from dateutil.parser import ParserError
 from enum import StrEnum
@@ -32,7 +32,7 @@ class DatetimeFormat(StrEnum):
 
 def date_reformat(dt_str: str,
                   to_format: str,
-                  **kwargs: any) -> str:
+                  **kwargs: any) -> str | None:
     """
     Convert the date in *dt_str* to the format especified in *to_format*.
 
@@ -64,7 +64,7 @@ def date_reformat(dt_str: str,
 
 
 def date_parse(dt_str: str,
-               **kwargs: any) -> date:
+               **kwargs: any) -> date | None:
     """
     Obtain and return the *date* object corresponding to *dt_str*.
 
@@ -80,7 +80,7 @@ def date_parse(dt_str: str,
 
     :param dt_str: the date, in a supported format
     :param kwargs: optional arguments for the parser in python-dateutil
-    :return: the corresponding date object, or None
+    :return: the corresponding date object, or *None*
     """
     # declare the return variable
     result: date | None
@@ -95,7 +95,7 @@ def date_parse(dt_str: str,
 
 
 def datetime_parse(dt_str: str,
-                   **kwargs: any) -> datetime:
+                   **kwargs: any) -> datetime | None:
     """
     Obtain and return the *datetime* object corresponding to *dt_str*.
 
@@ -121,5 +121,51 @@ def datetime_parse(dt_str: str,
                               **kwargs)
     except (TypeError, ParserError, OverflowError):
         result = None
+
+    return result
+
+
+def timestamp_interval(start: date | datetime | float | int,
+                       finish: date | datetime | float | int) -> tuple[int, int, int, int, int] | None:
+    """
+    Calculate the number of hours, minutes, seconds, milliseconds, and microseconds between *start* and *finish*.
+
+    It is assumed that *start* and *finish* refer to the same timezone, and that the latter comes after the former.
+
+    :param start: beginning of the interval, given as *date*, *datetime*, or Unix *timestamp*
+    :param finish: end of the interval, given as *date*, *datetime*, or Unix *timestamp*
+    :return: the number of hours, minutes, seconds, milliseconds, and microseconds in the interval, or *None* if error
+    """
+    # initialize the return variable
+    result: tuple[int, int, int, int, int] | None = None
+
+    # obtain the corresponding start datetime
+    start_dt: datetime
+    if isinstance(start, datetime):
+        start_dt = start
+    elif isinstance(start, date):
+        start_dt = datetime.combine(start, datetime.min.time())
+    else:
+        start_dt = datetime.fromtimestamp(timestamp=start)
+
+    # obtain the corresponding finish datetime
+    finish_dt: datetime
+    if isinstance(finish, datetime):
+        finish_dt = finish
+    elif isinstance(finish, date):
+        finish_dt = datetime.combine(finish, datetime.min.time())
+    else:
+        finish_dt = datetime.fromtimestamp(timestamp=finish)
+
+    # compute the duration parts
+    if finish_dt >= start_dt:
+        duration: timedelta = finish_dt - start_dt
+        total_secs: int = int(duration.total_seconds())
+        hours: int = total_secs // 3600
+        mins: int = (total_secs % 3600) // 60
+        secs: int = total_secs % 60
+        millis: int = duration.microseconds // 1000
+        micros: int = duration.microseconds % 1000
+        result = (hours, mins, secs, millis, micros)
 
     return result

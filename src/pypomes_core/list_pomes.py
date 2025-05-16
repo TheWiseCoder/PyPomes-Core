@@ -1,7 +1,7 @@
 import contextlib
 from collections import defaultdict
 from datetime import date
-from enum import Enum, IntEnum
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -297,8 +297,8 @@ def list_jsonify(source: list) -> list:
     Return a new *list* containing the values in *source*, made serializable if necessary.
 
     Possible transformations:
-      - *IntEnum* is changed with *int()*
-      - *bytes*, *bytearray*, and generic *Enum* are changed with *str()*
+      - *Enum* is changed with to its value
+      - *bytes* and *bytearray* are changed with *str()*
       - *date* and *datetime* are changed to their *ISO* representations
       - *Path* is changed to its *POSIX* representation
       - *dict* is recursively *jsonified* with *dict_jsonify()* (values, only)
@@ -326,9 +326,9 @@ def list_jsonify(source: list) -> list:
                                        jsonify_values=True))
         elif isinstance(value, list):
             result.append(list_jsonify(source=value))
-        elif isinstance(value, IntEnum):
-            result.append(int(value))
-        elif isinstance(value, bytes | bytearray | Enum):
+        elif isinstance(value, Enum):
+            result.append(value.value)
+        elif isinstance(value, bytes | bytearray):
             result.append(str(value))
         elif isinstance(value, date):
             result.append(value.isoformat())

@@ -32,7 +32,8 @@ def env_get_str(key: str,
     result: str | None = None
 
     value: str = os.getenv(key)
-    if not value:
+    # allow for value to be defined as an empty string
+    if value is None:
         result = def_value
     elif values:
         val: str = value
