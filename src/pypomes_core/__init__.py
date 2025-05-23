@@ -10,7 +10,7 @@ from .dict_pomes import (
     dict_jsonify, dict_hexify, dict_stringify
 )
 from .email_pomes import (
-    EmailConfig, email_send
+    EmailConfig, email_send, email_codify,
 )
 from .encoding_pomes import (
     encode_ascii_hex, decode_ascii_hex
@@ -44,7 +44,7 @@ from .str_pomes import (
     str_as_list, str_sanitize, str_split_on_mark,
     str_between, str_positional, str_random, str_splice,
     str_find_char, str_find_whitespace, str_rreplace,
-    str_from_any, str_to_bool, str_to_int, str_to_float
+    str_from_any, str_to_bool, str_to_int, str_to_float, str_is_int
 )
 from .validation_msgs import (
     validate_set_msgs, validate_update_msgs
@@ -75,7 +75,7 @@ __all__ = [
     "dict_replace_value", "dict_pop_value", "dict_unique_values",
     "dict_jsonify", "dict_hexify", "dict_stringify",
     # email_pomes
-    "EmailConfig", "email_send",
+    "EmailConfig", "email_send", "email_codify",
     # encoding_pomes
     "encode_ascii_hex", "decode_ascii_hex",
     # env_pomes
@@ -102,7 +102,7 @@ __all__ = [
     "str_as_list", "str_sanitize", "str_split_on_mark",
     "str_between", "str_positional", "str_random", "str_splice",
     "str_find_char", "str_find_whitespace", "str_rreplace",
-    "str_from_any", "str_to_bool", "str_to_int", "str_to_float",
+    "str_from_any", "str_to_bool", "str_to_int", "str_to_float", "str_is_int",
     # validation_msgs
     "validate_set_msgs", "validate_update_msgs",
     # validation_pomes

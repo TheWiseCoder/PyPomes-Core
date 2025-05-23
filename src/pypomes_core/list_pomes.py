@@ -210,7 +210,7 @@ def list_elem_with_attr(source: list,
 
 def list_elem_starting_with(source: list[str | bytes],
                             prefix: str | bytes,
-                            keep_prefix: bool = True) -> str | bytes:
+                            keep_prefix: bool = True) -> str | bytes | None:
     """
     Locate and return the first element in *source* prefixed by *prefix*.
 
@@ -218,7 +218,7 @@ def list_elem_starting_with(source: list[str | bytes],
 
     :param source: the list to be inspected
     :param prefix: the data prefixing the element to be returned
-    :param keep_prefix: defines whether or not the found element should be returned with the prefix
+    :param keep_prefix: defines whether the found element should be returned with the prefix
     :return: the prefixed element, with or without the prefix, or *None* if not found
     """
     # initialize the return variable
@@ -298,12 +298,12 @@ def list_jsonify(source: list,
     Return a new *list* containing the values in *source*, made serializable if necessary.
 
     Possible transformations:
-      - *Enum* is changed to its name or value, as per *jsonify_enums* (defaults to values)
+      - *Enum* is changed to its value or name, as per *jsonify_enums* (defaults to value)
       - *bytes* and *bytearray* are changed with *str()*
       - *date* and *datetime* are changed to their *ISO* representations
       - *Path* is changed to its *POSIX* representation
-      - *dict* is recursively *jsonified* with *dict_jsonify()* (values, only)
-      - *list* is recursively *jsonified* with *list_jsonify()* (values, only)
+      - *dict* is recursively *jsonified* with *dict_jsonify()*, unless *jsonify_enums* is *None*
+      - *list* is recursively *jsonified* with *list_jsonify()*
       - all other types are left unchanged
 
     Note that retrieving the original values through a reversal of this process is not deterministic.
@@ -322,24 +322,23 @@ def list_jsonify(source: list,
 
     # traverse the input list
     for value in source:
-        if isinstance(value, dict):
-            from .dict_pomes import dict_jsonify
-            result.append(dict_jsonify(source=value,
-                                       jsonify_keys=False,
-                                       jsonify_values=True))
-        elif isinstance(value, list):
-            result.append(list_jsonify(source=value))
-        elif isinstance(value, Enum):
-            if jsonify_enums == "values":
-                result.append(value.value)
-            elif jsonify_enums == "names":
-                result.append(value.name)
+        if isinstance(value, Enum):
+            result.append(value.value if jsonify_enums == "values" else value.name)
         elif isinstance(value, bytes | bytearray):
             result.append(str(value))
         elif isinstance(value, date):
             result.append(value.isoformat())
         elif isinstance(value, Path):
             result.append(value.as_posix())
+        elif isinstance(value, dict):
+            if jsonify_enums:
+                from .dict_pomes import dict_jsonify
+                result.append(dict_jsonify(source=value,
+                                           jsonify_keys=jsonify_enums,
+                                           jsonify_values=jsonify_enums))
+        elif isinstance(value, list):
+            result.append(list_jsonify(source=value,
+                                       jsonify_enums=jsonify_enums))
         else:
             result.append(value)
 

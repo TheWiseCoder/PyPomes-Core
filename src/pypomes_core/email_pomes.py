@@ -76,3 +76,24 @@ def email_send(errors: list[str] | None,
             logger.error(msg=err_msg)
         if isinstance(errors, list):
             errors.append(err_msg)
+
+
+def email_codify(email: str) -> str:
+    """
+    Codify *email* so as to provide a hint at its content, whilst preventing its usage.
+
+    The codification process changes my_mail@my_server.com into m*****l@m********.com.
+
+    :param email: the email to codify
+    :return: the codified email
+    """
+    # initialize the return variable
+    result: str = email
+
+    pos1: int = email.rfind("@")
+    pos2: int = email.rfind(".")
+    if pos2 > pos1 > 0:
+        result = email[0] + "*" * (pos1 - 2) + \
+                 email[pos1 - 1:pos1 + 2] + "*" * (pos2 - pos1 - 2) + email[pos2:]
+
+    return result

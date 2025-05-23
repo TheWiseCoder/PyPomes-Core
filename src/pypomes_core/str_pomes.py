@@ -58,9 +58,9 @@ def str_as_list(source: str | Any,
     return result
 
 
-def str_sanitize(target_str: str) -> str:
+def str_sanitize(source: str) -> str:
     """
-    Clean the given *target_str* string.
+    Clean the given *source* string.
 
     The sanitization is carried out by:
         - removing backslashes
@@ -68,13 +68,13 @@ def str_sanitize(target_str: str) -> str:
         - replacing newlines and tabs with whitespace
         - replacing multiple consecutive spaces with a single space
 
-    :param target_str: the string to be cleaned
+    :param source: the string to be cleaned
     :return: the cleaned string
     """
-    cleaned: str = target_str.replace("\\", "") \
-                             .replace('"', "'") \
-                             .replace("\n", " ") \
-                             .replace("\t", " ")
+    cleaned: str = source.replace("\\", "") \
+                         .replace('"', "'") \
+                         .replace("\n", " ") \
+                         .replace("\t", " ")
     return " ".join(cleaned.split())
 
 
@@ -235,7 +235,7 @@ def str_rreplace(source: str,
 
 
 def str_splice(source: str,
-               seps: list[str]) -> tuple:
+               seps: tuple[str]) -> tuple:
     """
     Splice *source* into segments delmited by the ordered list of separators *seps*.
 
@@ -250,13 +250,13 @@ def str_splice(source: str,
     If *source* ends with the separator, then the return tuple's last element will be an empty string.
 
     These examples illustrate the various possibilities (*source* = 'My string to be spliced'):
-      - [] ===> ('My string to be spliced',)
-      - ['tri'] ===> ('My s', 'ng to be spliced')
-      - ['iced'] ===> ('My string to be spl', '')
-      - ['X', 'B'] ===> (None, None, 'My string to be spliced')
-      - ['M', 'd'] ===> ('', 'y string to be splice', '')
-      - ['s', 's', 'd'] ===> ('My ', 'tring to be ', 'plice', '')
-      - ['X', 'ri', 'be'] ===> (None, 'My st', 'ng to ', ' spliced')
+      - () ===> ('My string to be spliced',)
+      - ('tri') ===> ('My s', 'ng to be spliced')
+      - ('iced') ===> ('My string to be spl', '')
+      - ('X', 'B') ===> (None, None, 'My string to be spliced')
+      - ('M', 'd') ===> ('', 'y string to be splice', '')
+      - ('s', 's', 'd') ===> ('My ', 'tring to be ', 'plice', '')
+      - ('X', 'ri', 'be') ===> (None, 'My st', 'ng to ', ' spliced')
 
     :param source: the source string
     :param seps: the ordered list of separators
@@ -285,7 +285,7 @@ def str_splice(source: str,
     return result
 
 
-def str_to_lower(source: Any) -> str:
+def str_to_lower(source: str) -> str:
     """
     Safely convert *source* to lower-case.
 
@@ -297,7 +297,7 @@ def str_to_lower(source: Any) -> str:
     return source.lower() if isinstance(source, str) else source
 
 
-def str_to_upper(source: Any) -> str:
+def str_to_upper(source: str) -> str:
     """
     Safely convert *source* to upper-case.
 
@@ -341,7 +341,7 @@ def str_from_any(source: Any) -> str:
     return result
 
 
-def str_to_bool(source: str) -> bool:
+def str_to_bool(source: str) -> bool | None:
     """
     Obtain and return the *bool* value encoded in *source*.
 
@@ -352,10 +352,11 @@ def str_to_bool(source: str) -> bool:
         - all other values causes *None* to be returned
 
     :param source: the encoded bool value
-    :return: the decoded bool value
+    :return: the decoded bool value, or *None* if *source* fails the encoding criteria
     """
-    # noinspection PyUnusedLocal
+    # initialize the return variable
     result: bool | None = None
+
     if source in ["1", "t", "true"]:
         result = True
     elif source in ["0", "f", "false"]:
@@ -364,45 +365,50 @@ def str_to_bool(source: str) -> bool:
     return result
 
 
-def str_to_int(source: str,
-               values: list[float] = None) -> int:
+def str_to_int(source: str) -> int | None:
     """
     Obtain and return the *int* value encoded in *source*.
 
-    If *values* is specified, the value obtained is checked for occurrence therein.
-    If no valid value was obtained, *None* is returned.
-
     :param source: the encoded int value
-    :param values: optional list of valid values
-    :return: the decoded int value
+    :return: the decoded *int* value, or *None* on error
     """
     # noinspection PyUnusedLocal
     result: int | None = None
     with suppress(Exception):
         result = int(source)
-    if values and result not in values:
-        result = None
 
     return result
 
 
-def str_to_float(source: str,
-                 values: list[float] = None) -> float:
+def str_to_float(source: str) -> float | None:
     """
     Obtain and return the *float* value encoded in *source*.
 
-    If *values* is specified, the value obtained is checked for occurrence therein.
-    If no valid value was obtained, *None* is returned.
-
     :param source: the encoded float value
-    :param values: optional list of valid values
-    :return: the decoded float value
+    :return: the decoded *float* value, or *None* on error
     """
     # noinspection PyUnusedLocal
     result: float | None = None
     with suppress(Exception):
         result = float(source)
-    if values and result not in values:
-        result = None
+
+    return result
+
+
+def str_is_int(source: str) -> bool:
+    """
+    Determine whether *source* encodes a valid positive or negative integer.
+
+    :param source: the encoded value
+    :return: *True* if *source* encodes a valid integer, *False* otherwise
+    """
+    # initialize the return variable
+    result: bool = False
+
+    if isinstance(source, str):
+        if source.startswith(("+", "-")):
+            result = source[1:].isdigit()
+        else:
+            result = source.isdigit()
 
     return result
