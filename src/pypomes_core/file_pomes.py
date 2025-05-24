@@ -89,7 +89,7 @@ def file_from_request(request: Request,
 
 def file_get_data(file_data: Path | str | bytes,
                   max_len: int = None,
-                  chunk_size: int = None) -> bytes:
+                  chunk_size: int = None) -> bytes | None:
     """
     Retrieve the data in *file_data*, or in a file in path *file_data*.
 
@@ -150,7 +150,7 @@ def file_get_data(file_data: Path | str | bytes,
     return result
 
 
-def file_get_mimetype(file_data: Path | str | bytes) -> Mimetype | str:
+def file_get_mimetype(file_data: Path | str | bytes) -> Mimetype | str | None:
     """
     Heuristics to determine the mimetype for *file_data*.
 

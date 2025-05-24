@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import Any, Literal
 
 
-def dict_has_key_chain(source: dict,
-                       key_chain: str | list[str]) -> bool:
+def dict_has_key(source: dict,
+                 key_chain: str | list[str]) -> bool:
     """
     Indicate the existence of an element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
@@ -74,7 +74,7 @@ def dict_get_value(source: dict,
     Return *None* if the sought after value is not found.
     Note that returning *None* might not be indicative of the absence of the element in *source*,
     since that element might exist therein with the value *None*. To determine whether this is the case,
-    use the operation *dict_has_key_chain()*.
+    use the operation *dict_has_key()*.
 
     :param source: the reference *dict*
     :param key_chain: the key chain
@@ -582,7 +582,7 @@ def dict_reduce(target: dict,
 
 def dict_from_list(source: list[dict],
                    key_chain: str | list[str],
-                   value: Any) -> dict:
+                   value: Any) -> dict | None:
     """
     Locate in *source*, and return, the element of type *dict* with value *value* in the key chain *key_chain*.
 
@@ -762,8 +762,8 @@ def dict_clone(source: dict,
     for elem in from_to_keys:
         from_key: str = elem[0] if isinstance(elem, tuple) else elem
         to_key: str = (elem[1] if isinstance(elem, tuple) and len(elem) > 1 else None) or from_key
-        has_key: bool = dict_has_key_chain(source=source,
-                                           key_chain=from_key)
+        has_key: bool = dict_has_key(source=source,
+                                     key_chain=from_key)
         if has_key or not omit_missing:
             value: Any = dict_get_value(source=source,
                                         key_chain=from_key)

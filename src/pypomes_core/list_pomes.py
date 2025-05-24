@@ -98,7 +98,7 @@ def list_get_coupled(coupled_elements: list[tuple[str, Any]],
     :return: the coupled element, or *None* if it is not found and *couple_to_same* is *False*
     """
     # initialize the return variable
-    result: Any | None = None
+    result: Any = None
 
     # remove the list element indication
     pos1: int = primary_element.find("[")

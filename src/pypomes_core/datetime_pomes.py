@@ -169,3 +169,20 @@ def timestamp_interval(start: date | datetime | float | int,
         result = (hours, mins, secs, millis, micros)
 
     return result
+
+
+def timestamp_duration(start: date | datetime | float | int,
+                       finish: date | datetime | float | int) -> str | None:
+    """
+    Calculate and return the interval between *start* and *finish*.
+
+    It is assumed that *start* and *finish* refer to the same timezone, and that the latter comes after the former.
+
+    :param start: beginning of the interval, given as *date*, *datetime*, or Unix *timestamp*
+    :param finish: end of the interval, given as *date*, *datetime*, or Unix *timestamp*
+    :return: a formatted string with the duration in hours, minutes, and seconds, or *None* if error
+    """
+    # obtain the interval and returned a formatted string
+    interval: tuple[int, int, int, int, int] = timestamp_interval(start=start,
+                                                                  finish=finish)
+    return f"{interval[0]}h{interval[1]}m{interval[2]}s"

@@ -1044,7 +1044,7 @@ def validate_unformat_errors(errors: list[dict[str, str] | str],
     # traverse the list of dicts
     for error in errors:
         if isinstance(error, dict):
-            desc: str = str_sanitize(error.get(desc) or "''")
+            desc: str = str_sanitize(source=error.get(desc) or "''")
             result.append(f"{error.get(name)}: {desc}")
         else:
             result.append(error)

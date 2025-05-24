@@ -1,9 +1,10 @@
 from .datetime_pomes import (
     DateFormat, DatetimeFormat, TIMEZONE_LOCAL,
-    date_reformat, date_parse, datetime_parse, timestamp_interval
+    date_reformat, date_parse, datetime_parse,
+    timestamp_interval, timestamp_duration
 )
 from .dict_pomes import (
-    dict_has_key_chain, dict_get_value, dict_set_value, dict_reduce,
+    dict_has_key, dict_get_value, dict_set_value, dict_reduce,
     dict_listify, dict_transform, dict_merge, dict_coalesce, dict_clone,
     dict_get_key, dict_get_keys, dict_from_object, dict_from_list,
     dict_replace_value, dict_pop_value, dict_unique_values,
@@ -67,9 +68,10 @@ __all__ = [
     "pypomes_versions",
     # datetime_pomes
     "DateFormat", "DatetimeFormat", "TIMEZONE_LOCAL",
-    "date_reformat", "date_parse", "datetime_parse", "timestamp_interval",
+    "date_reformat", "date_parse", "datetime_parse",
+    "timestamp_interval", "timestamp_duration",
     # dict_pomes
-    "dict_has_key_chain", "dict_get_value", "dict_set_value", "dict_reduce",
+    "dict_has_key", "dict_get_value", "dict_set_value", "dict_reduce",
     "dict_listify", "dict_transform", "dict_merge", "dict_coalesce", "dict_clone",
     "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
     "dict_replace_value", "dict_pop_value", "dict_unique_values",

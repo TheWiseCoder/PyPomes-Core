@@ -45,7 +45,7 @@ def str_as_list(source: str | Any,
 
     :param source: the string value to be worked on
     :param sep: the separator (defaults to ",")
-    :return: a list built from the contents of *source*, or *source* itself, if is not a string
+    :return: a list built from the contents of *source*, or *source* itself, if it is not a string
     """
     # declare the return variable
     result: list | Any
@@ -114,7 +114,7 @@ def str_find_char(source: str,
 
     :param source: the string to be inspected
     :param chars: the reference characters
-    :return: the position of the first character in *chars*, or -1 if none was found
+    :return: the position of the first character in *chars*, or *-1* if none was found
     """
     # initialize the return variable
     result: int = -1
@@ -133,7 +133,7 @@ def str_find_whitespace(source: str) -> int:
     Locate and return the position of the first occurence of a *whitespace* character in *source*.
 
     :param source: the string to be inspected
-    :return: the position of the first whitespace character, or -1 if none was found
+    :return: the position of the first whitespace character, or *-1* if none was found
     """
     # initialize the return variable
     result: int = -1
@@ -156,7 +156,7 @@ def str_between(source: str,
     :param source: the string to be inspected
     :param from_str: the initial delimiter
     :param to_str: the final delimiter
-    :return: the extracted substring, or None if no substring was obtained
+    :return: the extracted substring, or *None* if no substring was obtained
     """
     # initialize the return variable
     result: str | None = None
@@ -172,22 +172,22 @@ def str_between(source: str,
 
 
 def str_positional(source: str,
-                   list_origin: list[str],
-                   list_dest: list) -> Any:
+                   list_from: list[str],
+                   list_to: list) -> Any:
     """
-    Locate the position of *source* within *list_origin*, and return the element in the same position in *list_dest*.
+    Locate the position of *source* within *list_from*, and return the element in the same position in *list_to.
 
     :param source: the source string
-    :param list_origin: the list to be inspected
-    :param list_dest: the list containing the positionally corresponding values
-    :return: the value positionally corresponding to the source string, or None if not found
+    :param list_from: the list to be inspected
+    :param list_to: the list containing the positionally corresponding values
+    :return: the value positionally corresponding to the source string, or *None* if not found
     """
     # declare the return variable
     result: Any | None
 
     try:
-        pos: int = list_origin.index(source)
-        result = list_dest[pos]
+        pos: int = list_from.index(source)
+        result = list_to[pos]
     except (TypeError, ValueError, IndexError):
         result = None
 
@@ -235,7 +235,7 @@ def str_rreplace(source: str,
 
 
 def str_splice(source: str,
-               seps: tuple[str]) -> tuple:
+               seps: tuple) -> tuple:
     """
     Splice *source* into segments delmited by the ordered list of separators *seps*.
 
@@ -260,7 +260,7 @@ def str_splice(source: str,
 
     :param source: the source string
     :param seps: the ordered list of separators
-    :return: tuple with the segments obtained, or *None* if *source* is not a string.
+    :return: tuple with the segments obtained, or *None* if *source* is not a string
 
     """
     # initialize the return variable
