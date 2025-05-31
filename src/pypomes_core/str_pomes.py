@@ -35,25 +35,25 @@ def str_from_hex(source: str) -> str:
     return bytes.fromhex(source).decode()
 
 
-def str_as_list(source: str | Any,
-                sep: str = ",") -> list | Any:
+def str_as_list(source: str,
+                sep: str = ",") -> list[str]:
     """
     Return *source* as a *list*, by splitting its contents separated by *sep*.
 
     The returned substrings are fully whitespace-trimmed.
-    If *source* is not a non-empty *str*, then it is itself returned.
+    If *source* is not a non-empty *str*, then a list containing itself is returned.
 
     :param source: the string value to be worked on
     :param sep: the separator (defaults to ",")
-    :return: a list built from the contents of *source*, or *source* itself, if it is not a string
+    :return: a list built from the contents of *source*, or containing *source* itself, if it is not a string
     """
     # declare the return variable
-    result: list | Any
+    result: list[str]
 
     if source and isinstance(source, str):
         result = [s.strip() for s in source.split(sep=sep)]
     else:
-        result = source
+        result = [source]
 
     return result
 
@@ -89,7 +89,7 @@ def str_split_on_mark(source: str,
     :param mark: the separator
     :return: the list of text segments extracted
     """
-    # inicializa a variável de retorno
+    # inicialize the return variable
     result: list[str] = []
 
     pos: int = 0
@@ -175,21 +175,18 @@ def str_positional(source: str,
                    list_from: list[str],
                    list_to: list) -> Any:
     """
-    Locate the position of *source* within *list_from*, and return the element in the same position in *list_to.
+    Locate the position of *source* within *list_from*, and return the element in the same position in *list_to*.
 
     :param source: the source string
     :param list_from: the list to be inspected
     :param list_to: the list containing the positionally corresponding values
     :return: the value positionally corresponding to the source string, or *None* if not found
     """
-    # declare the return variable
-    result: Any | None
-
-    try:
+    # noinspection PyUnusedLocal
+    result: Any = None
+    with suppress(Exception):
         pos: int = list_from.index(source)
         result = list_to[pos]
-    except (TypeError, ValueError, IndexError):
-        result = None
 
     return result
 
@@ -214,7 +211,7 @@ def str_random(size: int,
         chars: str = "".join(chars)
 
     # generate and return the random string
-    # ruff: noqa: S311
+    # ruff: noqa: S311 - Standard pseudo-random generators are not suitable for cryptographic purposes
     return "".join(random.choice(seq=chars) for _ in range(size))
 
 
@@ -251,6 +248,7 @@ def str_splice(source: str,
 
     These examples illustrate the various possibilities (*source* = 'My string to be spliced'):
       - () ===> ('My string to be spliced',)
+      - ('My') ===> ('',  'string to be spliced')
       - ('tri') ===> ('My s', 'ng to be spliced')
       - ('iced') ===> ('My string to be spl', '')
       - ('X', 'B') ===> (None, None, 'My string to be spliced')
