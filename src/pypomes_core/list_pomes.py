@@ -70,7 +70,6 @@ def list_unflatten(source: str) -> list[str]:
     :param source: string with components concatenated by "."
     :return: the list of strings containing the concatenated components
     """
-    # import the needed function
     from .str_pomes import str_split_on_mark
 
     return str_split_on_mark(source, ".")
@@ -145,7 +144,6 @@ def list_transform(source: list,
     :param add_missing: whether to add entries in *source* missing in *from_to_keys* (defaults to *False*)
     :return: the new list
     """
-    # import the needed function
     from .dict_pomes import dict_transform
 
     # initialize the return variable
@@ -366,7 +364,6 @@ def list_hexify(source: list) -> list:
     :param source: the list to be *hexified*
     :return: a list with *hexified* values
     """
-    # needed imports
     from .dict_pomes import dict_hexify
 
     # initialize the return variable
@@ -489,6 +486,7 @@ def list_stringify(source: list) -> str:
     :return: the string listing the items in *source*
     """
     from .dict_pomes import dict_stringify
+
     # initialize the return variable
     result: str = "["
 

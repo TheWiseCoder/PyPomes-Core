@@ -7,7 +7,7 @@ from .dict_pomes import (
     dict_has_key, dict_get_value, dict_set_value, dict_reduce,
     dict_listify, dict_transform, dict_merge, dict_coalesce, dict_clone,
     dict_get_key, dict_get_keys, dict_from_object, dict_from_list,
-    dict_replace_value, dict_pop_value, dict_unique_values,
+    dict_replace_value, dict_pop, dict_pop_all, dict_unique_values,
     dict_jsonify, dict_hexify, dict_stringify
 )
 from .email_pomes import (
@@ -18,9 +18,11 @@ from .encoding_pomes import (
 )
 from .env_pomes import (
     APP_PREFIX,
-    env_get_str, env_get_int, env_get_float,
-    env_get_strs, env_get_ints, env_get_floats,
-    env_get_bytes, env_get_bool, env_get_enum,
+    env_get_str, env_get_strs,
+    env_get_int, env_get_ints,
+    env_get_float, env_get_floats,
+    env_get_enum, env_get_enums,
+    env_get_bool, env_get_bytes,
     env_get_date, env_get_path, env_is_docker
 )
 from .exception_pomes import (
@@ -28,8 +30,8 @@ from .exception_pomes import (
 )
 from .file_pomes import (
     TEMP_FOLDER, Mimetype,
-    file_from_request, file_get_data, file_get_mimetype,
-    file_is_binary, file_is_pdf
+    file_get_data, file_get_extension,
+    file_get_mimetype, file_is_binary
 )
 from .list_pomes import (
     list_compare, list_flatten, list_unflatten, list_get_coupled,
@@ -55,8 +57,7 @@ from .validation_pomes import (
     validate_value, validate_bool, validate_int, validate_decimal,
     validate_str, validate_date, validate_datetime, validate_enum,
     validate_email, validate_pwd, validate_ints, validate_strs,
-    validate_format_error, validate_format_errors,
-    validate_unformat_errors, validate_build_response
+    validate_format_error, validate_format_errors, validate_unformat_errors
 )
 from .xml_pomes import (
     XML_FILE_HEADER,
@@ -74,7 +75,7 @@ __all__ = [
     "dict_has_key", "dict_get_value", "dict_set_value", "dict_reduce",
     "dict_listify", "dict_transform", "dict_merge", "dict_coalesce", "dict_clone",
     "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
-    "dict_replace_value", "dict_pop_value", "dict_unique_values",
+    "dict_replace_value", "dict_pop", "dict_pop_all", "dict_unique_values",
     "dict_jsonify", "dict_hexify", "dict_stringify",
     # email_pomes
     "EmailConfig", "email_send", "email_codify",
@@ -82,16 +83,18 @@ __all__ = [
     "encode_ascii_hex", "decode_ascii_hex",
     # env_pomes
     "APP_PREFIX",
-    "env_get_str", "env_get_int", "env_get_float",
-    "env_get_strs", "env_get_ints", "env_get_floats",
-    "env_get_bytes", "env_get_bool", "env_get_enum",
+    "env_get_str", "env_get_strs",
+    "env_get_int", "env_get_ints",
+    "env_get_float", "env_get_floats",
+    "env_get_enum",  "env_get_enums",
+    "env_get_bool", "env_get_bytes",
     "env_get_date", "env_get_path", "env_is_docker",
     # exception_pomes
     "exc_format",
     # file_pomes
     "TEMP_FOLDER", "Mimetype",
-    "file_from_request", "file_get_data", "file_get_mimetype",
-    "file_is_binary", "file_is_pdf",
+    "file_get_data", "file_get_extension",
+    "file_get_mimetype", "file_is_binary",
     # list_pomes
     "list_compare", "list_flatten", "list_unflatten", "list_get_coupled",
     "list_elem_starting_with", "list_elem_with_attr", "list_transform",
@@ -112,8 +115,7 @@ __all__ = [
     "validate_value", "validate_bool", "validate_int", "validate_decimal",
     "validate_str", "validate_date", "validate_datetime", "validate_enum",
     "validate_email", "validate_pwd", "validate_ints", "validate_strs",
-    "validate_format_error", "validate_format_errors",
-    "validate_unformat_errors", "validate_build_response",
+    "validate_format_error", "validate_format_errors", "validate_unformat_errors",
     # xml_pomes
     "XML_FILE_HEADER",
     "xml_to_dict", "xml_normalize_keys"

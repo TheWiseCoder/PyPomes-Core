@@ -48,54 +48,6 @@ def env_get_str(key: str,
     return result
 
 
-def env_get_int(key: str,
-                values: list[int] = None,
-                def_value: int = None) -> int | None:
-    """
-    Retrieve and return the integer value defined for *key* in the current operating environment.
-
-    If *values* is specified, the value obtained is checked for occurrence therein.
-
-    :param key: the key which the value is associated with
-    :param values: optional list of valid values
-    :param def_value: the default value to return, if the key has not been defined
-    :return: the integer value associated with the key
-    """
-    result: int | None
-    try:
-        result = int(os.environ[key])
-        if values and result not in values:
-            result = None
-    except (AttributeError, KeyError, TypeError):
-        result = def_value
-
-    return result
-
-
-def env_get_float(key: str,
-                  values: list[float] = None,
-                  def_value: float = None) -> float | None:
-    """
-    Retrieve and return the float value defined for *key* in the current operating environment.
-
-    If *values* is specified, the value obtained is checked for occurrence therein.
-
-    :param key: the key which the value is associated with
-    :param values: optional list of valid values
-    :param def_value: the default value to return, if the key has not been defined
-    :return: the float value associated with the key
-    """
-    result: float | None
-    try:
-        result = float(os.environ[key])
-        if values and result not in values:
-            result = None
-    except (AttributeError, KeyError, TypeError):
-        result = def_value
-
-    return result
-
-
 def env_get_strs(key: str,
                  values: list[str] = None,
                  ignore_case: bool = False) -> list[str] | None:
@@ -128,6 +80,30 @@ def env_get_strs(key: str,
     return result
 
 
+def env_get_int(key: str,
+                values: list[int] = None,
+                def_value: int = None) -> int | None:
+    """
+    Retrieve and return the integer value defined for *key* in the current operating environment.
+
+    If *values* is specified, the value obtained is checked for occurrence therein.
+
+    :param key: the key which the value is associated with
+    :param values: optional list of valid values
+    :param def_value: the default value to return, if the key has not been defined
+    :return: the integer value associated with the key
+    """
+    result: int | None
+    try:
+        result = int(os.environ[key])
+        if values and result not in values:
+            result = None
+    except (AttributeError, KeyError, TypeError):
+        result = def_value
+
+    return result
+
+
 def env_get_ints(key: str,
                  values: list[str] = None) -> list[int] | None:
     """
@@ -155,6 +131,30 @@ def env_get_ints(key: str,
     return result
 
 
+def env_get_float(key: str,
+                  values: list[float] = None,
+                  def_value: float = None) -> float | None:
+    """
+    Retrieve and return the float value defined for *key* in the current operating environment.
+
+    If *values* is specified, the value obtained is checked for occurrence therein.
+
+    :param key: the key which the value is associated with
+    :param values: optional list of valid values
+    :param def_value: the default value to return, if the key has not been defined
+    :return: the float value associated with the key
+    """
+    result: float | None
+    try:
+        result = float(os.environ[key])
+        if values and result not in values:
+            result = None
+    except (AttributeError, KeyError, TypeError):
+        result = def_value
+
+    return result
+
+
 def env_get_floats(key: str,
                    values: list[str] = None) -> list[float] | None:
     """
@@ -179,6 +179,137 @@ def env_get_floats(key: str,
                     if val not in values:
                         result = None
                         break
+    return result
+
+
+def env_get_enum(key: str,
+                 enum_class: type[IntEnum | StrEnum],
+                 use_names: bool = False,
+                 values: list[IntEnum | StrEnum] = None,
+                 def_value: IntEnum | StrEnum = None) -> Any:
+    """
+    Retrieve and return the enum value defined for *key* in the current operating environment.
+
+    If provided, this value must be a name or a value corresponding to an instance of a subclass of *enum_class*.
+    The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*.
+    The parameter *use_names* determines whether the names of the elements in the *enum_class* should be used,
+    ignoring capitalization. If not specified, the values of the elements are used (the default).
+    If *values* is specified, the value obtained is checked for occurrence therein.
+    On failure, *None* is returned.
+
+    :param key: the key which the value is associated with
+    :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
+    :param use_names: specifies whether *enum*'s names should be used (defaults to using *enum*'s values)
+    :param values: optional list of allowed values (defaults to all elements of *enum_class*)
+    :param def_value: the default value to return, if the key has not been defined
+    :return: the value associated with the key, as an instance of *enum_class*, or *None* if failure
+    """
+    # initialize the return variable
+    result: Any = None
+
+    if use_names:
+        name: str = env_get_str(key=key,
+                                values=[e.name for e in (values or enum_class)],
+                                ignore_case=True,
+                                def_value=def_value.name if def_value else None)
+        if isinstance(name, str):
+            for e in enum_class:
+                if e.name.lower() == name.lower():
+                    result = e
+                    break
+    else:
+        value: Any = None
+        vals: list = [e.value for e in (values or enum_class)]
+        if issubclass(enum_class, StrEnum):
+            value: str = env_get_str(key=key,
+                                     values=vals,
+                                     def_value=def_value)
+        elif issubclass(enum_class, IntEnum):
+            value: int = env_get_int(key=key,
+                                     values=vals,
+                                     def_value=def_value)
+        if value:
+            result = enum_class(value)
+
+    return result
+
+
+def env_get_enums(key: str,
+                  enum_class: type[IntEnum | StrEnum],
+                  use_names: bool = False) -> list:
+    """
+    Retrieve and return the enum values defined for *key* in the current operating environment.
+
+    If provided, these value must be names or values corresponding to an instance of a subclass of *enum_class*.
+    The only accepted values for *enum_class* are subclasses of *StrEnum* or *IntEnum*.
+    The parameter *use_names* determines whether the names of the elements in the *enum_class* should be used,
+    ignoring capitalization. It must be possible to convert all names associated with *key* to enum instances.
+    On failure, *None* is returned.
+
+    :param key: the key which the values are associated with
+    :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
+    :param use_names: specifies whether *enum*'s names should be used (defaults to using *enum*'s values)
+    :return: the values associated with the key, as instances of *enum_class*, or *None* if failure
+    """
+    # initialize the return variable
+    result: list = None
+
+    enums: list = []
+    values: str = os.getenv(key)
+    if values:
+        found: bool = False
+        names: list[str] = values.split(",")
+        for name in names:
+            found = False
+            if use_names:
+                for e in enum_class:
+                    if e.name.lower() == name.lower():
+                        enums.append(e)
+                        found = True
+                        break
+            else:
+                if issubclass(enum_class, IntEnum) and name.isdigit():
+                    value: int = int(name)
+                else:
+                    value: str = name
+                if value in enum_class:
+                    enums.append(enum_class(value))
+                    found = True
+            # break on the first failure
+            if not found:
+                break
+        if found:
+            result = enums
+
+    return result
+
+
+def env_get_bool(key: str,
+                 def_value: bool = None) -> bool:
+    """
+    Retrieve and return the boolean value defined for *key* in the current operating environment.
+
+    These are the criteria:
+        - case is disregarded
+        - the string values accepted to stand for *True* are *1*, *t*, or *true*
+        - the string values accepted to stand for *False* are *0*, *f*, or *false*
+        - all other values causes *None* to be returned
+
+    :param key: the key which the value is associated with
+    :param def_value: the default value to return, if the key has not been defined
+    :return: the boolean value associated with the key, or *None* if a boolean value could not be established
+    """
+    result: bool | None
+    try:
+        if os.environ[key].lower() in ["1", "t", "true"]:
+            result = True
+        elif os.environ[key].lower() in ["0", "f", "false"]:
+            result = False
+        else:
+            result = None
+    except (AttributeError, KeyError, TypeError):
+        result = def_value
+
     return result
 
 
@@ -215,87 +346,6 @@ def env_get_bytes(key: str,
             result = None
     except (AttributeError, KeyError, TypeError):
         result = def_value
-
-    return result
-
-
-def env_get_bool(key: str,
-                 def_value: bool = None) -> bool:
-    """
-    Retrieve and return the boolean value defined for *key* in the current operating environment.
-
-    These are the criteria:
-        - case is disregarded
-        - the string values accepted to stand for *True* are *1*, *t*, or *true*
-        - the string values accepted to stand for *False* are *0*, *f*, or *false*
-        - all other values causes *None* to be returned
-
-    :param key: the key which the value is associated with
-    :param def_value: the default value to return, if the key has not been defined
-    :return: the boolean value associated with the key, or *None* if a boolean value could not be established
-    """
-    result: bool | None
-    try:
-        if os.environ[key].lower() in ["1", "t", "true"]:
-            result = True
-        elif os.environ[key].lower() in ["0", "f", "false"]:
-            result = False
-        else:
-            result = None
-    except (AttributeError, KeyError, TypeError):
-        result = def_value
-
-    return result
-
-
-def env_get_enum(key: str,
-                 enum_class: type[IntEnum | StrEnum],
-                 use_names: bool = False,
-                 values: list[IntEnum | StrEnum] = None,
-                 def_value: IntEnum | StrEnum = None) -> Any:
-    """
-    Retrieve and return the enum value defined for *key* in the current operating environment.
-
-    If provided, this value must be a name or a value corresponding to an instance of a subclass of *enum_class*.
-    The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*.
-    The parameter *use_names* determines whether the names of the elements in the *enum_class* should be used,
-    ignoring capitalization. If not specified, the values of the elements are used (the default).
-    If *values* is specified, the value obtained is checked for occurrence therein.
-    On failure, *None* is returned.
-
-    :param key: the key which the value is associated with
-    :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
-    :param use_names: specifies whether *enum*'s names should be used (defaults to using *enum*'s values)
-    :param values: optional list of allowed values (defaults to all elements of *enum_class*)
-    :param def_value: the default value to return, if the key has not been defined
-    :return: the string value associated with the key, as an instance of *enum_class*
-    """
-    # initialize the return variable
-    result: Any = None
-
-    if use_names:
-        name: str = env_get_str(key=key,
-                                values=[e.name for e in (values or enum_class)],
-                                ignore_case=True,
-                                def_value=def_value.name if def_value else None)
-        if isinstance(name, str):
-            for e in enum_class:
-                if e.name.lower() == name.lower():
-                    result = e
-                    break
-    else:
-        value: Any = None
-        vals: list = [e.value for e in (values or enum_class)]
-        if issubclass(enum_class, StrEnum):
-            value: str = env_get_str(key=key,
-                                     values=vals,
-                                     def_value=def_value)
-        elif issubclass(enum_class, IntEnum):
-            value: int = env_get_int(key=key,
-                                     values=vals,
-                                     def_value=def_value)
-        if value:
-            result = enum_class(value)
 
     return result
 

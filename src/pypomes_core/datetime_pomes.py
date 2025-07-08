@@ -125,8 +125,8 @@ def datetime_parse(dt_str: str,
     return result
 
 
-def timestamp_interval(start: date | datetime | float | int,
-                       finish: date | datetime | float | int) -> tuple[int, int, int, int, int] | None:
+def timestamp_interval(start: date | datetime | float,
+                       finish: date | datetime | float) -> tuple[int, int, int, int, int] | None:
     """
     Calculate the number of hours, minutes, seconds, milliseconds, and microseconds between *start* and *finish*.
 
@@ -171,8 +171,8 @@ def timestamp_interval(start: date | datetime | float | int,
     return result
 
 
-def timestamp_duration(start: date | datetime | float | int,
-                       finish: date | datetime | float | int) -> str | None:
+def timestamp_duration(start: date | datetime | float,
+                       finish: date | datetime | float) -> str | None:
     """
     Calculate and return the interval between *start* and *finish*.
 
@@ -185,4 +185,4 @@ def timestamp_duration(start: date | datetime | float | int,
     # obtain the interval and returned a formatted string
     interval: tuple[int, int, int, int, int] = timestamp_interval(start=start,
                                                                   finish=finish)
-    return f"{interval[0]}h{interval[1]}m{interval[2]}s"
+    return f"{interval[0]}h{interval[1]:02d}m{interval[2]:02d}s"

@@ -3,7 +3,6 @@ import string
 from datetime import date, datetime, time
 from decimal import Decimal
 from enum import IntEnum, StrEnum, auto
-from flask import jsonify, Response
 from logging import Logger
 from typing import Any, Final
 
@@ -31,7 +30,7 @@ VALIDATION_MSG_PREFIX: Final[str] = env_get_str(key=f"{APP_PREFIX}_VALIDATION_MS
 
 
 def validate_value(attr: str,
-                   val: str | int | float | Decimal,
+                   val: str | float | Decimal,
                    min_val: int = None,
                    max_val: int = None,
                    values: list = None,
@@ -271,7 +270,7 @@ def validate_decimal(errors: list[str] | None,
                      max_val: float = None,
                      required: bool = False,
                      values: list[float | int] = None,
-                     default: int | float = None,
+                     default: float = None,
                      logger: Logger = None) -> Decimal | None:
     """
     Validate the *float* value associated with *attr* in *source*.
@@ -722,7 +721,7 @@ def validate_ints(errors: list[str] | None,
     :return: the list of validated values, *[]* if not required and no values found, or *None* if validation failed
     """
     # initialize the return variable
-    result: list | None = []
+    result: list = []
 
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
@@ -735,13 +734,13 @@ def validate_ints(errors: list[str] | None,
             values = str_as_list(source=values,
                                  sep=sep)
         if isinstance(values, list):
-            result = []
             if len(values) > 0:
                 for inx, value in enumerate(values):
-                    result.append(value)
-                    if isinstance(value, int):
+                    if (isinstance(value, str) and value.isdigit()) or \
+                            (isinstance(value, int) and not isinstance(value, bool)):
+                        result.append(int(value))
                         stat = validate_value(attr=f"@{attr}[{inx+1}]",
-                                              val=value,
+                                              val=int(value),
                                               min_val=min_val,
                                               max_val=max_val)
                     else:
@@ -750,6 +749,8 @@ def validate_ints(errors: list[str] | None,
                                                      value,
                                                      "int",
                                                      f"@{attr}[{inx+1}]")
+                    if stat:
+                        break
             elif required:
                 # 121: Required attribute
                 stat = validate_format_error(121,
@@ -846,31 +847,6 @@ def validate_strs(errors: list[str] | None,
         if isinstance(errors, list):
             errors.append(stat)
         result = None
-
-    return result
-
-
-def validate_build_response(errors: list[str],
-                            reply: dict) -> Response:
-    """
-    Build a *Response* object based on the given *errors* list and the set of key/value pairs in *reply*.
-
-    :param errors: the reference errors
-    :param reply: the key/value pairs to add to the response as JSON string
-    :return: the appropriate *Response* object
-    """
-    # declare the return variable
-    result: Response
-
-    if len(errors) == 0:
-        # 'reply' might be 'None'
-        result = jsonify(reply)
-    else:
-        reply_err: dict = {"errors": validate_format_errors(errors=errors)}
-        if isinstance(reply, dict):
-            reply_err.update(reply)
-        result = jsonify(reply_err)
-        result.status_code = 400
 
     return result
 

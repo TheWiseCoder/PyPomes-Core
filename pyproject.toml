@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pypomes_core"
-version = "2.3.6"
+version = "2.5.0"
 authors = [
   { name="GT Nunes", email="wisecoder01@gmail.com" }
 ]
@@ -20,9 +20,8 @@ classifiers = [
 ]
 dependencies = [
     "filetype>=1.2.0",
-    "Flask>=3.1.1",
     "python-dateutil>=2.9.0",
-    "requests>=2.32.3",
+    "python-magic>=0.4.27",
     "tzdata>=2025.2",
     "xmltodict3>=0.0.4"
 ]

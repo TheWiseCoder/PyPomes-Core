@@ -194,10 +194,10 @@ def dict_set_value(target: dict,
     return target
 
 
-def dict_pop_value(target: dict,
-                   key_chain: str | list[str]) -> Any:
+def dict_pop(target: dict,
+             key_chain: str | list[str]) -> Any:
     """
-    Remove and return the value of the element in *source*, pointed to by *key_chain*.
+    Remove the element in *source* pointed to by *key_chain*, and return its value.
 
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
     The path up to the last key in the chain must point to an existing element.
@@ -206,7 +206,7 @@ def dict_pop_value(target: dict,
     Return *None* if the sought after value is not found.
     Note that returning *None* might not be indicative of the absence of the element in *source*,
     since that element might exist therein with the value *None*. To determine whether this is the case,
-    use the operation *dict_has_value()*.
+    use the operation *dict_has_key()*.
 
     :param target: the reference *dict*
     :param key_chain: the key chain
@@ -258,6 +258,29 @@ def dict_pop_value(target: dict,
             result = parent.pop(key)
 
     return result
+
+
+def dict_pop_all(target: dict,
+                 key: Any) -> dict:
+    """
+    Remove all elements in *source* associated with *key*, at all levels.
+
+    Values of type *dict* found while traversing *target* are recursively processed for removal.
+    For convenience the, possibly modified, input dict *target* is returned.
+
+    :param target: the reference *dict*
+    :param key: the key chain
+    :return: the possibly modifed input *dict*
+    """
+    # traverse the input dictionary
+    for k, v in target.copy().items():
+        if k == key:
+            target.pop(k)
+        elif v and isinstance(v, dict):
+            # 'v' is a nonempty 'dict'
+            target[k] = dict_pop_all(target=v,
+                                     key=key)
+    return target
 
 
 def dict_replace_value(target: dict,

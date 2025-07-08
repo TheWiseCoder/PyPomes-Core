@@ -40,8 +40,9 @@ def str_as_list(source: str,
     """
     Return *source* as a *list*, by splitting its contents separated by *sep*.
 
-    The returned substrings are fully whitespace-trimmed.
-    If *source* is not a non-empty *str*, then a list containing itself is returned.
+    The returned substrings are fully whitespace-trimmed. If *source* is *None*, an empty list is returned.
+    If it is an empty *str*, a list containg an empty *str* is returned. If it is not a *str*,
+    a list containing itself is returned.
 
     :param source: the string value to be worked on
     :param sep: the separator (defaults to ",")
@@ -50,8 +51,10 @@ def str_as_list(source: str,
     # declare the return variable
     result: list[str]
 
-    if source and isinstance(source, str):
+    if isinstance(source, str):
         result = [s.strip() for s in source.split(sep=sep)]
+    elif source is None:
+        result = []
     else:
         result = [source]
 
