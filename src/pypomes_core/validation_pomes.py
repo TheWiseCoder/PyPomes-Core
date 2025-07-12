@@ -2,7 +2,7 @@ import re
 import string
 from datetime import date, datetime, time
 from decimal import Decimal
-from enum import IntEnum, StrEnum, auto
+from enum import Enum, IntEnum, StrEnum, auto
 from logging import Logger
 from typing import Any, Final
 
@@ -30,89 +30,91 @@ VALIDATION_MSG_PREFIX: Final[str] = env_get_str(key=f"{APP_PREFIX}_VALIDATION_MS
 
 
 def validate_value(attr: str,
-                   val: str | float | Decimal,
-                   min_val: int = None,
-                   max_val: int = None,
+                   value: str | float | Decimal,
+                   min_value: int = None,
+                   max_value: int = None,
                    values: list = None,
                    ignore_case: bool = False,
                    required: bool = False) -> str | None:
     """
-    Validate *val* according to value, range, or membership in values list, as specified.
+    Validate *value* according to value, range, or membership in *values*, as specified.
 
     :param attr: the name of the attribute
-    :param val: the value to be validated
-    :param min_val: if *val* is a string, specifies its minimum length; otherwise, specifies its minimum value
-    :param max_val: if *val* is a string, specifies its maximum length; otherwise, specifies its maximum value
+    :param value: the value to be validated
+    :param min_value: if *value* is a string, specifies its minimum length; otherwise, specifies its minimum value
+    :param max_value: if *value* is a string, specifies its maximum length; otherwise, specifies its maximum value
     :param values: if provided, requires *val* to be contained therein
     :param ignore_case: specifies whether to ignore capitalization when handling string values
-    :param required:  requires *val* to be specified
-    :return: *None* if *val* passes validation, or the corresponding error message otherwise
+    :param required:  requires *value* to be specified
+    :return: *None* if *value* passes validation, or the corresponding error message otherwise
     """
     # initialize the return variable
     result: str | None = None
 
-    if val is None or val == "":
+    if value is None or value == "":
         if isinstance(required, bool) and required:
             # 121: Required attribute
             result = validate_format_error(121,
                                            f"@{attr}")
     elif isinstance(values, list):
+        val: str | float | Decimal = value
+        vals: list = values
         if ignore_case:
-            val = val.lower() if isinstance(val, str) else val
-            values = [v.lower() if isinstance(v, str) else v for v in values]
-        if val not in values:
+            val = value.lower() if isinstance(value, str) else value
+            vals = [v.lower() if isinstance(v, str) else v for v in values]
+        if val not in vals:
             length: int = len(values)
             if length == 1:
                 # 149: Invalid value {}: must be {}
                 result = validate_format_error(149,
-                                               val,
+                                               value,
                                                values[0],
                                                f"@{attr}")
             else:
                 # 150: Invalid value {}: must be one of {}
                 result = validate_format_error(150,
-                                               val,
+                                               value,
                                                values[:length],
                                                f"@{attr}")
-    elif isinstance(val, str):
-        length: int = len(val)
-        if min_val is not None and max_val == min_val and length != min_val:
+    elif isinstance(value, str):
+        length: int = len(value)
+        if min_value is not None and max_value == min_value and length != min_value:
             # 146: Invalid value {}: length must be {}
             result = validate_format_error(156,
-                                           val,
-                                           min_val,
+                                           value,
+                                           min_value,
                                            f"@{attr}")
-        elif max_val is not None and max_val < length:
+        elif max_value is not None and max_value < length:
             # 148: Invalid value {}: length longer than {}
             result = validate_format_error(148,
-                                           val,
-                                           max_val,
+                                           value,
+                                           max_value,
                                            f"@{attr}")
-        elif min_val is not None and length < min_val:
+        elif min_value is not None and length < min_value:
             # 147: Invalid value {}: length shorter than {}
             result = validate_format_error(147,
-                                           val,
-                                           min_val,
+                                           value,
+                                           min_value,
                                            f"@{attr}")
-    elif ((min_val is not None and val < min_val) or
-          (max_val is not None and val > max_val)):
-        if min_val is not None and max_val is not None:
+    elif ((min_value is not None and value < min_value) or
+          (max_value is not None and value > max_value)):
+        if min_value is not None and max_value is not None:
             # 151: Invalid value {}: must be in the range {}
             result = validate_format_error(151,
-                                           val,
-                                           [min_val, max_val],
+                                           value,
+                                           [min_value, max_value],
                                            f"@{attr}")
-        elif min_val is not None:
+        elif min_value is not None:
             # 144: Invalid value {}: must be greater than {}
             result = validate_format_error(144,
-                                           val,
-                                           min_val,
+                                           value,
+                                           min_value,
                                            f"@{attr}")
         else:
             # 143: Invalid value {}: must be less than {}
             result = validate_format_error(143,
-                                           val,
-                                           max_val,
+                                           value,
+                                           max_value,
                                            f"@{attr}")
     return result
 
@@ -247,9 +249,9 @@ def validate_int(errors: list[str] | None,
                                      f"@{attr}")
     if not stat:
         stat = validate_value(attr=attr,
-                              val=value,
-                              min_val=min_val,
-                              max_val=max_val,
+                              value=value,
+                              min_value=min_val,
+                              max_value=max_val,
                               values=values,
                               required=required)
     if stat:
@@ -314,9 +316,9 @@ def validate_decimal(errors: list[str] | None,
                                      f"@{attr}")
     if not stat:
         stat = validate_value(attr=attr,
-                              val=value,
-                              min_val=min_val,
-                              max_val=max_val,
+                              value=value,
+                              min_value=min_val,
+                              max_value=max_val,
                               values=values,
                               required=required)
     if stat:
@@ -378,9 +380,9 @@ def validate_str(errors: list[str] | None,
                                      f"@{attr}")
     else:
         stat = validate_value(attr=attr,
-                              val=value,
-                              min_val=min_length,
-                              max_val=max_length,
+                              value=value,
+                              min_value=min_length,
+                              max_value=max_length,
                               values=values,
                               ignore_case=ignore_case,
                               required=required)
@@ -541,10 +543,10 @@ def validate_datetime(errors: list[str] | None,
 def validate_enum(errors: list[str] | None,
                   source: dict[str, Any],
                   attr: str,
-                  enum_class: type[IntEnum | StrEnum],
+                  enum_class: type[IntEnum | StrEnum | str | int],
                   use_names: bool = False,
                   values: list[IntEnum | StrEnum] = None,
-                  default: IntEnum | StrEnum = None,
+                  default: IntEnum | StrEnum | str | int = None,
                   required: bool = False,
                   logger: Logger = None) -> Any:
     """
@@ -571,11 +573,19 @@ def validate_enum(errors: list[str] | None,
     result: Any = None
 
     if use_names:
+        pos: int = attr.rfind(".") + 1
+        suffix: str = attr[pos:]
+        value: Any = source.get(suffix)
+        if isinstance(value, Enum):
+            source = source.copy()
+            source[attr] = value.name
+        vals: list[str | int] = [v.name if isinstance(v, Enum) else v
+                                 for v in (values or enum_class._member_names_)]
         name: str = validate_str(errors=errors,
                                  source=source,
                                  attr=attr,
-                                 values=[e.name for e in (values or enum_class)],
-                                 default=default.name if default else None,
+                                 values=vals,
+                                 default=default.name if isinstance(default, Enum) else default,
                                  ignore_case=True,
                                  required=required,
                                  logger=logger)
@@ -740,9 +750,9 @@ def validate_ints(errors: list[str] | None,
                             (isinstance(value, int) and not isinstance(value, bool)):
                         result.append(int(value))
                         stat = validate_value(attr=f"@{attr}[{inx+1}]",
-                                              val=int(value),
-                                              min_val=min_val,
-                                              max_val=max_val)
+                                              value=int(value),
+                                              min_value=min_val,
+                                              max_value=max_val)
                     else:
                         # 152: Invalid value {}: must be type {}
                         stat = validate_format_error(152,
@@ -818,9 +828,9 @@ def validate_strs(errors: list[str] | None,
                     result.append(value)
                     if isinstance(value, str):
                         stat = validate_value(attr=f"@{attr}[{inx+1}]",
-                                              val=value,
-                                              min_val=min_length,
-                                              max_val=max_length)
+                                              value=value,
+                                              min_value=min_length,
+                                              max_value=max_length)
                     else:
                         # 152: Invalid value {}: must be type {}
                         stat = validate_format_error(152,
