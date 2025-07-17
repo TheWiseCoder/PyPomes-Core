@@ -41,7 +41,7 @@ def email_send(errors: list[str] | None,
     :param logger: optional logger
     """
     # import needed function
-    from .exception_pomes import exc_format
+    from .obj_pomes import exc_format
 
     # build the email object
     email_msg = EmailMessage()

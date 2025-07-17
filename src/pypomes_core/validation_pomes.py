@@ -298,15 +298,15 @@ def validate_decimal(errors: list[str] | None,
     suffix: str = attr[pos:]
 
     # retrieve the value
-    value: float = source.get(suffix)
+    value: Decimal = source.get(suffix)
 
     # validate it
     if value is None and isinstance(default, int | float | Decimal):
-        value = Decimal(default)
+        value = Decimal(value=default)
     elif (isinstance(value, float) or
           (isinstance(value, int) and not isinstance(value, bool)) or
           (isinstance(value, str) and value.replace(".", "", 1).isnumeric())):
-        value = Decimal(value)
+        value = Decimal(value=value)
     elif isinstance(value, bool) or \
             (value is not None and not isinstance(value, int | float | Decimal)):
         # 152: Invalid value {}: must be type {}
@@ -543,10 +543,10 @@ def validate_datetime(errors: list[str] | None,
 def validate_enum(errors: list[str] | None,
                   source: dict[str, Any],
                   attr: str,
-                  enum_class: type[IntEnum | StrEnum | str | int],
+                  enum_class: type[IntEnum | StrEnum],
                   use_names: bool = False,
-                  values: list[IntEnum | StrEnum] = None,
-                  default: IntEnum | StrEnum | str | int = None,
+                  values: list[IntEnum | StrEnum | str | int | Decimal] = None,
+                  default: IntEnum | StrEnum | str | int | Decimal = None,
                   required: bool = False,
                   logger: Logger = None) -> Any:
     """
@@ -579,8 +579,8 @@ def validate_enum(errors: list[str] | None,
         if isinstance(value, Enum):
             source = source.copy()
             source[attr] = value.name
-        vals: list[str | int] = [v.name if isinstance(v, Enum) else v
-                                 for v in (values or enum_class._member_names_)]
+        vals: list[str | int | Decimal] = [v.name if isinstance(v, Enum) else v
+                                           for v in (values or enum_class._member_names_)]
         name: str = validate_str(errors=errors,
                                  source=source,
                                  attr=attr,
@@ -596,13 +596,14 @@ def validate_enum(errors: list[str] | None,
                     break
     else:
         value: Any = None
-        vals: list = [e.value for e in (values or enum_class)]
+        vals: list[str | int | Decimal] = [v.value if isinstance(v, Enum) else v
+                                           for v in (values or enum_class)]
         if issubclass(enum_class, StrEnum):
             value: str = validate_str(errors=errors,
                                       source=source,
                                       attr=attr,
                                       values=vals,
-                                      default=default,
+                                      default=default.value if isinstance(default, Enum) else default,
                                       required=required,
                                       logger=logger)
         elif issubclass(enum_class, IntEnum):
@@ -610,7 +611,7 @@ def validate_enum(errors: list[str] | None,
                                       source=source,
                                       attr=attr,
                                       values=vals,
-                                      default=default,
+                                      default=default.value if isinstance(default, Enum) else default,
                                       required=required,
                                       logger=logger)
         if value:
@@ -731,7 +732,7 @@ def validate_ints(errors: list[str] | None,
     :return: the list of validated values, *[]* if not required and no values found, or *None* if validation failed
     """
     # initialize the return variable
-    result: list = []
+    result: list | None = []
 
     stat: str | None = None
     pos: int = attr.rfind(".") + 1

@@ -25,9 +25,6 @@ from .env_pomes import (
     env_get_bool, env_get_bytes,
     env_get_date, env_get_path, env_is_docker
 )
-from .exception_pomes import (
-    exc_format,
-)
 from .file_pomes import (
     TEMP_FOLDER, Mimetype,
     file_get_data, file_get_extension,
@@ -40,7 +37,7 @@ from .list_pomes import (
     list_jsonify, list_hexify, list_hierarchize, list_stringify
 )
 from .obj_pomes import (
-    obj_is_serializable
+    obj_is_serializable, exc_format, func_get_passed_args
 )
 from .str_pomes import (
     str_to_hex, str_from_hex, str_to_lower, str_to_upper,
@@ -89,8 +86,6 @@ __all__ = [
     "env_get_enum",  "env_get_enums",
     "env_get_bool", "env_get_bytes",
     "env_get_date", "env_get_path", "env_is_docker",
-    # exception_pomes
-    "exc_format",
     # file_pomes
     "TEMP_FOLDER", "Mimetype",
     "file_get_data", "file_get_extension",
@@ -101,7 +96,7 @@ __all__ = [
     "list_prune_duplicates", "list_prune_in", "list_prune_not_in",
     "list_jsonify", "list_hexify", "list_hierarchize", "list_stringify",
     # obj_pomes
-    "obj_is_serializable",
+    "obj_is_serializable", "exc_format", "func_get_passed_args",
     # str_pomes
     "str_to_hex", "str_from_hex", "str_to_lower", "str_to_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",
@@ -130,7 +125,7 @@ __version_info__: tuple = tuple(int(i) for i in __version__.split(".") if i.isdi
 
 def pypomes_versions() -> dict[str, str]:
     """
-    Retrieve and return the versions of the *Pypomes* packages in use.
+    Retrieve the versions of the *Pypomes* packages in use.
 
     :return: the versions of the Pypomes packages in use
     """
@@ -166,9 +161,12 @@ def pypomes_versions() -> dict[str, str]:
         result["PyPomes-S3"] = import_module(name="pypomes_s3").__version__
 
     with suppress(Exception):
-        result["PyPomes-Scheduling"] = import_module(name="pypomes_scheduling").__version__
+        result["PyPomes-SOAP"] = import_module(name="pypomes_soap").__version__
 
     with suppress(Exception):
-        result["PyPomes-SOAP"] = import_module(name="pypomes_soap").__version__
+        result["PyPomes-SOB"] = import_module(name="pypomes_sob").__version__
+
+    with suppress(Exception):
+        result["PyPomes-Scheduling"] = import_module(name="pypomes_scheduling").__version__
 
     return result

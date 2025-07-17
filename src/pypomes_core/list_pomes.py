@@ -332,8 +332,8 @@ def list_jsonify(source: list,
             if jsonify_enums:
                 from .dict_pomes import dict_jsonify
                 result.append(dict_jsonify(source=value,
-                                           jsonify_keys=jsonify_enums,
-                                           jsonify_values=jsonify_enums))
+                                           jsonify_keys=jsonify_enums == "names",
+                                           jsonify_values=jsonify_enums == "values"))
         elif isinstance(value, list):
             result.append(list_jsonify(source=value,
                                        jsonify_enums=jsonify_enums))

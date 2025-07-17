@@ -1018,7 +1018,7 @@ def dict_hexify(source: dict,
 
 def dict_stringify(source: dict[Any, Any]) -> str:
     """
-    Return a string with the key-value pairs from *source* listed as *{<k1> = <v1>, ..., <kn = <vn>}*.
+    Return a string with the key-value pairs from *source* listed as *{<k1> = <v1>, ..., <kn> = <vn>}*.
 
     The *stringification* is done recursively, with *dict* and *list* as values handled accordingly.
 

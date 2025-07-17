@@ -18,7 +18,7 @@ def env_get_str(key: str,
                 ignore_case: bool = False,
                 def_value: str = None) -> str | None:
     """
-    Retrieve and return the string value defined for *key* in the current operating environment.
+    Retrieve the string value defined for *key* in the current operating environment.
 
     If *values* is specified, the value obtained is checked for occurrence therein.
 
@@ -52,7 +52,7 @@ def env_get_strs(key: str,
                  values: list[str] = None,
                  ignore_case: bool = False) -> list[str] | None:
     """
-    Retrieve and return the string values defined for *key* in the current operating environment.
+    Retrieve the string values defined for *key* in the current operating environment.
 
     The values must be provided as a comma-separated list of strings.
     If *values* is specified, the values obtained are checked for occurrence therein, with *ignore_case*
@@ -84,7 +84,7 @@ def env_get_int(key: str,
                 values: list[int] = None,
                 def_value: int = None) -> int | None:
     """
-    Retrieve and return the integer value defined for *key* in the current operating environment.
+    Retrieve the integer value defined for *key* in the current operating environment.
 
     If *values* is specified, the value obtained is checked for occurrence therein.
 
@@ -107,7 +107,7 @@ def env_get_int(key: str,
 def env_get_ints(key: str,
                  values: list[str] = None) -> list[int] | None:
     """
-    Retrieve and return the integer values defined for *key* in the current operating environment.
+    Retrieve the integer values defined for *key* in the current operating environment.
 
     The values must be provided as a comma-separated list of integers.
     If *values* is specified, the values obtained are checked for occurrence therein.
@@ -135,7 +135,7 @@ def env_get_float(key: str,
                   values: list[float] = None,
                   def_value: float = None) -> float | None:
     """
-    Retrieve and return the float value defined for *key* in the current operating environment.
+    Retrieve the float value defined for *key* in the current operating environment.
 
     If *values* is specified, the value obtained is checked for occurrence therein.
 
@@ -158,7 +158,7 @@ def env_get_float(key: str,
 def env_get_floats(key: str,
                    values: list[str] = None) -> list[float] | None:
     """
-    Retrieve and return the float values defined for *key* in the current operating environment.
+    Retrieve the float values defined for *key* in the current operating environment.
 
     The values must be provided as a comma-separated list of floats.
     If *values* is specified, the values obtained are checked for occurrence therein.
@@ -188,7 +188,7 @@ def env_get_enum(key: str,
                  values: list[IntEnum | StrEnum] = None,
                  def_value: IntEnum | StrEnum = None) -> Any:
     """
-    Retrieve and return the enum value defined for *key* in the current operating environment.
+    Retrieve the enum value defined for *key* in the current operating environment.
 
     If provided, this value must be a name or a value corresponding to an instance of a subclass of *enum_class*.
     The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*.
@@ -238,7 +238,7 @@ def env_get_enums(key: str,
                   enum_class: type[IntEnum | StrEnum],
                   use_names: bool = False) -> list:
     """
-    Retrieve and return the enum values defined for *key* in the current operating environment.
+    Retrieve the enum values defined for *key* in the current operating environment.
 
     If provided, these value must be names or values corresponding to an instance of a subclass of *enum_class*.
     The only accepted values for *enum_class* are subclasses of *StrEnum* or *IntEnum*.
@@ -252,7 +252,7 @@ def env_get_enums(key: str,
     :return: the values associated with the key, as instances of *enum_class*, or *None* if failure
     """
     # initialize the return variable
-    result: list = None
+    result: list | None = None
 
     enums: list = []
     values: str = os.getenv(key)
@@ -287,7 +287,7 @@ def env_get_enums(key: str,
 def env_get_bool(key: str,
                  def_value: bool = None) -> bool:
     """
-    Retrieve and return the boolean value defined for *key* in the current operating environment.
+    Retrieve the boolean value defined for *key* in the current operating environment.
 
     These are the criteria:
         - case is disregarded
@@ -318,7 +318,7 @@ def env_get_bytes(key: str,
                   values: list[bytes] = None,
                   def_value: bytes = None) -> bytes | None:
     """
-    Retrieve and return the byte value defined for *key* in the current operating environment.
+    Retrieve the byte value defined for *key* in the current operating environment.
 
     The string defined in the environment must contain the *bytes* value encoded as defined in *encoding*.
     If *values* is specified, the value obtained is checked for occurrence therein.
@@ -353,7 +353,7 @@ def env_get_bytes(key: str,
 def env_get_date(key: str,
                  def_value: date = None) -> date:
     """
-    Retrieve and return the date value defined for *key* in the current operating environment.
+    Retrieve the date value defined for *key* in the current operating environment.
 
     :param key: the key which the value is associated with
     :param def_value: the default value to return, if the key has not been defined
@@ -371,7 +371,7 @@ def env_get_date(key: str,
 def env_get_path(key: str,
                  def_value: Path = None) -> Path:
     """
-    Retrieve and return the path value defined for *key* in the current operating environment.
+    Retrieve the path value defined for *key* in the current operating environment.
 
     :param key: the key which the value is associated with
     :param def_value: the default value to return, if the key has not been defined
