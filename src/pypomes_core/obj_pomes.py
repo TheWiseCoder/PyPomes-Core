@@ -2,6 +2,7 @@ import inspect
 import json
 import os
 import traceback
+from contextlib import suppress
 from types import FrameType, TracebackType
 from typing import Any
 
@@ -21,6 +22,42 @@ def obj_is_serializable(obj: Any) -> bool:
         json.dumps(obj)
     except (TypeError, OverflowError):
         result = False
+
+    return result
+
+
+def obj_to_dict(obj: Any,
+                omit_private: bool = True) -> dict[str, Any] | list[Any] | Any:
+    """
+    Convert the generic object *obj* to a *dict*.
+
+    The conversion is done recursively. Attributes for which exceptions are raised on attempt
+    to access them are silently omited.
+
+    :param obj: the object to be converted
+    :param omit_private: whether to omit private attributes (defaults to *True*)
+    :return: the dict obtained from *obj*
+    """
+    # declare the return variable
+    result: dict[str, Any] | list[Any] | Any
+
+    if isinstance(obj, dict):
+        result = {str(k): obj_to_dict(obj=v,
+                                      omit_private=omit_private) for k, v in obj.items()}
+    elif isinstance(obj, list | tuple | set):
+        result = [obj_to_dict(obj=item,
+                              omit_private=omit_private) for item in obj]
+    elif hasattr(obj, "__dict__") or not isinstance(obj, str | int | float | bool | type(None)):
+        result = {}
+        for attr in dir(obj):
+            if not (omit_private and attr.startswith("_")):
+                with suppress(Exception):
+                    value: Any = getattr(obj, attr)
+                    if not callable(value):
+                        result[attr] = obj_to_dict(obj=value,
+                                                   omit_private=omit_private)
+    else:
+        result = obj
 
     return result
 
