@@ -31,7 +31,8 @@ from .file_pomes import (
     file_get_mimetype, file_is_binary
 )
 from .list_pomes import (
-    list_compare, list_flatten, list_unflatten, list_get_coupled,
+    list_compare, list_correlate, list_bin_search,
+    list_flatten, list_unflatten, list_get_coupled,
     list_elem_starting_with, list_elem_with_attr, list_transform,
     list_prune_duplicates, list_prune_in, list_prune_not_in,
     list_jsonify, list_hexify, list_hierarchize, list_stringify
@@ -91,7 +92,8 @@ __all__ = [
     "file_get_data", "file_get_extension",
     "file_get_mimetype", "file_is_binary",
     # list_pomes
-    "list_compare", "list_flatten", "list_unflatten", "list_get_coupled",
+    "list_compare", "list_correlate", "list_bin_search",
+    "list_flatten", "list_unflatten", "list_get_coupled",
     "list_elem_starting_with", "list_elem_with_attr", "list_transform",
     "list_prune_duplicates", "list_prune_in", "list_prune_not_in",
     "list_jsonify", "list_hexify", "list_hierarchize", "list_stringify",

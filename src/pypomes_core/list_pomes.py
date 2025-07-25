@@ -12,6 +12,7 @@ def list_compare(list1: list,
     Compare the contents of the two lists *list1* e *list2*.
 
     Return *True* if all the elements in *list1* are also in *list2*, and vice versa, with the same cardinality.
+    The input list need not be sorted.
 
     :param list1: the first list
     :param list2: the second list
@@ -34,6 +35,130 @@ def list_compare(list1: list,
     else:
         # no, the lists are not equal
         result = False
+
+    return result
+
+
+def list_correlate(list_first: list,
+                   list_second: list,
+                   only_in_first: bool = False,
+                   only_in_second: bool = False,
+                   in_both: bool = False,
+                   bin_search: bool = False) -> tuple:
+    """
+    Correlate *list_first* and *list_second* by computing their differences.
+
+    A tuple containing up to three lists is returned, with contents based on the parameters:
+      - *only_in_first*: items existing in *list_first* but not in *list_second*
+      - *only_in_second*: items existing in *list_second* but not in *list_first*
+      - *in_both*: items existing in both lists
+    If none of these parameters have been specified, no correlation is carried out and an empty tuple is returned.
+
+    If *bin_search* is specified, it is assumed that both *list_first* and *list_second* are ascendingly or
+    descendingly sorted, and binary search is used in the correlation process.
+
+    Note that, depending on the context, a returning list might be the same object as *list_first*
+    or *list_second*. The input lists need not be sorted.
+
+    :param list_first: the first list to consider
+    :param list_second: the second list to consider
+    :param only_in_first: include list of items existing in *list_first* but not in *list_second*
+    :param only_in_second: include list of items existing in *list_second* but not in *list_first*
+    :param in_both: include list of items existing in both lists
+    :param bin_search: use binary search, as *list_first* and *list_second* are both sorted
+    :return: a tuple containing up to three lists, resulting from correlating the input lists
+    """
+    # initialize the return variable
+    result: tuple = ()
+
+    if only_in_first or only_in_second or in_both:
+        result_first: list = []
+        result_second: list = []
+        result_both: list = []
+
+        if list_first and list_second:
+            if bin_search:
+                if in_both or only_in_first:
+                    for item in list_first:
+                        if list_bin_search(source=list_second,
+                                           item=item) >= 0:
+                            if in_both:
+                                result_both.append(item)
+                        elif only_in_first:
+                            result_first.append(item)
+                if only_in_second:
+                    result_second = [item for item in list_second if list_bin_search(source=list_first,
+                                                                                     item=item) < 0]
+            # make sure to traverse the smaller list
+            elif len(list_first) <= len(list_second):
+                if in_both or only_in_first:
+                    for item in list_first:
+                        if item in list_second:
+                            if in_both:
+                                result_both.append(item)
+                        elif only_in_first:
+                            result_first.append(item)
+                if only_in_second:
+                    result_second = [item for item in list_second if item not in list_first]
+            else:
+                if in_both or only_in_second:
+                    for item in list_second:
+                        if item in list_first:
+                            if in_both:
+                                result_both.append(item)
+                        elif only_in_second:
+                            result_second.append(item)
+                if only_in_first:
+                    result_first = [item for item in list_first if item not in list_second]
+        elif list_first and only_in_first:
+            result_first = list_first
+        elif list_second and only_in_second:
+            result_second = list_second
+
+        # assemble the return tuple
+        correlations: list[list] = []
+        if only_in_first:
+            correlations.append(result_first)
+        if only_in_second:
+            correlations.append(result_second)
+        if in_both:
+            correlations.append(result_both)
+        result = tuple(correlations)
+
+    return result
+
+
+def list_bin_search(source: list,
+                    item: Any) -> int:
+    """
+    Find the index of *item* in the sorted list *source*, using binary search.
+
+    If *source* is not ascendingly or descendinlgy sorted, the return value is not valid.
+
+    :param source: the sorted list to inspect
+    :param item: the item to find
+    :return: the position of *item* in *source*, or "-1" if not found
+    """
+    # initialize the return variable
+    result: int = -1
+
+    low: int = 0
+    high: int = len(source) - 1
+    is_ascending: bool = source[low] < source[high]
+
+    while result < 0 and low <= high:
+        mid: int = (low + high) // 2
+        if source[mid] == item:
+            result = mid
+        elif is_ascending:
+            if item < source[mid]:
+                high = mid - 1
+            else:
+                low = mid + 1
+        elif item > source[mid]:
+            high = mid - 1
+        else:
+            low = mid + 1
 
     return result
 
