@@ -44,7 +44,7 @@ def list_correlate(list_first: list,
                    only_in_first: bool = False,
                    only_in_second: bool = False,
                    in_both: bool = False,
-                   bin_search: bool = False) -> tuple:
+                   is_sorted: bool = False) -> tuple:
     """
     Correlate *list_first* and *list_second* by computing their differences.
 
@@ -54,7 +54,7 @@ def list_correlate(list_first: list,
       - *in_both*: items existing in both lists
     If none of these parameters have been specified, no correlation is carried out and an empty tuple is returned.
 
-    If *bin_search* is specified, it is assumed that both *list_first* and *list_second* are ascendingly or
+    The parameter *is_sorted* indicates that both *list_first* and *list_second* are ascendingly or
     descendingly sorted, and binary search is used in the correlation process.
 
     Note that, depending on the context, a returning list might be the same object as *list_first*
@@ -65,7 +65,7 @@ def list_correlate(list_first: list,
     :param only_in_first: include list of items existing in *list_first* but not in *list_second*
     :param only_in_second: include list of items existing in *list_second* but not in *list_first*
     :param in_both: include list of items existing in both lists
-    :param bin_search: use binary search, as *list_first* and *list_second* are both sorted
+    :param is_sorted: *list_first* and *list_second* are both ascendingly or descendingly sorted
     :return: a tuple containing up to three lists, resulting from correlating the input lists
     """
     # initialize the return variable
@@ -77,20 +77,19 @@ def list_correlate(list_first: list,
         result_both: list = []
 
         if list_first and list_second:
-            if bin_search:
+            if is_sorted:
                 if in_both or only_in_first:
                     for item in list_first:
                         if list_bin_search(source=list_second,
-                                           item=item) >= 0:
-                            if in_both:
-                                result_both.append(item)
-                        elif only_in_first:
-                            result_first.append(item)
+                                           item=item) < 0:
+                            if only_in_first:
+                                result_first.append(item)
+                        elif in_both:
+                            result_both.append(item)
                 if only_in_second:
                     result_second = [item for item in list_second if list_bin_search(source=list_first,
                                                                                      item=item) < 0]
-            # make sure to traverse the smaller list
-            elif len(list_first) <= len(list_second):
+            else:
                 if in_both or only_in_first:
                     for item in list_first:
                         if item in list_second:
@@ -100,16 +99,6 @@ def list_correlate(list_first: list,
                             result_first.append(item)
                 if only_in_second:
                     result_second = [item for item in list_second if item not in list_first]
-            else:
-                if in_both or only_in_second:
-                    for item in list_second:
-                        if item in list_first:
-                            if in_both:
-                                result_both.append(item)
-                        elif only_in_second:
-                            result_second.append(item)
-                if only_in_first:
-                    result_first = [item for item in list_first if item not in list_second]
         elif list_first and only_in_first:
             result_first = list_first
         elif list_second and only_in_second:
@@ -359,18 +348,45 @@ def list_elem_starting_with(source: list[str | bytes],
     return result
 
 
-def list_prune_duplicates(target: list) -> list:
+def list_prune_duplicates(target: list,
+                          is_sorted: bool = False) -> list:
     """
-    Remove all duplicates from *target*.
+    Remove duplicate elements from *target*.
 
-    The pruned input list is returned, for convenience.
+    The parameter *is_sorted* indicates that *target* is ascendingly or descendingly sorted.
+    In both cases, the original order of the elements in *target* is maintained.
+    For convenience, the pruned imput list is returned.
 
     :param target: the target list
-    :return: the target list without duplicate elements
+    :param is_sorted: *target* is ascendingly or descendingly sorted
+    :return: *target* with its duplicate elements removed
     """
-    # a 'dict' maintains the insertion order of its elements
-    uniques: dict[Any, None] = dict.fromkeys(target)
-    return list(uniques.keys())
+    # mark the boundary of the unique segment in the list
+    write_index: int = 1
+
+    # traverse the list
+    if is_sorted:
+        # remove duplicates by comparing each element with the last unique one
+        for read_index in range(1, len(target)):
+            if target[read_index] != target[write_index - 1]:
+                # add this element to the unique segment in the list
+                if write_index != read_index:
+                    target[write_index] = target[read_index]
+                write_index += 1
+    else:
+        # remove duplicates by verifying if each element is in the unique segment in the list
+        for read_index in range(1, len(target)):
+            if target[read_index] not in target[:write_index]:
+                # add this element to the unique segment in the list
+                if write_index != read_index:
+                    target[write_index] = target[read_index]
+                write_index += 1
+
+    # delete the remaining tail of the list
+    del target[write_index:]
+
+    # return the input list for convenience
+    return target
 
 
 def list_prune_in(target: list,

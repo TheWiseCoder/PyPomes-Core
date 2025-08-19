@@ -130,6 +130,6 @@ max-doc-length = 120
 
 [lint.pylint]
 max-args = 30
-max-branches = 40
+max-branches = 50
 max-returns = 1
 max-statements = 150

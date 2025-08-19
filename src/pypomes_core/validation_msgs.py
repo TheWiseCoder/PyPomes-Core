@@ -117,6 +117,10 @@ __ERR_MSGS: Final[dict[int, dict[str, str]]] = {
         "en": "Invalid value {}: date is later than the current date",
         "pt": "Valor {} inválido: data posterior à data atual",
     },
+    154: {
+        "en": "Value {} not a valid date",
+        "pt": "Valor {} não é uma data válida"
+    },
     171: {
         "en": "Error receiving attachment: {}",
         "pt": "Erro no recebimento de documento anexado: {}",

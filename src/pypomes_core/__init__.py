@@ -1,5 +1,5 @@
 from .datetime_pomes import (
-    DateFormat, DatetimeFormat, TIMEZONE_LOCAL,
+    TZ_LOCAL, DateFormat, DatetimeFormat,
     date_reformat, date_parse, datetime_parse,
     timestamp_interval, timestamp_duration
 )
@@ -66,7 +66,7 @@ __all__ = [
     # __init__
     "pypomes_versions",
     # datetime_pomes
-    "DateFormat", "DatetimeFormat", "TIMEZONE_LOCAL",
+    "TZ_LOCAL", "DateFormat", "DatetimeFormat",
     "date_reformat", "date_parse", "datetime_parse",
     "timestamp_interval", "timestamp_duration",
     # dict_pomes
@@ -163,12 +163,12 @@ def pypomes_versions() -> dict[str, str]:
         result["PyPomes-S3"] = import_module(name="pypomes_s3").__version__
 
     with suppress(Exception):
+        result["PyPomes-Scheduling"] = import_module(name="pypomes_scheduling").__version__
+
+    with suppress(Exception):
         result["PyPomes-SOAP"] = import_module(name="pypomes_soap").__version__
 
     with suppress(Exception):
         result["PyPomes-SOB"] = import_module(name="pypomes_sob").__version__
-
-    with suppress(Exception):
-        result["PyPomes-Scheduling"] = import_module(name="pypomes_scheduling").__version__
 
     return result

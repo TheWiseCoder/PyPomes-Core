@@ -6,7 +6,7 @@ from enum import Enum, IntEnum, StrEnum, auto
 from logging import Logger
 from typing import Any, Final
 
-from .datetime_pomes import TIMEZONE_LOCAL
+from .datetime_pomes import TZ_LOCAL
 from .env_pomes import APP_PREFIX, env_get_str, env_get_enum
 from .str_pomes import (
     str_as_list, str_sanitize, str_find_char, str_find_whitespace
@@ -449,7 +449,7 @@ def validate_date(errors: list[str] | None,
             stat = validate_format_error(141,
                                          value,
                                          f"@{attr}")
-        elif result > datetime.now(tz=TIMEZONE_LOCAL).date():
+        elif result > datetime.now(tz=TZ_LOCAL).date():
             # 153: Invalid value {}: date is later than the current date
             stat = validate_format_error(153,
                                          value,
@@ -520,7 +520,7 @@ def validate_datetime(errors: list[str] | None,
             stat = validate_format_error(141,
                                          value,
                                          f"@{attr}")
-        elif result > datetime.now(tz=TIMEZONE_LOCAL):
+        elif result > datetime.now(tz=TZ_LOCAL):
             # 153: Invalid value {}: date is later than the current date
             stat = validate_format_error(153,
                                          value,
@@ -718,8 +718,9 @@ def validate_ints(errors: list[str] | None,
     """
     Validate the list of *int* values associated with *attr* in *source*.
 
-    If provided as a string, the elements therein must be valid string representations of *ints*,
-    separated by *sep* (which defaults to a *comma*).
+    If provided as a string, the elements therein must be valid string representations of *ints*, separated
+    by *sep* (which defaults to a *comma*). Note that an empty string os an empty list are acceptable values,
+    yielding an empty list of *ints*.
 
     :param errors: incidental error messages
     :param source: *dict* containing the list of values to be validated
@@ -729,10 +730,10 @@ def validate_ints(errors: list[str] | None,
     :param max_val:  the maximum value accepted
     :param required: whether the list of values must be provided
     :param logger: optional logger
-    :return: the list of validated values, *[]* if not required and no values found, or *None* if validation failed
+    :return: the list of validated values, or *None* if validation failed or not required and no values found
     """
     # initialize the return variable
-    result: list | None = []
+    result: list[int] | None = None
 
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
@@ -745,11 +746,12 @@ def validate_ints(errors: list[str] | None,
             values = str_as_list(source=values,
                                  sep=sep)
         if isinstance(values, list):
+            ints: list[int] = []
             if len(values) > 0:
                 for inx, value in enumerate(values):
                     if (isinstance(value, str) and value.isdigit()) or \
                             (isinstance(value, int) and not isinstance(value, bool)):
-                        result.append(int(value))
+                        ints.append(int(value))
                         stat = validate_value(attr=f"@{attr}[{inx+1}]",
                                               value=int(value),
                                               min_value=min_val,
@@ -762,17 +764,16 @@ def validate_ints(errors: list[str] | None,
                                                      f"@{attr}[{inx+1}]")
                     if stat:
                         break
-            elif required:
-                # 121: Required attribute
-                stat = validate_format_error(121,
-                                             f"@{attr}")
+            if not stat:
+                result = ints
         else:
             # 152: Invalid value {}: must be type {}
             stat = validate_format_error(152,
-                                         result,
+                                         values,
                                          "list",
                                          f"@{attr}")
-    elif required:
+
+    if required and not stat and result is None:
         # 121: Required attribute
         stat = validate_format_error(121,
                                      f"@{attr}")
@@ -781,7 +782,6 @@ def validate_ints(errors: list[str] | None,
             logger.error(msg=stat)
         if isinstance(errors, list):
             errors.append(stat)
-        result = None
 
     return result
 
@@ -798,6 +798,7 @@ def validate_strs(errors: list[str] | None,
     Validate the list of *str* values associated with *attr* in *source*.
 
     If provided as a string, the elements therein must be separated by *sep* (which defaults to a *comma*).
+    Note that an empty string os an empty list are acceptable values, yielding an empty list of *strs*.
 
     :param errors: incidental error messages
     :param source: *dict* containing the list of values to be validated
@@ -807,10 +808,10 @@ def validate_strs(errors: list[str] | None,
     :param max_length:  optional maximum length accepted
     :param required: whether the list of values must be provided
     :param logger: optional logger
-    :return: the list of validated values, *[]* if not required and no values found, or *None* if validation failed
+    :return: the list of validated values, or *None* if validation failed or not required and no values found
     """
     # initialize the return variable
-    result: list | None = []
+    result: list[str] | None = None
 
     stat: str | None = None
     pos: int = attr.rfind(".") + 1
@@ -823,10 +824,10 @@ def validate_strs(errors: list[str] | None,
             values = str_as_list(source=values,
                                  sep=sep)
         if isinstance(values, list):
-            result = []
+            strs: list[str] = []
             if len(values) > 0:
                 for inx, value in enumerate(values):
-                    result.append(value)
+                    strs.append(value)
                     if isinstance(value, str):
                         stat = validate_value(attr=f"@{attr}[{inx+1}]",
                                               value=value,
@@ -838,17 +839,18 @@ def validate_strs(errors: list[str] | None,
                                                      value,
                                                      "str",
                                                      f"@{attr}[{inx+1}]")
-            elif required:
-                # 121: Required attribute
-                stat = validate_format_error(121,
-                                             f"@{attr}")
+                    if stat:
+                        break
+            if not stat:
+                result = strs
         else:
             # 152: Invalid value {}: must be type {}
             stat = validate_format_error(152,
-                                         result,
+                                         values,
                                          "list",
                                          f"@{attr}")
-    elif required:
+
+    if required and not stat and result is None:
         # 121: Required attribute
         stat = validate_format_error(121,
                                      f"@{attr}")
@@ -857,7 +859,6 @@ def validate_strs(errors: list[str] | None,
             logger.error(msg=stat)
         if isinstance(errors, list):
             errors.append(stat)
-        result = None
 
     return result
 
