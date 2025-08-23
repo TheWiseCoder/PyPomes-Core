@@ -24,20 +24,20 @@ class EmailConfig(StrEnum):
                            def_value="")
 
 
-def email_send(errors: list[str] | None,
-               user_email: str,
+def email_send(user_email: str,
                subject: str,
                content: str,
                content_type: Mimetype = Mimetype.TEXT,
+               errors: list[str] = None,
                logger: Logger = None) -> None:
     """
     Send email to *user_email*, with *subject* as the email subject, and *content* as the email message.
 
-    :param errors: incidental error messages
     :param user_email: the address to send the email to
     :param subject: the email subject
     :param content: the email message
     :param content_type: the mimetype of the content (defaults to *text/plain*)
+    :param errors: incidental error messages
     :param logger: optional logger
     """
     # import needed function

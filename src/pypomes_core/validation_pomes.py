@@ -4,13 +4,15 @@ from datetime import date, datetime, time
 from decimal import Decimal
 from enum import Enum, IntEnum, StrEnum, auto
 from logging import Logger
-from typing import Any, Final
+from typing import Any, Final, TypeVar
 
 from .datetime_pomes import TZ_LOCAL
 from .env_pomes import APP_PREFIX, env_get_str, env_get_enum
 from .str_pomes import (
     str_as_list, str_sanitize, str_find_char, str_find_whitespace
 )
+# define a TypeVar constrained to IntEnum or StrEnum
+IntStrEnum = TypeVar("IntStrEnum", bound=IntEnum | StrEnum)
 
 
 class MsgLang(StrEnum):
@@ -27,6 +29,19 @@ VALIDATION_MSG_LANGUAGE: Final[MsgLang] = env_get_enum(key=f"{APP_PREFIX}_VALIDA
                                                        def_value=MsgLang.EN)
 VALIDATION_MSG_PREFIX: Final[str] = env_get_str(key=f"{APP_PREFIX}_VALIDATION_MSG_PREFIX",
                                                 def_value=APP_PREFIX)
+CRON_REGEX: Final[re.Pattern] = re.compile(
+     r"^"                                                                                   # start of string
+     r"((\*|([0-5]?\d)(-([0-5]?\d))?(/\d+)?)(,(\*|([0-5]?\d)(-([0-5]?\d))?(/\d+)?))*)\s+"   # minute
+     r"((\*|([01]?\d|2[0-3])(-([01]?\d|2[0-3]))?(/\d+)?)"
+     r"(,(\*|([01]?\d|2[0-3])(-([01]?\d|2[0-3]))?(/\d+)?))*)\s+"                            # hour
+     r"((\*|([1-9]|[12]\d|3[01])(-([1-9]|[12]\d|3[01]))?(/\d+)?)"
+     r"(,(\*|([1-9]|[12]\d|3[01])(-([1-9]|[12]\d|3[01]))?(/\d+)?))*)\s+"                    # day of month
+     r"((\*|(0?[1-9]|1[0-2])(-(0?[1-9]|1[0-2]))?(/\d+)?)"
+     r"(,(\*|(0?[1-9]|1[0-2])(-(0?[1-9]|1[0-2]))?(/\d+)?))*)\s+"                            # month
+     r"((\*|0-7?(/\d+)?)(,(\*|0-7?(/\d+)?))*)"                                              # day of week
+     r"$"                                                                                   # end of string
+)
+CRON_EMAIL: Final[re.Pattern] = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 
 
 def validate_value(attr: str,
@@ -119,11 +134,11 @@ def validate_value(attr: str,
     return result
 
 
-def validate_bool(errors: list[str] | None,
-                  source: dict[str, Any],
+def validate_bool(source: dict[str, Any],
                   attr: str,
                   default: bool = None,
                   required: bool = False,
+                  errors: list[str] = None,
                   logger: Logger = None) -> bool | None:
     """
     Validate the boolean value associated with *attr* in *source*.
@@ -134,11 +149,11 @@ def validate_bool(errors: list[str] | None,
         - the string *1*, *t*, or *true*, case disregarded
         - the string *0*, *f*, or *false*, case disregarded
 
-    :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the name of the attribute whose value is being validated
     :param default: default value, overrides *required*
     :param required: specifies whether a value must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -200,21 +215,20 @@ def validate_bool(errors: list[str] | None,
     return result
 
 
-def validate_int(errors: list[str] | None,
-                 source: dict[str, Any],
+def validate_int(source: dict[str, Any],
                  attr: str,
                  min_val: int = None,
                  max_val: int = None,
                  values: list[int] = None,
                  default: int = None,
                  required: bool = False,
+                 errors: list[str] = None,
                  logger: Logger = None) -> int | None:
     """
     Validate the *int* value associated with *attr* in *source*.
 
     If provided, this value must be a *int*, or a valid string representation of a *int*.
 
-    :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param min_val: the minimum value accepted
@@ -222,6 +236,7 @@ def validate_int(errors: list[str] | None,
     :param values: optional list of allowed values
     :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -265,21 +280,20 @@ def validate_int(errors: list[str] | None,
     return result
 
 
-def validate_decimal(errors: list[str] | None,
-                     source: dict[str, Any],
+def validate_decimal(source: dict[str, Any],
                      attr: str,
                      min_val: float = None,
                      max_val: float = None,
                      required: bool = False,
                      values: list[float | int] = None,
                      default: float = None,
+                     errors: list[str] = None,
                      logger: Logger = None) -> Decimal | None:
     """
     Validate the *float* value associated with *attr* in *source*.
 
     If provided, this value must be a *float*, or a valid string representation of a *float*.
 
-    :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param min_val: the minimum value accepted
@@ -287,6 +301,7 @@ def validate_decimal(errors: list[str] | None,
     :param values: optional list of allowed values
     :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -332,8 +347,7 @@ def validate_decimal(errors: list[str] | None,
     return result
 
 
-def validate_str(errors: list[str] | None,
-                 source: dict[str, Any],
+def validate_str(source: dict[str, Any],
                  attr: str,
                  min_length: int = None,
                  max_length: int = None,
@@ -341,13 +355,13 @@ def validate_str(errors: list[str] | None,
                  default: str = None,
                  ignore_case: bool = False,
                  required: bool = False,
+                 errors: list[str] = None,
                  logger: Logger = None) -> str | None:
     """
     Validate the *str* value associated with *attr* in *source*.
 
     If provided, this value must be a *str*.
 
-    :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param min_length: optional minimum length accepted
@@ -356,6 +370,7 @@ def validate_str(errors: list[str] | None,
     :param default: optional default value, overrides *required*
     :param ignore_case: specifies whether to ignore capitalization
     :param required: specifies whether a value must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -397,12 +412,12 @@ def validate_str(errors: list[str] | None,
     return result
 
 
-def validate_date(errors: list[str] | None,
-                  source: dict[str, Any],
+def validate_date(source: dict[str, Any],
                   attr: str,
                   day_first: bool = False,
                   default: date = None,
                   required: bool = False,
+                  errors: list[str] = None,
                   logger: Logger = None) -> date | None:
     """
     Validate the *date* value associated with *attr* in *source*.
@@ -411,12 +426,12 @@ def validate_date(errors: list[str] | None,
     a *date* or *datetime*, or an integer or float encoding a UNIX-style *timestamp*.
     If the value obtained is a *datetime*, its *date* part is returned.
 
-    :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param day_first: indicates that the day precedes the month in the string representing the date
     :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -470,12 +485,12 @@ def validate_date(errors: list[str] | None,
     return result
 
 
-def validate_datetime(errors: list[str] | None,
-                      source: dict[str, Any],
+def validate_datetime(source: dict[str, Any],
                       attr: str,
                       day_first: bool = True,
                       default: datetime = None,
                       required: bool = False,
+                      errors: list[str] = None,
                       logger: Logger = None) -> datetime | None:
     """
     Validate the *datetime* value associated with *attr* in *source*.
@@ -484,12 +499,12 @@ def validate_datetime(errors: list[str] | None,
     a *date* or *datetime*, or an integer or float encoding a UNIX-style timestamp.
     If the value obtained is a *date*, it is converted to a *datetime* by appending *00:00:00*.
 
-    :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param day_first: indicates that the day precedes the month in the string representing the date
     :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -540,15 +555,15 @@ def validate_datetime(errors: list[str] | None,
     return result
 
 
-def validate_enum(errors: list[str] | None,
-                  source: dict[str, Any],
+def validate_enum(source: dict[str, Any],
                   attr: str,
                   enum_class: type[IntEnum | StrEnum],
                   use_names: bool = False,
                   values: list[IntEnum | StrEnum | str | int | Decimal] = None,
                   default: IntEnum | StrEnum | str | int | Decimal = None,
                   required: bool = False,
-                  logger: Logger = None) -> Any:
+                  errors: list[str] = None,
+                  logger: Logger = None) -> IntStrEnum:
     """
     Validate the *enum* value associated with *attr* in *source*.
 
@@ -558,7 +573,6 @@ def validate_enum(errors: list[str] | None,
     ignoring capitalization. If not specified, the values of the elements are used (the default).
     If *values* is specified, the value obtained is checked for occurrence therein.
 
-    :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
@@ -566,11 +580,12 @@ def validate_enum(errors: list[str] | None,
     :param default: optional default value, overrides *required*
     :param values: optional list of allowed values (defaults to all elements of *enum_class*)
     :param required: specifies whether a value must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the validated value as an instance of *enum_class*, or *None* if validation failed
     """
     # initialize the return variable
-    result: Any = None
+    result: IntEnum | StrEnum | None = None
 
     if use_names:
         pos: int = attr.rfind(".") + 1
@@ -581,13 +596,13 @@ def validate_enum(errors: list[str] | None,
             source[attr] = value.name
         vals: list[str | int | Decimal] = [v.name if isinstance(v, Enum) else v
                                            for v in (values or enum_class._member_names_)]
-        name: str = validate_str(errors=errors,
-                                 source=source,
+        name: str = validate_str(source=source,
                                  attr=attr,
                                  values=vals,
                                  default=default.name if isinstance(default, Enum) else default,
                                  ignore_case=True,
                                  required=required,
+                                 errors=errors,
                                  logger=logger)
         if name:
             for e in enum_class:
@@ -599,20 +614,20 @@ def validate_enum(errors: list[str] | None,
         vals: list[str | int | Decimal] = [v.value if isinstance(v, Enum) else v
                                            for v in (values or enum_class)]
         if issubclass(enum_class, StrEnum):
-            value: str = validate_str(errors=errors,
-                                      source=source,
+            value: str = validate_str(source=source,
                                       attr=attr,
                                       values=vals,
                                       default=default.value if isinstance(default, Enum) else default,
                                       required=required,
+                                      errors=errors,
                                       logger=logger)
         elif issubclass(enum_class, IntEnum):
-            value: int = validate_int(errors=errors,
-                                      source=source,
+            value: int = validate_int(source=source,
                                       attr=attr,
                                       values=vals,
                                       default=default.value if isinstance(default, Enum) else default,
                                       required=required,
+                                      errors=errors,
                                       logger=logger)
         if value:
             result = enum_class(value)
@@ -620,51 +635,54 @@ def validate_enum(errors: list[str] | None,
     return result
 
 
-def validate_email(errors: list[str] | None,
-                   source: dict[str, Any],
+def validate_email(source: dict[str, Any],
                    attr: str,
                    default: str = None,
                    required: bool = False,
-                   logger: Logger = None) -> IntEnum | StrEnum | None:
+                   errors: list[str] = None,
+                   logger: Logger = None) -> str | None:
     """
     Validate the email value associated with *attr* in *source*.
 
     If provided, this value must be a syntactically correct email.
 
-    :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
     # initialize the return variable
     result: str | None = None
 
-    value: str = validate_str(errors=errors,
-                              source=source,
+    value: str = validate_str(source=source,
                               attr=attr,
                               default=default,
                               required=required,
+                              errors=errors,
                               logger=logger)
     if value:
-        email_pattern: str = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-        if re.match(email_pattern, value):
+        if CRON_EMAIL.match(value):
             result = value
         elif isinstance(errors, list):
             # 141: Invalid value {}
             errors.append(validate_format_error(141,
                                                 value,
                                                 f"@{attr}"))
+    elif isinstance(required, bool) and required and isinstance(errors, list):
+        # 121: Required attribute
+        errors.append(validate_format_error(121,
+                                            f"@{attr}"))
     return result
 
 
-def validate_pwd(errors: list[str] | None,
-                 source: dict[str, Any],
+def validate_pwd(source: dict[str, Any],
                  attr: str,
                  required: bool = False,
-                 logger: Logger = None) -> IntEnum | StrEnum | None:
+                 errors: list[str] = None,
+                 logger: Logger = None) -> str | None:
     r"""
     Validate the password value associated with *attr* in *source*.
 
@@ -675,45 +693,120 @@ def validate_pwd(errors: list[str] | None,
       - at least 1 uppercase letter (in renge [A-Z])
       - at least 1 special character (#$%&"'()*+,-./:;<=>?@[\]^_`{|}~!)
 
-    :param errors: incidental error messages
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param required: specifies whether a value must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
     # initialize the return variable
     result: str | None = None
 
-    value: str = validate_str(errors=errors,
-                              source=source,
+    value: str = validate_str(source=source,
                               attr=attr,
                               required=required,
+                              errors=errors,
                               logger=logger)
-    if (value and len(value) >= 8 and
-        str_find_char(source=value,
-                      chars=string.digits) >= 0 and
-        str_find_char(source=value,
-                      chars=string.ascii_uppercase) >= 0 and
-        str_find_char(source=value,
-                      chars=string.ascii_lowercase) >= 0 and
-        str_find_char(source=value,
-                      chars=string.punctuation) >= 0):
-        result = value
-    elif not errors and isinstance(errors, list):
-        # 237: Value does not meet the formation rules
-        errors.append(validate_format_error(237,
+    if value:
+        if (len(value) >= 8 and
+            str_find_char(source=value,
+                          chars=string.digits) >= 0 and
+            str_find_char(source=value,
+                          chars=string.ascii_uppercase) >= 0 and
+            str_find_char(source=value,
+                          chars=string.ascii_lowercase) >= 0 and
+            str_find_char(source=value,
+                          chars=string.punctuation) >= 0):
+            result = value
+        elif isinstance(errors, list):
+            # 237: Value {} does not meet the formation rules
+            errors.append(validate_format_error(237,
+                                                value,
+                                                f"@{attr}"))
+    elif isinstance(required, bool) and required and isinstance(errors, list):
+        # 121: Required attribute
+        errors.append(validate_format_error(121,
                                             f"@{attr}"))
     return result
 
 
-def validate_ints(errors: list[str] | None,
-                  source: dict[str, Any],
+def validate_cron(source: dict[str, Any],
+                  attr: str,
+                  required: bool = False,
+                  errors: list[str] = None,
+                  logger: Logger = None) -> str | None:
+    r"""
+    Validate the *CRON* expression associated with *attr* in *source*.
+
+    A valid *CRON* expression has the syntax *<min> <hour> <day> <month> <day-of-week>*, and can include:
+      - numbers (e.g. '5')
+      - ranges (e.g. '1-5')
+      - lists (e.g. '1,2,3')
+      - steps (e.g. '*/15')
+      - wildcards ('*')
+
+    The following meta-expressions may be substituted for their equivalent CRON expressions:
+      - @annually: "0 0 1 1 *"  (on January 1st, at 00h00)
+      - @daily:    "1 0 * * *"  (daily, at 00h01)
+      - @hourly:   "0 * * * *"  (every hour, at minute 0 - ??h00)
+      - @midnight: "0 0 * * *"  (daily, at 00h00)
+      - @monthly:  "0 0 1 * *"  (on the first day of the month, at 00h00)
+      - @reboot:   "1 0 * * *"  (same as @daily)
+      - @weekly:   "0 0 * * 0"  (on Sundays, at 00h00)
+      - @yearly:   "0 0 1 1 *"  (same as @anually)
+
+    :param source: *dict* containing the expression to be validated
+    :param attr: the attribute associated with the expression to be validated
+    :param required: specifies whether a value must be provided
+    :param errors: incidental error messages
+    :param logger: optional logger
+    :return: the validated expression, or *None* if validation failed
+    """
+    # initialize the return variable
+    result: str | None = None
+
+    expr: str = validate_str(source=source,
+                             attr=attr,
+                             required=required,
+                             errors=errors,
+                             logger=logger)
+    if expr:
+        match expr:
+            case "@annually" | "@yearly":
+                result = "0 0 1 1 *"                      # on January 1st, at 00h00
+            case "@daily" | "@reboot":
+                result = "1 0 * * *"                      # daily, at 00h01
+            case "@hourly":
+                result = "0 * * * *"                      # every hour, at minute 0 (??h00)
+            case "@midnight":
+                result = "0 0 * * *"                      # daily, at 00h00
+            case "@monthly":
+                result = "0 0 1 * *"                      # on the first day of the month, at 00h00
+            case "@weekly":
+                result = "0 0 * * 0"                      # on Sundays, at 00h00
+            case _:
+                if CRON_REGEX.match(expr):
+                    result = expr
+                elif isinstance(errors, list):
+                    # 213: Invalid CRON expression {}
+                    errors.append(validate_format_error(238,
+                                                        expr,
+                                                        f"@{attr}"))
+    elif isinstance(required, bool) and required and isinstance(errors, list):
+        # 121: Required attribute
+        errors.append(validate_format_error(121,
+                                            f"@{attr}"))
+    return result
+
+
+def validate_ints(source: dict[str, Any],
                   attr: str,
                   sep: str = ",",
                   min_val: int = None,
                   max_val: int = None,
                   required: bool = False,
+                  errors: list[str] = None,
                   logger: Logger = None) -> list[int] | None:
     """
     Validate the list of *int* values associated with *attr* in *source*.
@@ -722,13 +815,13 @@ def validate_ints(errors: list[str] | None,
     by *sep* (which defaults to a *comma*). Note that an empty string os an empty list are acceptable values,
     yielding an empty list of *ints*.
 
-    :param errors: incidental error messages
     :param source: *dict* containing the list of values to be validated
     :param attr: the attribute associated with the list of values to be validated
     :param sep: the separator in the list of values
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
     :param required: whether the list of values must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the list of validated values, or *None* if validation failed or not required and no values found
     """
@@ -773,7 +866,7 @@ def validate_ints(errors: list[str] | None,
                                          "list",
                                          f"@{attr}")
 
-    if required and not stat and result is None:
+    if isinstance(required, bool) and required and not stat and result is None:
         # 121: Required attribute
         stat = validate_format_error(121,
                                      f"@{attr}")
@@ -786,13 +879,13 @@ def validate_ints(errors: list[str] | None,
     return result
 
 
-def validate_strs(errors: list[str] | None,
-                  source: dict[str, Any],
+def validate_strs(source: dict[str, Any],
                   attr: str,
                   sep: str = ",",
                   min_length: int = None,
                   max_length: int = None,
                   required: bool = False,
+                  errors: list[str] = None,
                   logger: Logger = None) -> list[str] | None:
     """
     Validate the list of *str* values associated with *attr* in *source*.
@@ -800,13 +893,13 @@ def validate_strs(errors: list[str] | None,
     If provided as a string, the elements therein must be separated by *sep* (which defaults to a *comma*).
     Note that an empty string os an empty list are acceptable values, yielding an empty list of *strs*.
 
-    :param errors: incidental error messages
     :param source: *dict* containing the list of values to be validated
     :param attr: the attribute associated with the list of values to be validated
     :param sep: the separator in the list of values
     :param min_length: optional minimum length accepted
     :param max_length:  optional maximum length accepted
     :param required: whether the list of values must be provided
+    :param errors: incidental error messages
     :param logger: optional logger
     :return: the list of validated values, or *None* if validation failed or not required and no values found
     """
@@ -891,8 +984,7 @@ def validate_format_error(error_id: int,
     """
     # obtain definitions for prefix and language
     msg_prefix: str = kwargs.get("msg_prefix") if "msg_prefix" in kwargs else VALIDATION_MSG_PREFIX
-    msg_lang: MsgLang = validate_enum(errors=None,
-                                      source=kwargs or {},
+    msg_lang: MsgLang = validate_enum(source=kwargs or {},
                                       attr="msg_lang",
                                       enum_class=MsgLang,
                                       default=VALIDATION_MSG_LANGUAGE)
@@ -959,8 +1051,7 @@ def validate_format_errors(errors: list[str],
     """
     # obtain definitions for prefix and language
     msg_prefix: str = kwargs.get("msg_prefix") if "msg_prefix" in kwargs else VALIDATION_MSG_PREFIX
-    msg_lang: MsgLang = validate_enum(errors=None,
-                                      source=kwargs or {},
+    msg_lang: MsgLang = validate_enum(source=kwargs or {},
                                       attr="msg_lang",
                                       enum_class=MsgLang,
                                       default=VALIDATION_MSG_LANGUAGE)
@@ -1017,8 +1108,7 @@ def validate_unformat_errors(errors: list[dict[str, str] | str],
     :return: the built list of errors
     """
     # obtain definitions for language and prefix
-    msg_lang: MsgLang = validate_enum(errors=None,
-                                      source=kwargs or {},
+    msg_lang: MsgLang = validate_enum(source=kwargs or {},
                                       attr="msg_lang",
                                       enum_class=MsgLang,
                                       default=VALIDATION_MSG_LANGUAGE)

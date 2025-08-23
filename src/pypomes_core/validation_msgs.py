@@ -206,8 +206,8 @@ __ERR_MSGS: Final[dict[int, dict[str, str]]] = {
         "pt": "Usuário/senha inválido",
     },
     237: {
-        "en": "Value does not meet the formation rules",
-        "pt": "Valor não atende as regras de formação"
+        "en": "Value {} does not meet the formation rules",
+        "pt": "Valor {} não atende as regras de formação"
     },
     241: {
         "en": "Error accessing the digital signing service at {}: {}",
