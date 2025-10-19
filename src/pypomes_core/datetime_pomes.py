@@ -63,6 +63,33 @@ def date_reformat(dt_str: str,
     return result
 
 
+def date_weekday(dt_base: str | date | datetime,
+                 weekdays: list[int]) -> date | datetime | None:
+    """
+    Obtain and return the first date with day-of-week specified in *weekdays*, starting at *dt_base*.
+
+    The parameter *weekdays* lists the accepted days-of-week, indicated as:
+      - 0: Monday
+      - 1: Tuesday
+      - 2: Wednesday
+      - 3: Thursday
+      - 4: Friday
+      - 5: Saturday
+      - 6: Sunday
+
+    :param dt_base: the base date, either as *date*, *datetime*, or as a valid string representation of a *date*
+    :param weekdays: the list of accepted days-of-week, as 0 (Monday) through 6 (Sunday)
+    :return: the first satisfying date starting at *dt_base*, or *None*  if it could not be obtained
+    """
+    result: date | datetime = date_parse(dt_str=dt_base) if isinstance(dt_base, str) else dt_base
+    # 'datetime' is subclass of 'date'
+    if isinstance(result, date):
+        while result.weekday() not in weekdays:
+            result += timedelta(days=1)
+
+    return result
+
+
 def date_parse(dt_str: str,
                **kwargs: any) -> date | None:
     """
@@ -80,7 +107,7 @@ def date_parse(dt_str: str,
 
     :param dt_str: the date, in a supported format
     :param kwargs: optional arguments for the parser in python-dateutil
-    :return: the corresponding date object, or *None*
+    :return: the corresponding date object, or *None* if it could not be obtained
     """
     # declare the return variable
     result: date | None

@@ -238,8 +238,8 @@ __ERR_MSGS: Final[dict[int, dict[str, str]]] = {
         "pt": "Digesto do documento {} inválido",
     },
     248: {
-        "en": "Document {} has already been filed: {}",
-        "pt": "Documento {} já cadastrado: {}",
+        "en": "Document {} has already been filed",
+        "pt": "Documento {} já cadastrado",
     }
 }
 

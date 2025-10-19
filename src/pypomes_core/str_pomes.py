@@ -6,64 +6,65 @@ from pathlib import Path
 from typing import Any
 
 
-def str_to_hex(source: str) -> str:
+def str_to_hex(s: str, /) -> str:
     """
-    Obtain and return the hex representation of *source*.
+    Obtain and return the hex representation of *s*.
 
     This is an encapsulation of the built-in methods *<str>.encode()* and *<bytes>.hex()*.
 
-    :param source: the input string
+    :param s: the input string
     :return: the hex representation of the input string
-    :raises AttributeError: *source* is not a string
+    :raises AttributeError: *s* is not a string
     :raises UnicodeEncodeError:  a UTF-8 encoding error occurred
     """
-    return source.encode().hex()
+    return s.encode().hex()
 
 
-def str_from_hex(source: str) -> str:
+def str_from_hex(s: str, /) -> str:
     """
-    Obtain and return the original string from its hex representation in *source*.
+    Obtain and return the original string from its hex representation in *s*.
 
     This is an encapsulation of the built-in methods *bytes.fromhex()* and *<bytes>.decode()*
 
-    :param source: the hex representation of a string
+    :param s: the hex representation of a string
     :return: the original string
-    :raises ValueError: *source* is not a valid hexadecimal string
-    :raises TypeError: *source* is not a string
+    :raises ValueError: *s* is not a valid hexadecimal string
+    :raises TypeError: *s* is not a string
     :raises UnicodeDecodeError: a UTF-8 decoding error occurred
     """
-    return bytes.fromhex(source).decode()
+    return bytes.fromhex(s).decode()
 
 
-def str_as_list(source: str,
+def str_as_list(s: str,
+                /,
                 sep: str = ",") -> list[str]:
     """
-    Return *source* as a *list*, by splitting its contents separated by *sep*.
+    Return *s* as a *list*, by splitting its contents separated by *sep*.
 
-    The returned substrings are fully whitespace-trimmed. If *source* is *None*, an empty list is returned.
+    The returned substrings are fully whitespace-trimmed. If *s* is *None*, an empty list is returned.
     If it is an empty *str*, a list containg an empty *str* is returned. If it is not a *str*,
     a list containing itself is returned.
 
-    :param source: the string value to be worked on
+    :param s: the string value to be worked on
     :param sep: the separator (defaults to ",")
-    :return: a list built from the contents of *source*, or containing *source* itself, if it is not a string
+    :return: a list built from the contents of *s*, or containing *s* itself, if it is not a string
     """
     # declare the return variable
     result: list[str]
 
-    if isinstance(source, str):
-        result = [s.strip() for s in source.split(sep=sep)]
-    elif source is None:
+    if isinstance(s, str):
+        result = [s.strip() for s in s.split(sep=sep)]
+    elif s is None:
         result = []
     else:
-        result = [source]
+        result = [s]
 
     return result
 
 
-def str_sanitize(source: str) -> str:
+def str_sanitize(s: str, /) -> str:
     """
-    Clean the given *source* string.
+    Clean the given *s* string.
 
     The sanitization is carried out by:
         - removing backslashes
@@ -71,24 +72,25 @@ def str_sanitize(source: str) -> str:
         - replacing newlines and tabs with whitespace
         - replacing multiple consecutive spaces with a single space
 
-    :param source: the string to be cleaned
+    :param s: the string to be cleaned
     :return: the cleaned string
     """
-    cleaned: str = source.replace("\\", "") \
-                         .replace('"', "'") \
-                         .replace("\n", " ") \
-                         .replace("\t", " ")
+    cleaned: str = s.replace("\\", "") \
+                    .replace('"', "'") \
+                    .replace("\n", " ") \
+                    .replace("\t", " ")
     return " ".join(cleaned.split())
 
 
-def str_split_on_mark(source: str,
+def str_split_on_mark(s: str,
+                      /,
                       mark: str) -> list[str]:
     """
-    Extract from *source* the text segments separated by *mark*, and return them in a *list*.
+    Extract from *s* the text segments separated by *mark*, and return them in a *list*.
 
     The separator itself will not be in the returned list.
 
-    :param source: the string to be inspected
+    :param s: the string to be inspected
     :param mark: the separator
     :return: the list of text segments extracted
     """
@@ -97,25 +99,26 @@ def str_split_on_mark(source: str,
 
     pos: int = 0
     skip: int = len(mark)
-    after: int = source.find(mark)
+    after: int = s.find(mark)
     while after >= 0:
-        result.append(source[pos:after])
+        result.append(s[pos:after])
         pos = after + skip
-        after = source.find(mark, pos)
-    if pos < len(source):
-        result.append(source[pos:])
+        after = s.find(mark, pos)
+    if pos < len(s):
+        result.append(s[pos:])
     else:
         result.append("")
 
     return result
 
 
-def str_find_char(source: str,
+def str_find_char(s: str,
+                  /,
                   chars: str) -> int:
     """
-    Locate and return the position of the first occurence, in *source*, of a character in *chars*.
+    Locate and return the position of the first occurence, in *s*, of a character in *chars*.
 
-    :param source: the string to be inspected
+    :param s: the string to be inspected
     :param chars: the reference characters
     :return: the position of the first character in *chars*, or *-1* if none was found
     """
@@ -123,7 +126,7 @@ def str_find_char(source: str,
     result: int = -1
 
     # search for whitespace
-    for inx, char in enumerate(source):
+    for inx, char in enumerate(s):
         if char in chars:
             result = inx
             break
@@ -131,18 +134,18 @@ def str_find_char(source: str,
     return result
 
 
-def str_find_whitespace(source: str) -> int:
+def str_find_whitespace(s: str, /) -> int:
     """
-    Locate and return the position of the first occurence of a *whitespace* character in *source*.
+    Locate and return the position of the first occurence of a *whitespace* character in *s*.
 
-    :param source: the string to be inspected
+    :param s: the string to be inspected
     :return: the position of the first whitespace character, or *-1* if none was found
     """
     # initialize the return variable
     result: int = -1
 
     # search for whitespace
-    for inx, char in enumerate(source):
+    for inx, char in enumerate(s):
         if char.isspace():
             result = inx
             break
@@ -150,13 +153,14 @@ def str_find_whitespace(source: str) -> int:
     return result
 
 
-def str_between(source: str,
+def str_between(s: str,
+                /,
                 from_str: str,
                 to_str: str) -> str:
     """
-    Extract and return the *substring* in *source* located between the delimiters *from_str* and *to_str*.
+    Extract and return the *substring* in *s* located between the delimiters *from_str* and *to_str*.
 
-    :param source: the string to be inspected
+    :param s: the string to be inspected
     :param from_str: the initial delimiter
     :param to_str: the final delimiter
     :return: the extracted substring, or *None* if no substring was obtained
@@ -164,32 +168,33 @@ def str_between(source: str,
     # initialize the return variable
     result: str | None = None
 
-    pos1: int = source.find(from_str)
+    pos1: int = s.find(from_str)
     if pos1 >= 0:
         pos1 += len(from_str)
-        pos2: int = source.find(to_str, pos1)
+        pos2: int = s.find(to_str, pos1)
         if pos2 >= pos1:
-            result = source[pos1:pos2]
+            result = s[pos1:pos2]
 
     return result
 
 
-def str_positional(source: str,
-                   list_from: list[str],
-                   list_to: list) -> Any:
+def str_positional(s: str,
+                   /,
+                   keys: tuple[str, ...],
+                   values: tuple[str, ...]) -> Any:
     """
-    Locate the position of *source* within *list_from*, and return the element in the same position in *list_to*.
+    Locate the position of *s* within *keys*, and return the element in the same position in *values*.
 
-    :param source: the source string
-    :param list_from: the list to be inspected
-    :param list_to: the list containing the positionally corresponding values
+    :param s: the source string
+    :param keys: the tuple holding the keys to be inspected
+    :param values: the tuple holding the positionally corresponding values
     :return: the value positionally corresponding to the source string, or *None* if not found
     """
     # noinspection PyUnusedLocal
     result: Any = None
     with suppress(Exception):
-        pos: int = list_from.index(source)
-        result = list_to[pos]
+        pos: int = keys.index(s)
+        result = values[pos]
 
     return result
 
@@ -218,38 +223,40 @@ def str_random(size: int,
     return "".join(random.choice(seq=chars) for _ in range(size))
 
 
-def str_rreplace(source: str,
+def str_rreplace(s: str,
+                 /,
                  old: str,
                  new: str,
                  count: int = 1) -> str:
     """
-    Replace at most *count* occurrences of substring *old* with string *new* in *source*, in reverse order.
+    Replace at most *count* occurrences of substring *old* with string *new* in *s*, in reverse order.
 
-    :param source: the string to have a substring replaced
+    :param s: the string to have a substring replaced
     :param old: the substring to replace
     :param new: the string replacement
     :param count: the maximum number of replacements (defaults to 1)
     :return: the modified string
     """
-    return source[::-1].replace(old[::-1], new[::-1], count)[::-1]
+    return s[::-1].replace(old[::-1], new[::-1], count)[::-1]
 
 
-def str_splice(source: str,
-               seps: tuple) -> tuple:
+def str_splice(s: str,
+               /,
+               seps: tuple[str, ...]) -> tuple[str, ...]:
     """
-    Splice *source* into segments delmited by the ordered list of separators *seps*.
+    Splice *s* into segments delimited by the ordered list of separators *seps*.
 
-    The number of segments returned is always the number of separators in *seps* plus 1.
+    The number of segments returned is always the number of separators in *seps*, plus 1.
     An individual segment returned can be null or an empty string. If no separators are found,
-    the returned tuple will contain *source* as its last element, and *None* as the remaining elements.
+    the returned tuple will contain *s* as its last element, and *None* as the remaining elements.
     Separators will not be part of their respective segments.
 
     Separators in *seps* can not be *None* or empty strings. If no separators are provided
-    (*seps* itself is an empty list), then the returned tuple will contain *source* as its only element.
-    If *source* starts with the separator, then the return tuple's first element will be an empty string.
-    If *source* ends with the separator, then the return tuple's last element will be an empty string.
+    (*seps* itself is an empty list), then the returned tuple will contain *s* as its only element.
+    If *s* starts with the separator, then the return tuple's first element will be an empty string.
+    If *s* ends with the separator, then the return tuple's last element will be an empty string.
 
-    These examples illustrate the various possibilities (*source* = 'My string to be spliced'):
+    These examples illustrate the various possibilities (*s* = 'My string to be spliced'):
       - () ===> ('My string to be spliced',)
       - ('My') ===> ('',  'string to be spliced')
       - ('tri') ===> ('My s', 'ng to be spliced')
@@ -259,60 +266,60 @@ def str_splice(source: str,
       - ('s', 's', 'd') ===> ('My ', 'tring to be ', 'plice', '')
       - ('X', 'ri', 'be') ===> (None, 'My st', 'ng to ', ' spliced')
 
-    :param source: the source string
+    :param s: the source string
     :param seps: the ordered list of separators
-    :return: tuple with the segments obtained, or *None* if *source* is not a string
+    :return: tuple with the segments obtained, or *None* if *s* is not a string
 
     """
     # initialize the return variable
-    result: tuple | None = None
+    result: tuple[str, ...] | None = None
 
-    if isinstance(source, str) and None not in seps and "" not in seps:
-        segments = []
+    if isinstance(s, str) and None not in seps and "" not in seps:
+        segments: list[str | None] = []
         for sep in seps:
-            pos: int = source.find(sep)
+            pos: int = s.find(sep)
             if pos < 0:
                 segments.append(None)
             else:
-                segments.append(source[:pos])
-                source = source[pos+len(sep):]
-                if not source:
+                segments.append(s[:pos])
+                s = s[pos + len(sep):]
+                if not s:
                     break
 
-        segments.append(source)
+        segments.append(s)
         segments.extend([None] * (len(seps) - len(segments)))
         result = tuple(segments)
 
     return result
 
 
-def str_to_lower(source: str) -> str:
+def str_to_lower(s: str, /) -> str:
     """
-    Safely convert *source* to lower-case.
+    Safely convert *s* to lower-case.
 
-    If *source* is not a *str*, then it is itself returned.
+    If *s* is not a *str*, then it is itself returned.
 
-    :param source: the string to convert to lower-case
-    :return: *source* in lower-case, or *source* itself, if is not a string
+    :param s: the string to convert to lower-case
+    :return: *s* in lower-case, or *s* itself, if is not a string
     """
-    return source.lower() if isinstance(source, str) else source
+    return s.lower() if isinstance(s, str) else s
 
 
-def str_to_upper(source: str) -> str:
+def str_to_upper(s: str, /) -> str:
     """
-    Safely convert *source* to upper-case.
+    Safely convert *s* to upper-case.
 
-    If *source* is not a *str*, then it is itself returned.
+    If *s* is not a *str*, then it is itself returned.
 
-    :param source: the string to convert to upper-case
-    :return: *source* in upper-case, or *source* itself, if it is not a string
+    :param s: the string to convert to upper-case
+    :return: *s* in upper-case, or *s* itself, if it is not a string
     """
-    return source.upper() if isinstance(source, str) else source
+    return s.upper() if isinstance(s, str) else s
 
 
-def str_from_any(source: Any) -> str:
+def str_from_any(s: Any, /) -> str:
     """
-    Convert *source* to its string representation.
+    Convert *s* to its string representation.
 
     These are the string representations returned:
         - *None*: the string 'None'
@@ -323,28 +330,28 @@ def str_from_any(source: Any) -> str:
         - *Path*: its POSIX form
         - all other types: their *str()* representation
 
-    :param source: the data to be converted to string.
+    :param s: the data to be converted to string.
     :return: the string representation of the source data
     """
     # declare the return variable
     result: str
 
     # obtain the string representation
-    if isinstance(source, bytes):
-        result = source.hex()
-    elif isinstance(source, date):
-        result = source.isoformat()
-    elif isinstance(source, Path):
-        result = source.as_posix()
+    if isinstance(s, bytes):
+        result = s.hex()
+    elif isinstance(s, date):
+        result = s.isoformat()
+    elif isinstance(s, Path):
+        result = s.as_posix()
     else:
-        result = str(source)
+        result = str(s)
 
     return result
 
 
-def str_to_bool(source: str) -> bool | None:
+def str_to_bool(s: str, /) -> bool | None:
     """
-    Obtain and return the *bool* value encoded in *source*.
+    Obtain and return the *bool* value encoded in *s*.
 
     These are the criteria:
         - case is disregarded
@@ -352,64 +359,105 @@ def str_to_bool(source: str) -> bool | None:
         - the string values accepted to stand for *False* are *0*, *f*, or *false*
         - all other values causes *None* to be returned
 
-    :param source: the encoded bool value
-    :return: the decoded bool value, or *None* if *source* fails the encoding criteria
+    :param s: the encoded bool value
+    :return: the decoded bool value, or *None* if *s* fails the encoding criteria
     """
     # initialize the return variable
     result: bool | None = None
 
-    if source in ["1", "t", "true"]:
+    if s in ["1", "t", "true"]:
         result = True
-    elif source in ["0", "f", "false"]:
+    elif s in ["0", "f", "false"]:
         result = False
 
     return result
 
 
-def str_to_int(source: str) -> int | None:
+def str_to_int(s: str, /) -> int | None:
     """
-    Obtain and return the *int* value encoded in *source*.
+    Silently obtain and return the *int* value encoded in *s*.
 
-    :param source: the encoded int value
+    :param s: the encoded int value
     :return: the decoded *int* value, or *None* on error
     """
     # noinspection PyUnusedLocal
     result: int | None = None
     with suppress(Exception):
-        result = int(source)
+        result = int(s)
 
     return result
 
 
-def str_to_float(source: str) -> float | None:
+def str_to_float(s: str, /) -> float | None:
     """
-    Obtain and return the *float* value encoded in *source*.
+    Silently obtain and return the *float* value encoded in *s*.
 
-    :param source: the encoded float value
+    :param s: the encoded float value
     :return: the decoded *float* value, or *None* on error
     """
     # noinspection PyUnusedLocal
     result: float | None = None
     with suppress(Exception):
-        result = float(source)
+        result = float(s)
 
     return result
 
 
-def str_is_int(source: str) -> bool:
+def str_is_int(s: str, /) -> bool:
     """
-    Determine whether *source* encodes a valid positive or negative integer.
+    Determine whether *s* encodes a valid positive or negative integer.
 
-    :param source: the encoded value
-    :return: *True* if *source* encodes a valid integer, *False* otherwise
+    :param s: the encoded value
+    :return: *True* if *s* encodes a valid integer, *False* otherwise
     """
-    # initialize the return variable
-    result: bool = False
+    # declare the return variable
+    result: bool
 
-    if isinstance(source, str):
-        if source.startswith(("+", "-")):
-            result = source[1:].isdigit()
-        else:
-            result = source.isdigit()
+    try:
+        int(s)
+        result = True
+    except ValueError:
+        result = False
+
+    return result
+
+
+def str_is_float(s: str, /) -> bool:
+    """
+    Determine whether *s* encodes a valid positive or negative floating-point number.
+
+    :param s: the encoded value
+    :return: *True* if *s* encodes a valid floating-point number, *False* otherwise
+    """
+    # declare the return variable
+    result: bool
+
+    try:
+        float(s)
+        result = True
+    except ValueError:
+        result = False
+
+    return result
+
+
+def str_is_hex(s: str, /) -> bool:
+    """
+    Determine whether *s* encodes a valid hexadecimal integer.
+
+    :param s: the encoded value
+    :return: *True* if *s* encodes a valid hexadecimal number, *False* otherwise
+    """
+    # declare the return variable
+    result: bool
+
+    #  remove the prefix
+    if s.startswith(("0x", "0X")):
+        s = s[2:]
+    try:
+        int(s)
+        result = True
+    except ValueError:
+        result = False
 
     return result

@@ -7,7 +7,7 @@ from typing import Any, Literal
 
 
 def dict_has_key(source: dict,
-                 key_chain: str | list[str]) -> bool:
+                 key_chain: str | list[Any]) -> bool:
     """
     Indicate the existence of an element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
@@ -64,7 +64,7 @@ def dict_has_key(source: dict,
 
 
 def dict_get_value(source: dict,
-                   key_chain: str | list[str]) -> Any:
+                   key_chain: str | list[Any]) -> Any:
     """
     Obtain the value of the element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
@@ -121,7 +121,7 @@ def dict_get_value(source: dict,
 
 
 def dict_set_value(target: dict,
-                   key_chain: str | list[str],
+                   key_chain: str | list[Any],
                    value: Any) -> dict:
     """
     Assign to an element of *source* the value *value*.
@@ -195,7 +195,7 @@ def dict_set_value(target: dict,
 
 
 def dict_pop(target: dict,
-             key_chain: str | list[str]) -> Any:
+             key_chain: str | list[Any]) -> Any:
     """
     Remove the element in *source* pointed to by *key_chain*, and return its value.
 
@@ -373,7 +373,7 @@ def dict_get_key(source: dict,
 
 
 def dict_get_keys(source: dict,
-                  value: Any) -> list[str]:
+                  value: Any) -> list[Any]:
     """
     Return all keys in *source*, mapping the value *value*.
 
@@ -444,7 +444,7 @@ def dict_merge(target: dict,
 
 
 def dict_coalesce(target: dict,
-                  key_chain: str | list[str]) -> dict:
+                  key_chain: str | list[Any]) -> dict:
     """
     Coalesce the element of type *list* in *target* at the level *n* with the list at the level immediately above.
 
@@ -547,7 +547,7 @@ def dict_coalesce(target: dict,
 
 
 def dict_reduce(target: dict,
-                key_chain: str | list[str]) -> dict:
+                key_chain: str | list[Any]) -> dict:
     """
     Relocate the elements from *target* at level *n*, to the level immediately above.
 
@@ -604,10 +604,10 @@ def dict_reduce(target: dict,
 
 
 def dict_from_list(source: list[dict],
-                   key_chain: str | list[str],
+                   key_chain: str | list[Any],
                    value: Any) -> dict | None:
     """
-    Locate in *source*, and return, the element of type *dict* with value *value* in the key chain *key_chain*.
+    Locate in *source*, and return, the element of type *dict* having the attribute *key_chain* with value *value*.
 
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
 
@@ -760,7 +760,7 @@ def dict_transform(source: dict,
 
 
 def dict_clone(source: dict,
-               from_to_keys: list[tuple[str, str] | str],
+               from_to_keys: list[tuple[Any, Any] | Any],
                omit_missing: bool = True) -> dict:
     """
     Build a new *dict*, according to the rules presented herein.
@@ -796,7 +796,7 @@ def dict_clone(source: dict,
 
 
 def dict_listify(target: dict,
-                 key_chain: str | list[str]) -> dict:
+                 key_chain: str | list[Any]) -> dict:
     """
     Insert the value of the item pointed to by the key chain *[keys[0]: ... :keys[n]* in a list.
 
@@ -1016,7 +1016,7 @@ def dict_hexify(source: dict,
     return source
 
 
-def dict_stringify(source: dict[Any, Any]) -> str:
+def dict_stringify(source: dict) -> str:
     """
     Return a string with the key-value pairs from *source* listed as *{<k1> = <v1>, ..., <kn> = <vn>}*.
 

@@ -1,5 +1,5 @@
 import filetype
-import magic
+import puremagic
 import mimetypes
 from contextlib import suppress
 from enum import StrEnum
@@ -188,11 +188,11 @@ def file_get_mimetype(file_data: Path | str | bytes) -> Mimetype | str:
 
     if not mimetype:
         if isinstance(file_data, Path):
-            mimetype = magic.from_file(filename=file_data,
-                                       mime=True)
+            mimetype = puremagic.from_file(filename=file_data,
+                                           mime=True)
         else:
-            mimetype = magic.from_buffer(buffer=file_data,
-                                         mime=True)
+            mimetype = puremagic.from_string(string=file_data,
+                                             mime=True)
     result: Mimetype | str
     if mimetype:
         # for unknown mimetypes, return its identifying string

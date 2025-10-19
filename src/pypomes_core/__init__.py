@@ -1,6 +1,7 @@
 from .datetime_pomes import (
     TZ_LOCAL, DateFormat, DatetimeFormat,
-    date_reformat, date_parse, datetime_parse,
+    date_reformat, date_weekday,
+    date_parse, datetime_parse,
     timestamp_interval, timestamp_duration
 )
 from .dict_pomes import (
@@ -11,7 +12,7 @@ from .dict_pomes import (
     dict_jsonify, dict_hexify, dict_stringify
 )
 from .email_pomes import (
-    EmailConfig, email_send, email_codify,
+    EmailParam, email_setup, email_send, email_codify,
 )
 from .encoding_pomes import (
     encode_ascii_hex, decode_ascii_hex
@@ -45,7 +46,8 @@ from .str_pomes import (
     str_as_list, str_sanitize, str_split_on_mark,
     str_between, str_positional, str_random, str_splice,
     str_find_char, str_find_whitespace, str_rreplace,
-    str_from_any, str_to_bool, str_to_int, str_to_float, str_is_int
+    str_from_any, str_to_bool, str_to_int, str_to_float,
+    str_is_int, str_is_float, str_is_hex
 )
 from .validation_msgs import (
     validate_set_msgs, validate_update_msgs
@@ -67,7 +69,8 @@ __all__ = [
     "pypomes_versions",
     # datetime_pomes
     "TZ_LOCAL", "DateFormat", "DatetimeFormat",
-    "date_reformat", "date_parse", "datetime_parse",
+    "date_reformat", "date_weekday",
+    "date_parse", "datetime_parse",
     "timestamp_interval", "timestamp_duration",
     # dict_pomes
     "dict_has_key", "dict_get_value", "dict_set_value", "dict_reduce",
@@ -76,7 +79,7 @@ __all__ = [
     "dict_replace_value", "dict_pop", "dict_pop_all", "dict_unique_values",
     "dict_jsonify", "dict_hexify", "dict_stringify",
     # email_pomes
-    "EmailConfig", "email_send", "email_codify",
+    "EmailParam", "email_setup", "email_send", "email_codify",
     # encoding_pomes
     "encode_ascii_hex", "decode_ascii_hex",
     # env_pomes
@@ -104,7 +107,8 @@ __all__ = [
     "str_as_list", "str_sanitize", "str_split_on_mark",
     "str_between", "str_positional", "str_random", "str_splice",
     "str_find_char", "str_find_whitespace", "str_rreplace",
-    "str_from_any", "str_to_bool", "str_to_int", "str_to_float", "str_is_int",
+    "str_from_any", "str_to_bool", "str_to_int", "str_to_float",
+    "str_is_int", "str_is_float", "str_is_hex",
     # validation_msgs
     "validate_set_msgs", "validate_update_msgs",
     # validation_pomes

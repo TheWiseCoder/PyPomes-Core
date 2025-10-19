@@ -1,42 +1,80 @@
 import sys
 from email.message import EmailMessage
-from enum import StrEnum
+from enum import StrEnum, auto
 from logging import Logger
-from smtplib import SMTP
+from smtplib import SMTP, SMTP_SSL
+from typing import Any
 
 from .file_pomes import Mimetype
-from .env_pomes import APP_PREFIX, env_get_str
+from .env_pomes import APP_PREFIX, env_get_int, env_get_str
 
 
-class EmailConfig(StrEnum):
+class EmailParam(StrEnum):
     """
     Parameters for email.
     """
-    HOST = env_get_str(key=f"{APP_PREFIX}_EMAIL_HOST",
-                       def_value="")
-    PORT = env_get_str(key=f"{APP_PREFIX}_EMAIL_PORT",
-                       def_value="")
-    ACCOUNT = env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT",
-                          def_value="")
-    PWD = env_get_str(key=f"{APP_PREFIX}_EMAIL_PWD",
-                      def_value="")
-    SECURITY = env_get_str(key=f"{APP_PREFIX}_EMAIL_SECURITY",
-                           def_value="")
+    HOST = auto()
+    PORT = auto()
+    ACCOUNT = auto()
+    PWD = auto()
+    ORIGIN = auto()
+    SECURITY = auto()
 
 
-def email_send(user_email: str,
+_EMAIL_CONFIG: [EmailParam, Any] = {
+    EmailParam.HOST: env_get_str(key=f"{APP_PREFIX}_EMAIL_HOST"),
+    EmailParam.PORT: env_get_int(key=f"{APP_PREFIX}_EMAIL_PORT"),
+    EmailParam.ACCOUNT: env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT"),
+    EmailParam.PWD: env_get_str(key=f"{APP_PREFIX}_EMAIL_PWD"),
+    EmailParam.ORIGIN: env_get_str(key=f"{APP_PREFIX}_EMAIL_ORIGIN"),
+    EmailParam.SECURITY: env_get_str(key=f"{APP_PREFIX}_EMAIL_SECURITY")
+}
+
+
+def email_setup(host: str,
+                port: int,
+                account: str,
+                pwd: str,
+                origin: str,
+                security: str = None) -> None:
+    """
+    Configure the email server.
+
+    Invoking this function overrides the configuration parameters obtained from environment variables.
+
+    :param host: the host URL
+    :param port: the connection port (a positive integer)
+    :param account: the logon account
+    :param pwd: the logon password
+    :param origin: the address of origin for the e-mails
+    :param security: the security protocol ('ssl' and 'tls' are currently supported)
+    """
+    global _EMAIL_CONFIG
+    _EMAIL_CONFIG = {
+        EmailParam.HOST: host,
+        EmailParam.PORT: port,
+        EmailParam.ACCOUNT: account,
+        EmailParam.PWD: pwd,
+        EmailParam.ORIGIN: origin or account,
+        EmailParam.SECURITY: security
+    }
+
+
+def email_send(email_to: str,
                subject: str,
                content: str,
-               content_type: Mimetype = Mimetype.TEXT,
+               mimetype: Mimetype = Mimetype.TEXT,
+               email_from: str = None,
                errors: list[str] = None,
                logger: Logger = None) -> None:
     """
     Send email to *user_email*, with *subject* as the email subject, and *content* as the email message.
 
-    :param user_email: the address to send the email to
+    :param email_to: the address to send the email to
     :param subject: the email subject
     :param content: the email message
-    :param content_type: the mimetype of the content (defaults to *text/plain*)
+    :param mimetype: the mimetype of the content (defaults to *text/plain*)
+    :param email_from: the email address of origin (defaults to the configured origin)
     :param errors: incidental error messages
     :param logger: optional logger
     """
@@ -45,28 +83,38 @@ def email_send(user_email: str,
 
     # build the email object
     email_msg = EmailMessage()
-    email_msg["From"] = EmailConfig.ACCOUNT
-    email_msg["To"] = user_email
+    email_msg["From"] = email_from or _EMAIL_CONFIG[EmailParam.ORIGIN]
+    email_msg["To"] = email_to
     email_msg["Subject"] = subject
-    if content_type == Mimetype.HTML:
-        email_msg.set_content("Your browser does not support HTML.")
-        email_msg.add_alternative(content,
-                                  subtype="html")
+    maintype, subtype = mimetype.split("/")
+    # BUG HANDLING:
+    #   will crash if parameter 'maintype' is passed and 'content' is a string
+    if isinstance(content, str):
+        email_msg.set_content(content,
+                              subtype=subtype)
     else:
-        email_msg.set_content(content)
-
+        email_msg.set_content(content,
+                              maintype=maintype,
+                              subtype=subtype)
     # send the message
     try:
         # instantiate the email server, login and send the email
-        with SMTP(host=EmailConfig.HOST,
-                  port=int(EmailConfig.PORT)) as server:
-            if EmailConfig.SECURITY == "tls":
-                server.starttls()
-            server.login(user=EmailConfig.ACCOUNT,
-                         password=EmailConfig.PWD)
-            server.send_message(msg=email_msg)
-            if logger:
-                logger.debug(msg=f"Sent email '{subject}' to '{user_email}'")
+        if _EMAIL_CONFIG[EmailParam.SECURITY] == "ssl":
+            with SMTP_SSL(host=_EMAIL_CONFIG[EmailParam.HOST],
+                          port=_EMAIL_CONFIG[EmailParam.PORT]) as server:
+                server.login(user=_EMAIL_CONFIG[EmailParam.ACCOUNT],
+                             password=_EMAIL_CONFIG[EmailParam.PWD])
+                server.send_message(msg=email_msg)
+        else:
+            with SMTP(host=_EMAIL_CONFIG[EmailParam.HOST],
+                      port=_EMAIL_CONFIG[EmailParam.PORT]) as server:
+                if _EMAIL_CONFIG[EmailParam.SECURITY] == "tls":
+                    server.starttls()
+                server.login(user=_EMAIL_CONFIG[EmailParam.ACCOUNT],
+                             password=_EMAIL_CONFIG[EmailParam.PWD])
+                server.send_message(msg=email_msg)
+        if logger:
+            logger.debug(msg=f"Sent email '{subject}' to '{email_to}'")
     except Exception as e:
         # the operatin raised an exception
         exc_err: str = exc_format(exc=e,

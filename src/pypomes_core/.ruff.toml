@@ -1,7 +1,7 @@
 # environment
 cache-dir = "~/.cache/ruff"
 force-exclude = true
-required-version = ">=0.12"
+required-version = ">=0.14"
 target-version = "py312"
 respect-gitignore = true
 lint.task-tags = ["TODO", "FIXME", "HACK", "HAZARD"]
@@ -90,6 +90,7 @@ lint.ignore = [
     "PLC0415",  # 'import' should be at the top level of a file
     "PLR2004",  # magic value used in comparison, consider replacing it with a constant variable
     "PLW0603",  # using the global statement to update a variable is discouraged
+    "PLW2901",  # outer {outer_kind} variable {name} overwritten by inner {inner_kind} target
     "PTH118",   # os.{module}.join() should be replaced by Path with / operator
     "RUF013",   # implicit Optional in type annotations when the default parameter value is None
     "RUF022",   # __all__ is not sorted

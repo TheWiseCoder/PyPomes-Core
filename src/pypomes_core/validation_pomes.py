@@ -710,13 +710,13 @@ def validate_pwd(source: dict[str, Any],
                               logger=logger)
     if value:
         if (len(value) >= 8 and
-            str_find_char(source=value,
+            str_find_char(value,
                           chars=string.digits) >= 0 and
-            str_find_char(source=value,
+            str_find_char(value,
                           chars=string.ascii_uppercase) >= 0 and
-            str_find_char(source=value,
+            str_find_char(value,
                           chars=string.ascii_lowercase) >= 0 and
-            str_find_char(source=value,
+            str_find_char(value,
                           chars=string.punctuation) >= 0):
             result = value
         elif isinstance(errors, list):
@@ -836,7 +836,7 @@ def validate_ints(source: dict[str, Any],
     values: list = source.get(suffix)
     if values:
         if isinstance(values, str):
-            values = str_as_list(source=values,
+            values = str_as_list(values,
                                  sep=sep)
         if isinstance(values, list):
             ints: list[int] = []
@@ -914,7 +914,7 @@ def validate_strs(source: dict[str, Any],
     values: list = source.get(suffix)
     if values:
         if isinstance(values, str):
-            values = str_as_list(source=values,
+            values = str_as_list(values,
                                  sep=sep)
         if isinstance(values, list):
             strs: list[str] = []
@@ -1122,7 +1122,7 @@ def validate_unformat_errors(errors: list[dict[str, str] | str],
     # traverse the list of dicts
     for error in errors:
         if isinstance(error, dict):
-            desc: str = str_sanitize(source=error.get(desc) or "''")
+            desc: str = str_sanitize(error.get(desc) or "''")
             result.append(f"{error.get(name)}: {desc}")
         else:
             result.append(error)
