@@ -17,7 +17,7 @@ class EmailParam(StrEnum):
     PORT = auto()
     ACCOUNT = auto()
     PWD = auto()
-    ORIGIN = auto()
+    DEFAULT_FROM = auto()
     SECURITY = auto()
 
 
@@ -26,7 +26,7 @@ _EMAIL_CONFIG: [EmailParam, Any] = {
     EmailParam.PORT: env_get_int(key=f"{APP_PREFIX}_EMAIL_PORT"),
     EmailParam.ACCOUNT: env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT"),
     EmailParam.PWD: env_get_str(key=f"{APP_PREFIX}_EMAIL_PWD"),
-    EmailParam.ORIGIN: env_get_str(key=f"{APP_PREFIX}_EMAIL_ORIGIN"),
+    EmailParam.DEFAULT_FROM: env_get_str(key=f"{APP_PREFIX}_EMAIL_DEFAULT_FROM"),
     EmailParam.SECURITY: env_get_str(key=f"{APP_PREFIX}_EMAIL_SECURITY")
 }
 
@@ -55,7 +55,7 @@ def email_setup(host: str,
         EmailParam.PORT: port,
         EmailParam.ACCOUNT: account,
         EmailParam.PWD: pwd,
-        EmailParam.ORIGIN: origin or account,
+        EmailParam.DEFAULT_FROM: origin or account,
         EmailParam.SECURITY: security
     }
 
@@ -83,7 +83,9 @@ def email_send(email_to: str,
 
     # build the email object
     email_msg = EmailMessage()
-    email_msg["From"] = email_from or _EMAIL_CONFIG[EmailParam.ORIGIN]
+    email_msg["From"] = (email_from or
+                         _EMAIL_CONFIG[EmailParam.DEFAULT_FROM] or
+                         _EMAIL_CONFIG[EmailParam.ACCOUNT])
     email_msg["To"] = email_to
     email_msg["Subject"] = subject
     maintype, subtype = mimetype.split("/")
@@ -110,6 +112,13 @@ def email_send(email_to: str,
                       port=_EMAIL_CONFIG[EmailParam.PORT]) as server:
                 if _EMAIL_CONFIG[EmailParam.SECURITY] == "tls":
                     server.starttls()
+
+                # possible exceptions:
+                #   - SMTPAuthenticationError: the server didn't accept the username/password combination
+                #   - SMTPException: no suitable authentication method was found
+                #   - SMTPHeloError: the server didn't reply properly to the helo greeting
+                #   - SMTPNotSupportedError: the AUTH command is not supported by the server
+                #   - SMTPServerDisconnected: the connection was unexpectedly closed
                 server.login(user=_EMAIL_CONFIG[EmailParam.ACCOUNT],
                              password=_EMAIL_CONFIG[EmailParam.PWD])
                 server.send_message(msg=email_msg)

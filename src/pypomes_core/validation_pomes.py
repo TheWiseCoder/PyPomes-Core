@@ -957,6 +957,7 @@ def validate_strs(source: dict[str, Any],
 
 
 def validate_format_error(error_id: int,
+                          /,
                           *args: Any,
                           **kwargs: dict) -> str:
     """
