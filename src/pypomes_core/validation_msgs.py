@@ -1,6 +1,11 @@
 from typing import Final, Literal
 
 __ERR_MSGS: Final[dict[int, dict[str, str]]] = {
+    # omits the attribute 'code'
+    100: {
+        "en": "{}",
+        "pt": "{}",
+    },
     101: {
         "en": "{}",
         "pt": "{}",

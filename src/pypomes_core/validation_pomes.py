@@ -978,6 +978,8 @@ def validate_format_error(error_id: int,
     The formatted error message will be (*<VMP>* is the validation message prefix):
       - <VMP>147: Invalid value 'my_value': length shorter than 10 @my_attr
 
+    if the value of *error_id* is *100*, then the message prefix *<VMP><error-id>* is omitted.
+
     :param error_id: the identification of the message element
     :param args: optional non-keyworded arguments to format the error message with
     :param kwargs: optional keyworded arguments to define language and prefix
@@ -1002,9 +1004,10 @@ def validate_format_error(error_id: int,
 
     # initialize the return variable
     result: str = ""
-    if msg_prefix:
-        result += msg_prefix + str(error_id) + ": "
-    result += err_msgs.get(error_id) or ""
+    if error_id != 100:
+        if msg_prefix:
+            result += msg_prefix + str(error_id) + ": "
+        result += err_msgs.get(error_id) or ""
 
     # apply the provided arguments
     for arg in args:

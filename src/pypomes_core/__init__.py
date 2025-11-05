@@ -39,7 +39,8 @@ from .list_pomes import (
     list_jsonify, list_hexify, list_hierarchize, list_stringify
 )
 from .obj_pomes import (
-    obj_is_serializable, obj_to_dict, exc_format, func_get_passed_args
+    obj_is_serializable, obj_to_dict, exc_format,
+    func_get_passed_args, func_get_specified_params, func_get_defaulted_params
 )
 from .str_pomes import (
     str_to_hex, str_from_hex, str_to_lower, str_to_upper,
@@ -101,7 +102,8 @@ __all__ = [
     "list_prune_duplicates", "list_prune_in", "list_prune_not_in",
     "list_jsonify", "list_hexify", "list_hierarchize", "list_stringify",
     # obj_pomes
-    "obj_is_serializable", "obj_to_dict", "exc_format", "func_get_passed_args",
+    "obj_is_serializable", "obj_to_dict", "exc_format",
+    "func_get_passed_args", "func_get_specified_params", "func_get_defaulted_params",
     # str_pomes
     "str_to_hex", "str_from_hex", "str_to_lower", "str_to_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",
@@ -150,6 +152,9 @@ def pypomes_versions() -> dict[str, str]:
 
     with suppress(Exception):
         result["PyPomes-HTTP"] = import_module(name="pypomes_http").__version__
+
+    with suppress(Exception):
+        result["PyPomes-IAM"] = import_module(name="pypomes_iam").__version__
 
     with suppress(Exception):
         result["PyPomes-JWT"] = import_module(name="pypomes_jwt").__version__
