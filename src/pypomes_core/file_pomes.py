@@ -157,6 +157,7 @@ def file_get_extension(mimetype: Mimetype | str) -> str | None:
 
     if not result and mimetype in Mimetype:
         mimetype = Mimetype(mimetype)
+        # noinspection PyProtectedMember
         result = f".{mimetype._name_.lower()}"
 
     return result

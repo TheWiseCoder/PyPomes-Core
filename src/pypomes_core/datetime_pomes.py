@@ -58,7 +58,7 @@ def date_reformat(dt_str: str,
     ts: datetime = parser.parse(timestr=dt_str,
                                 **kwargs)
     if ts:
-        result = ts.strftime(format=to_format)
+        result = ts.strftime(to_format)
 
     return result
 
@@ -173,7 +173,7 @@ def timestamp_interval(start: date | datetime | float,
     elif isinstance(start, date):
         start_dt = datetime.combine(start, datetime.min.time())
     else:
-        start_dt = datetime.fromtimestamp(timestamp=start)
+        start_dt = datetime.fromtimestamp(start)
 
     # obtain the corresponding finish datetime
     finish_dt: datetime
@@ -182,7 +182,7 @@ def timestamp_interval(start: date | datetime | float,
     elif isinstance(finish, date):
         finish_dt = datetime.combine(finish, datetime.min.time())
     else:
-        finish_dt = datetime.fromtimestamp(timestamp=finish)
+        finish_dt = datetime.fromtimestamp(finish)
 
     # compute the duration parts
     if finish_dt >= start_dt:

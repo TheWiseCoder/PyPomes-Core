@@ -24,12 +24,16 @@ from .env_pomes import (
     env_get_float, env_get_floats,
     env_get_enum, env_get_enums,
     env_get_bool, env_get_bytes,
-    env_get_date, env_get_path, env_is_docker
+    env_get_date, env_get_path, env_get_obj, env_is_docker
 )
 from .file_pomes import (
     TEMP_FOLDER, Mimetype,
     file_get_data, file_get_extension,
     file_get_mimetype, file_is_binary
+)
+from .func_pomes import (
+    func_capture_args, func_defaulted_args, func_specified_args,
+    func_capture_params, func_defaulted_params, func_specified_params
 )
 from .list_pomes import (
     list_compare, list_correlate, list_bin_search,
@@ -39,8 +43,7 @@ from .list_pomes import (
     list_jsonify, list_hexify, list_hierarchize, list_stringify
 )
 from .obj_pomes import (
-    obj_is_serializable, obj_to_dict, exc_format,
-    func_get_passed_args, func_get_specified_params, func_get_defaulted_params
+    obj_is_serializable, obj_to_dict, exc_format
 )
 from .str_pomes import (
     str_to_hex, str_from_hex, str_to_lower, str_to_upper,
@@ -90,11 +93,14 @@ __all__ = [
     "env_get_float", "env_get_floats",
     "env_get_enum",  "env_get_enums",
     "env_get_bool", "env_get_bytes",
-    "env_get_date", "env_get_path", "env_is_docker",
+    "env_get_date", "env_get_path", "env_get_obj", "env_is_docker",
     # file_pomes
     "TEMP_FOLDER", "Mimetype",
     "file_get_data", "file_get_extension",
     "file_get_mimetype", "file_is_binary",
+    # func_pomes
+    "func_capture_args", "func_defaulted_args", "func_specified_args",
+    "func_capture_params", "func_defaulted_params", "func_specified_params",
     # list_pomes
     "list_compare", "list_correlate", "list_bin_search",
     "list_flatten", "list_unflatten", "list_get_coupled",
@@ -103,7 +109,6 @@ __all__ = [
     "list_jsonify", "list_hexify", "list_hierarchize", "list_stringify",
     # obj_pomes
     "obj_is_serializable", "obj_to_dict", "exc_format",
-    "func_get_passed_args", "func_get_specified_params", "func_get_defaulted_params",
     # str_pomes
     "str_to_hex", "str_from_hex", "str_to_lower", "str_to_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",

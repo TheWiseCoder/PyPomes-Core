@@ -153,7 +153,7 @@ def validate_bool(source: dict[str, Any],
     :param attr: the name of the attribute whose value is being validated
     :param default: default value, overrides *required*
     :param required: specifies whether a value must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -236,7 +236,7 @@ def validate_int(source: dict[str, Any],
     :param values: optional list of allowed values
     :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -301,7 +301,7 @@ def validate_decimal(source: dict[str, Any],
     :param values: optional list of allowed values
     :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -370,7 +370,7 @@ def validate_str(source: dict[str, Any],
     :param default: optional default value, overrides *required*
     :param ignore_case: specifies whether to ignore capitalization
     :param required: specifies whether a value must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -431,7 +431,7 @@ def validate_date(source: dict[str, Any],
     :param day_first: indicates that the day precedes the month in the string representing the date
     :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -504,7 +504,7 @@ def validate_datetime(source: dict[str, Any],
     :param day_first: indicates that the day precedes the month in the string representing the date
     :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -580,7 +580,7 @@ def validate_enum(source: dict[str, Any],
     :param default: optional default value, overrides *required*
     :param values: optional list of allowed values (defaults to all elements of *enum_class*)
     :param required: specifies whether a value must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the validated value as an instance of *enum_class*, or *None* if validation failed
     """
@@ -594,6 +594,7 @@ def validate_enum(source: dict[str, Any],
         if isinstance(value, Enum):
             source = source.copy()
             source[attr] = value.name
+        # noinspection PyProtectedMember
         vals: list[str | int | Decimal] = [v.name if isinstance(v, Enum) else v
                                            for v in (values or enum_class._member_names_)]
         name: str = validate_str(source=source,
@@ -650,7 +651,7 @@ def validate_email(source: dict[str, Any],
     :param attr: the attribute associated with the value to be validated
     :param default: optional default value, overrides *required*
     :param required: specifies whether a value must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -696,7 +697,7 @@ def validate_pwd(source: dict[str, Any],
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param required: specifies whether a value must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the validated value, or *None* if validation failed
     """
@@ -759,7 +760,7 @@ def validate_cron(source: dict[str, Any],
     :param source: *dict* containing the expression to be validated
     :param attr: the attribute associated with the expression to be validated
     :param required: specifies whether a value must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the validated expression, or *None* if validation failed
     """
@@ -821,7 +822,7 @@ def validate_ints(source: dict[str, Any],
     :param min_val: the minimum value accepted
     :param max_val:  the maximum value accepted
     :param required: whether the list of values must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the list of validated values, or *None* if validation failed or not required and no values found
     """
@@ -899,7 +900,7 @@ def validate_strs(source: dict[str, Any],
     :param min_length: optional minimum length accepted
     :param max_length:  optional maximum length accepted
     :param required: whether the list of values must be provided
-    :param errors: incidental error messages
+    :param errors: incidental error messages (might be a non-empty list)
     :param logger: optional logger
     :return: the list of validated values, or *None* if validation failed or not required and no values found
     """
@@ -959,7 +960,7 @@ def validate_strs(source: dict[str, Any],
 def validate_format_error(error_id: int,
                           /,
                           *args: Any,
-                          **kwargs: dict) -> str:
+                          **kwargs: dict[str, Any]) -> str:
     """
     Format and return the error message identified by *err_id* in the standard messages list.
 

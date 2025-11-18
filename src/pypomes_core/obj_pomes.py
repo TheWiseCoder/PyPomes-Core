@@ -1,9 +1,8 @@
-import inspect
 import json
 import os
 import traceback
 from contextlib import suppress
-from types import FrameType, TracebackType
+from types import TracebackType
 from typing import Any
 
 
@@ -89,82 +88,3 @@ def exc_format(exc: Exception,
     fline: int = tlast.tb_lineno
 
     return f"{fname}, {fline}, {cls[8:-2]} - {exc}"
-
-
-def func_get_passed_args(include_defaults: bool = False) -> dict[str, Any]:
-    """
-    Retrieve the arguments passed to the invoking function, as *key-value* pairs.
-
-    *include_defaults* determines whether to include parameters that were not actually passed,
-    but have default values defined.
-
-    :param include_defaults: whether to include parameters with default values that were not actually passed
-    :return: a *dict* with the passed parameters as *key-value* pairs
-    """
-    # get the caller's frame
-    frame: FrameType = inspect.currentframe().f_back
-
-    # get the function object
-    func: Any = frame.f_globals[frame.f_code.co_name]
-
-    # get info on the passed arguments
-    args_info: inspect.ArgInfo = inspect.getargvalues(frame=frame)
-
-    # get a signature object for 'func'
-    sig: inspect.Signature = inspect.signature(obj=func)
-
-    bound_args: inspect.BoundArguments
-    if include_defaults:
-        # bind all arguments, filling in defaults
-        bound_args = sig.bind(**args_info.locals)
-        bound_args.apply_defaults()
-    else:
-        # bind only explicitly passed arguments
-        bound_args = sig.bind_partial(**args_info.locals)
-
-    return dict(bound_args.arguments)
-
-
-def func_get_specified_params() -> list[str]:
-    """
-    Retrieve the parameters explicitly passed to the invoking function.
-
-    :return: the explicitly passed parameters as a list of names
-    """
-    # get the caller's frame
-    frame: FrameType = inspect.currentframe().f_back
-
-    # get info on the arguments passed
-    args_info: inspect.ArgInfo = inspect.getargvalues(frame=frame)
-
-    # get explicitly passed arguments and return as a list
-    return list(args_info.locals.keys())
-
-
-def func_get_defaulted_params() -> list[str]:
-    """
-    Retrieve the parameters not explicitly passed to the invoking function, but defaulted.
-
-    :return: the not explicitly passed, but defaulted, parameters as a list of names
-    """
-    # get the caller's frame
-    frame: FrameType = inspect.currentframe().f_back
-
-    # get the function object
-    func: Any = frame.f_globals[frame.f_code.co_name]
-
-    # get a signature object for 'func'
-    sig: inspect.Signature = inspect.signature(obj=func)
-
-    # get all parameters and their default values
-    defaulted_params: set[str] = {
-        name for name, param in sig.parameters.items()
-        if param.default is not inspect.Parameter.empty
-    }
-
-    # get explicitly passed arguments
-    args_info: inspect.ArgInfo = inspect.getargvalues(frame=frame)
-    explicitly_passed: set[str] = set(args_info.locals.keys())
-
-    # return those with defaults that were not passed
-    return list(defaulted_params - explicitly_passed)
