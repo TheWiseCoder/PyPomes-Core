@@ -1,6 +1,5 @@
 import json
 import os
-import traceback
 from contextlib import suppress
 from types import TracebackType
 from typing import Any
@@ -31,7 +30,7 @@ def obj_to_dict(obj: Any,
     Convert the generic object *obj* to a *dict*.
 
     The conversion is done recursively. Attributes for which exceptions are raised on attempt
-    to access them are silently omited.
+    to access them are silently omitted.
 
     :param obj: the object to be converted
     :param omit_private: whether to omit private attributes (defaults to *True*)
@@ -76,14 +75,14 @@ def exc_format(exc: Exception,
     cls: str = str(exc.__class__)
 
     # retrieve the execution point where the exception was raised (bottom of the stack)
-    tlast: traceback = tback
+    tlast: TracebackType = tback
     while tlast.tb_next:
         tlast = tlast.tb_next
 
     # retrieve the module name and the line number within the module
     try:
         fname: str = os.path.split(p=tlast.tb_frame.f_code.co_filename)[1]
-    except Exception:
+    except Exception:  # noqa: # noinspection PyBroadException
         fname: str = "<unknow module>"
     fline: int = tlast.tb_lineno
 

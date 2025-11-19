@@ -122,7 +122,7 @@ def list_bin_search(source: list,
     """
     Find the index of *item* in the sorted list *source*, using binary search.
 
-    If *source* is not ascendingly or descendinlgy sorted, the return value is not valid.
+    If *source* is not ascendingly or descendingly sorted, the return value is not valid.
 
     :param source: the sorted list to inspect
     :param item: the item to find
@@ -154,9 +154,9 @@ def list_bin_search(source: list,
 
 def list_flatten(source: list[str]) -> str:
     """
-    Buiild and return a *str* by concatenating with "." the elements in *source*.
+    Build and return a *str* by concatenating with "." the elements in *source*.
 
-    Exemples:
+    Examples:
         - ['1', '2', '']     -> '1.2.'
         - ['', 'a', 'b']     -> '.a.b'
         - ['x', '', '', 'y'] -> 'x...y'
@@ -175,7 +175,7 @@ def list_unflatten(source: str) -> list[str]:
     """
     Build and return a *list*, by splitting *source* into its components separated by ".".
 
-    This *list* will contain the extracted components. Exemples:
+    This *list* will contain the extracted components. Examples:
         - '1.2.'  -> ['1', '2', '']
         - '.a.b'  -> ['', 'a', 'b']
         - 'x...y' -> ['x', '', '', 'y']
@@ -326,7 +326,7 @@ def list_elem_starting_with(source: list[str | bytes],
     """
     Locate and return the first element in *source* prefixed by *prefix*.
 
-    Retorna *None* se esse elemento não for encontrado.
+    Retorn *None* if this element is not found.
 
     :param source: the list to be inspected
     :param prefix: the data prefixing the element to be returned
@@ -355,7 +355,7 @@ def list_prune_duplicates(target: list,
 
     The parameter *is_sorted* indicates that *target* is ascendingly or descendingly sorted.
     In both cases, the original order of the elements in *target* is maintained.
-    For convenience, the pruned imput list is returned.
+    For convenience, the pruned input list is returned.
 
     :param target: the target list
     :param is_sorted: *target* is ascendingly or descendingly sorted
@@ -452,7 +452,7 @@ def list_jsonify(source: list,
     *HAZARD*: depending on the type of object contained in *source*, the final result may still
     not be fully serializable.
 
-    :param source: the *dict* to be *jasonified*
+    :param source: the *dict* to be *jsonified*
     :param jsonify_enums: whether to *jsonify* enums, using their values (the default) or names
     :return: a new *jsonified* list
     """
@@ -537,9 +537,9 @@ def list_hexify(source: list) -> list:
 
 def list_hierarchize(source: list[list | tuple]) -> list:
     """
-    Hierarquize a fully sorted list of tuples or list of lists by aggregating common values at all levels.
+    Hierarchize a fully sorted list of tuples or list of lists by aggregating common values at all levels.
 
-    To ilustrate, let us assume *source* is the input list:
+    To illustrate, let us assume *source* is the input list:
     ::
       [
         ('John', 'parent Fred', 'old age', 'indifferent'),
@@ -557,7 +557,7 @@ def list_hierarchize(source: list[list | tuple]) -> list:
         ('Mary', 'sibling Joan', 'smart girl')
      ]
 
-    The resulting hierarquization would yield the list:
+    The resulting hierarchization would yield the list:
     ::
       [
         ['John',
@@ -590,7 +590,7 @@ def list_hierarchize(source: list[list | tuple]) -> list:
                          value: list | tuple) -> None:
         for key in keys[:-1]:
             hierarchy.setdefault(key, {})
-        # if isinstance(hierarchy.get(keys[-1]), dict):
+        # if isinstance(l_hierarchy.get(keys[-1]), dict):
         hierarchy.setdefault(keys[-1], []).append(value)
 
     def convert_to_list(item: Any) -> list:
@@ -608,13 +608,13 @@ def list_hierarchize(source: list[list | tuple]) -> list:
             result = [item]
         return result
 
-    hierarchy: dict = defaultdict(dict)
-    for item in source:
-        add_to_hierarchy(hierarchy=hierarchy,
-                         keys=item[:-1],
-                         value=item[-1])
+    l_hierarchy: dict = defaultdict(dict)
+    for l_item in source:
+        add_to_hierarchy(hierarchy=l_hierarchy,
+                         keys=l_item[:-1],
+                         value=l_item[-1])
 
-    return convert_to_list(item=hierarchy)
+    return convert_to_list(item=l_hierarchy)
 
 
 def list_stringify(source: list) -> str:

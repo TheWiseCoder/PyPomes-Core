@@ -21,7 +21,7 @@ class EmailParam(StrEnum):
     SECURITY = auto()
 
 
-_EMAIL_CONFIG: [EmailParam, Any] = {
+_EMAIL_CONFIG: dict[EmailParam, Any] = {
     EmailParam.HOST: env_get_str(key=f"{APP_PREFIX}_EMAIL_HOST"),
     EmailParam.PORT: env_get_int(key=f"{APP_PREFIX}_EMAIL_PORT"),
     EmailParam.ACCOUNT: env_get_str(key=f"{APP_PREFIX}_EMAIL_ACCOUNT"),
@@ -125,7 +125,7 @@ def email_send(email_to: str,
         if logger:
             logger.debug(msg=f"Sent email '{subject}' to '{email_to}'")
     except Exception as e:
-        # the operatin raised an exception
+        # the operation raised an exception
         exc_err: str = exc_format(exc=e,
                                   exc_info=sys.exc_info())
         err_msg: str = f"Error sending the email: {exc_err}"

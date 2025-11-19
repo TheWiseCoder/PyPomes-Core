@@ -1,7 +1,7 @@
 import inspect
 from contextvars import ContextVar
 from functools import wraps
-from typing import Any
+from typing import Any, Callable
 
 
 # initialize the context variables holding argument data
@@ -13,9 +13,9 @@ func_defaulted_params: ContextVar[list[str]] = ContextVar("defaulted_params")
 func_specified_params: ContextVar[list[str]] = ContextVar("specified_params")
 
 
-def func_capture_args(func: callable) -> callable:
+def func_capture_args(func: Callable) -> Callable:
     """
-    Create a decorator to identify arguments in a function which were defaulted, and which were explicility passed.
+    Create a decorator to identify arguments in a function which were defaulted, and which were explicitly passed.
 
     Introspect the call to *func* and make available two dictionaries in context variables:
         - *defaulted_args*: arguments not passed, but defaulted as per their respective declarations
@@ -64,7 +64,7 @@ def func_capture_args(func: callable) -> callable:
         func_specified_args.set(explicitly_passed)
         func_defaulted_args.set(used_defaults)
 
-        # proceeed executing the decorated function
+        # proceed executing the decorated function
         return func(*args, **kwargs)
 
     # prevent a rogue error ("View function mapping is overwriting an existing endpoint function")
@@ -73,9 +73,9 @@ def func_capture_args(func: callable) -> callable:
     return wrapper
 
 
-def func_capture_params(func: callable) -> callable:
+def func_capture_params(func: Callable) -> Callable:
     """
-    Create a decorator to identify parameters in a function which were defaulted, and which were explicility passed.
+    Create a decorator to identify parameters in a function which were defaulted, and which were explicitly passed.
 
     Introspect the call to *func* and make available two lists in context variables:
         - *defaulted_params*: parameters not passed, but defaulted as per their respective declarations
@@ -114,7 +114,7 @@ def func_capture_params(func: callable) -> callable:
         func_specified_params.set(list(explicitly_passed))
         func_defaulted_params.set(list(used_defaults))
 
-        # proceeed executing the decorated function
+        # proceed executing the decorated function
         return func(*args, **kwargs)
 
     # prevent a rogue error ("View function mapping is overwriting an existing endpoint function")

@@ -755,7 +755,7 @@ def validate_cron(source: dict[str, Any],
       - @monthly:  "0 0 1 * *"  (on the first day of the month, at 00h00)
       - @reboot:   "1 0 * * *"  (same as @daily)
       - @weekly:   "0 0 * * 0"  (on Sundays, at 00h00)
-      - @yearly:   "0 0 1 1 *"  (same as @anually)
+      - @yearly:   "0 0 1 1 *"  (same as @annually)
 
     :param source: *dict* containing the expression to be validated
     :param attr: the attribute associated with the expression to be validated
@@ -1035,7 +1035,7 @@ def validate_format_errors(errors: list[str],
     Build and return a list of *dicts* from the list of errors in *errors*.
 
     Each element in *errors* is encoded as a *dict*.
-    This list is tipically used in a returning *JSON* string.
+    This list is typically used in a returning *JSON* string.
 
     Optional custom language and prefix, replacing those defined respectively by the environment variables
     *VALIDATION_MSG_LANGUAGE* and *VALIDATION_MSG_PREFIX*, may be provided in *kwargs*, with the corresponding

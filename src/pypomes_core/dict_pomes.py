@@ -97,9 +97,8 @@ def dict_get_value(source: dict,
             result = None
             break
 
-        # does the key refer to an elemenent in a list ?
         if key[-1] == "]":
-            # yes, retrieve it
+            # the key refers to an element in a list, retrieve it
             pos: int = key.find("[")
             inx: int = int(key[pos+1:-1])
             result = result.get(key[:pos])
@@ -270,7 +269,7 @@ def dict_pop_all(target: dict,
 
     :param target: the reference *dict*
     :param key: the key chain
-    :return: the possibly modifed input *dict*
+    :return: the possibly modified input *dict*
     """
     # traverse the input dictionary
     for k, v in target.copy().items():
@@ -434,7 +433,7 @@ def dict_merge(target: dict,
                     if item not in tvalue:
                         tvalue.append(item)
             else:
-                # both elements are not lists or dictionarie, replace the value in target
+                # both elements are not lists or dictionaries, replace the value in target
                 target[skey] = svalue
         else:
             # the item is not in target, add it
@@ -479,7 +478,7 @@ def dict_coalesce(target: dict,
             for in_dict in in_list:
                 # is 'in_dict' a dictionary ?
                 if isinstance(in_dict, dict):
-                    # yes, recursively coaslesce it
+                    # yes, recursively coalesce it
                     dict_coalesce(target=in_dict,
                                   key_chain=key_chain[inx + 1:])
             # finalize the operation
@@ -778,7 +777,7 @@ def dict_clone(source: dict,
     :param omit_missing: omit the elements not found in the source *dict* (defaults to *True*)
     :return: the new *dict*
     """
-    # inicialize the return variable
+    # initialize the return variable
     result: dict = {}
 
     # traverse the list of elements and add to the target dict
@@ -834,16 +833,13 @@ def dict_listify(target: dict,
     parent: Any = target
     for inx, key in enumerate(key_chain[:-1]):
         parent = parent.get(key)
-        # is the item a list ?
         if isinstance(parent, list):
-            # yess, process it and close the operation
+            # process the list and close the operation
             items_listify(in_targets=parent,
                           in_keys=key_chain[inx+1:])
             parent = None
 
-        # is it possible to proceed ?
-        if not isinstance(parent, dict):
-            # no, exit the loop
+            # cannot proceed, exit the loop
             break
 
     if isinstance(parent, dict) and len(key_chain) > 0:

@@ -17,7 +17,7 @@ def encode_ascii_hex(source: bytes) -> bytes:
     while pos < len(source):
         char: bytes = source[pos:pos+1]
         if char != b"\\" and b" " <= char <= b"~":
-            result += char                                  # char   - ASCII char, less the backslah
+            result += char                                  # char   - ASCII char, less the backslash
         else:
             byte_str: str
             match char:
@@ -60,7 +60,7 @@ def decode_ascii_hex(source: bytes) -> bytes:
     # initialize the return variable
     result: bytes = b""
 
-    # traverse 'source', decoding the occurences of '\'
+    # traverse 'source', decoding the occurrences of '\'
     byte_val: bytes
     pos1: int = 0
     # locate the first '\'

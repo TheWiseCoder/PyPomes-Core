@@ -42,7 +42,7 @@ def str_as_list(s: str,
     Return *s* as a *list*, by splitting its contents separated by *sep*.
 
     The returned substrings are fully whitespace-trimmed. If *s* is *None*, an empty list is returned.
-    If it is an empty *str*, a list containg an empty *str* is returned. If it is not a *str*,
+    If it is an empty *str*, a list containing an empty *str* is returned. If it is not a *str*,
     a list containing itself is returned.
 
     :param s: the string value to be worked on
@@ -94,7 +94,7 @@ def str_split_on_mark(s: str,
     :param mark: the separator
     :return: the list of text segments extracted
     """
-    # inicialize the return variable
+    # initialize the return variable
     result: list[str] = []
 
     pos: int = 0
@@ -116,7 +116,7 @@ def str_find_char(s: str,
                   /,
                   chars: str) -> int:
     """
-    Locate and return the position of the first occurence, in *s*, of a character in *chars*.
+    Locate and return the position of the first occurrence, in *s*, of a character in *chars*.
 
     :param s: the string to be inspected
     :param chars: the reference characters
@@ -136,7 +136,7 @@ def str_find_char(s: str,
 
 def str_find_whitespace(s: str, /) -> int:
     """
-    Locate and return the position of the first occurence of a *whitespace* character in *s*.
+    Locate and return the position of the first occurrence of a *whitespace* character in *s*.
 
     :param s: the string to be inspected
     :return: the position of the first whitespace character, or *-1* if none was found
@@ -206,10 +206,10 @@ def str_random(size: int,
 
     If *chars* is  provided, either as a string or as a list of characters, the characters
     therein will be used in the construction of the random string. Otherwise, a concatenation of
-    *string.ascii_letters*, *string.digits*, and *string.puctuation* will provide the base characters.
+    *string.ascii_letters*, *string.digits*, and *string.punctuation* will provide the base characters.
 
     :param size: the length of the target random string
-    :param chars: optional characters to build the random string from (a string or a list of characteres)
+    :param chars: optional characters to build the random string from (a string or a list of characters)
     :return: the random string
     """
     # establish the base characters
@@ -323,7 +323,7 @@ def str_from_any(s: Any, /) -> str:
 
     These are the string representations returned:
         - *None*: the string 'None'
-        - *bool*: the string 'True' of 'Talse'
+        - *bool*: the string 'True' of 'False'
         - *str* : the source string itself
         - *bytes*: its hex representation
         - *date*: the date in ISO format (*datetime* is a *date* subtype)

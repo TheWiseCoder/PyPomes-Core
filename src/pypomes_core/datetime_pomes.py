@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from dateutil import parser
 from dateutil.parser import ParserError
 from enum import StrEnum
-from typing import Final
+from typing import Any, Final
 from zoneinfo import ZoneInfo
 
 from .env_pomes import APP_PREFIX, env_get_str
@@ -32,9 +32,9 @@ class DatetimeFormat(StrEnum):
 
 def date_reformat(dt_str: str,
                   to_format: str,
-                  **kwargs: any) -> str | None:
+                  **kwargs: Any) -> str | None:
     """
-    Convert the date in *dt_str* to the format especified in *to_format*.
+    Convert the date in *dt_str* to the format specified in *to_format*.
 
     The argument *dt_str* must represent a valid date, with or without time-of-day information.
     The argument *to_format* must be a valid format for *date* ou *datetime*.
@@ -91,7 +91,7 @@ def date_weekday(dt_base: str | date | datetime,
 
 
 def date_parse(dt_str: str,
-               **kwargs: any) -> date | None:
+               **kwargs: Any) -> date | None:
     """
     Obtain and return the *date* object corresponding to *dt_str*.
 
@@ -122,7 +122,7 @@ def date_parse(dt_str: str,
 
 
 def datetime_parse(dt_str: str,
-                   **kwargs: any) -> datetime | None:
+                   **kwargs: Any) -> datetime | None:
     """
     Obtain and return the *datetime* object corresponding to *dt_str*.
 

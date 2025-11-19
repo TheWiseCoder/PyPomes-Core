@@ -26,7 +26,7 @@ def env_get_str(key: str,
     :param key: the key which the value is associated with
     :param values: optional list of valid values
     :param ignore_case: specifies whether to ignore capitalization
-    :param def_value: the vaule to return, if obtaining the value for *key* fails (defaults to *None*)
+    :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the string value associated with the key, or *def_value* if error
     """
     # initialize the return variable
@@ -91,7 +91,7 @@ def env_get_int(key: str,
 
     :param key: the key which the value is associated with
     :param values: optional list of valid values
-    :param def_value: the vaule to return, if obtaining the value for *key* fails (defaults to *None*)
+    :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the integer value associated with the key, or *def_value* if error
     """
     result: int | None
@@ -142,7 +142,7 @@ def env_get_float(key: str,
 
     :param key: the key which the value is associated with
     :param values: optional list of valid values
-    :param def_value: the vaule to return, if obtaining the value for *key* fails (defaults to *None*)
+    :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the float value associated with the key, or *def_value* if error
     """
     result: float | None
@@ -202,7 +202,7 @@ def env_get_enum(key: str,
     :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
     :param use_names: specifies whether *enum*'s names should be used (defaults to using *enum*'s values)
     :param values: optional list of allowed values (defaults to all elements of *enum_class*)
-    :param def_value: the vaule to return, if obtaining the value for *key* fails (defaults to *None*)
+    :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the value associated with the key, or *def_value* if error
     """
     # initialize the return variable
@@ -297,7 +297,7 @@ def env_get_bool(key: str,
         - all other values causes *None* to be returned
 
     :param key: the key which the value is associated with
-    :param def_value: the vaule to return, if obtaining the value for *key* fails (defaults to *None*)
+    :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the boolean value associated with the key, or *def_value* if error
     """
     result: bool | None
@@ -328,7 +328,7 @@ def env_get_bytes(key: str,
     :param key: the key which the value is associated with
     :param encoding: the representation of the *bytes* value
     :param values: optional list of valid values
-    :param def_value: the vaule to return, if obtaining the value for *key* fails (defaults to *None*)
+    :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the byte value associated with the key, or *def_value* if error
     """
     result: bytes | None = None
@@ -357,7 +357,7 @@ def env_get_date(key: str,
     Retrieve the date value defined for *key* in the current operating environment.
 
     :param key: the key which the value is associated with
-    :param def_value: the vaule to return, if obtaining the value for *key* fails (defaults to *None*)
+    :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the date value associated with the key, or *def_value* if error
     """
     result: date
@@ -375,7 +375,7 @@ def env_get_path(key: str,
     Retrieve the path value defined for *key* in the current operating environment.
 
     :param key: the key which the value is associated with
-    :param def_value: the vaule to return, if obtaining the value for *key* fails (defaults to *None*)
+    :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the path value associated with the key, or *def_value* if error
     """
     result: Path
@@ -393,7 +393,7 @@ def env_get_obj(key: str,
     Retrieve the string-marshalled object defined for *key* in the current operating environment.
 
     As an example, suppose the string *"{'name': 'Alice', 'age': 30, 'city': 'New York'}"*.
-    When properly umarshalled, it yields the *dict* object
+    When properly unmarshalled, it yields the *dict* object
         {
             'name': 'Alice',
             'age': 30,
@@ -401,7 +401,7 @@ def env_get_obj(key: str,
         }
 
     :param key: the key which the value is associated with
-    :param def_value: the vaule to return, if obtaining the value for *key* fails (defaults to *None*)
+    :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the unmarshalled object associated with the key, or *def_value* if error
     """
     result: Any
@@ -417,7 +417,7 @@ def env_is_docker() -> bool:
     """
     Determine whether the application is running inside a Docker container.
 
-    Note that a resonable, but not infallible, heuristics is used.
+    Note that a reasonable, but not infallible, heuristics is used.
 
     :return: 'True' if this could be determined, 'False' otherwise
     """
