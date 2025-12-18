@@ -3,6 +3,7 @@ import puremagic
 import mimetypes
 from contextlib import suppress
 from enum import StrEnum
+from io import BytesIO, StringIO
 from pathlib import Path
 from tempfile import gettempdir
 from typing import Final
@@ -77,18 +78,20 @@ class Mimetype(StrEnum):
     ZIP = "application/zip"
 
 
-def file_get_data(file_data: Path | str | bytes,
+def file_get_data(file_data: BytesIO | StringIO | Path | str | bytes,
                   max_len: int = None,
                   chunk_size: int = None) -> bytes | None:
     """
-    Retrieve the data in *file_data*, or in a file in path *file_data*.
+    Retrieve the data in *file_data*, as implicitly defined by its data type.
 
     The distinction is made with the parameter's type:
-        - type *bytes*: *file_data* holds the data (returned as is)
-        - type *str*: *file_data* holds the data (returned as utf8-encoded)
+        - type *BytesIO*: *file_data* is a stream of bytes (collect and returned as is)
+        - type *StringIO*: *file_data* is a stream of characters (collect and returned as utf8-encoded)
         - type *Path*: *file_data* is a path to a file holding the data
+        - type *str*: *file_data* holds the data (returned as utf8-encoded)
+        - type *bytes*: *file_data* holds the data (returned as is)
 
-    :param file_data: the data as *bytes* or *str*, or the path to locate the file containing the data
+    :param file_data: the data as implicitly defined by its data type
     :param max_len: optional maximum length of the data to return, defaults to all data
     :param chunk_size: optional chunk size to use in reading the data, defaults to 128 KB
     :return: the data, or *None* if the file data could not be obtained
@@ -113,7 +116,14 @@ def file_get_data(file_data: Path | str | bytes,
 
     elif isinstance(file_data, str):
         # argument is type 'str'
-        result = file_data.encode()
+        result = file_data.encode(encoding="utf-8")
+
+    elif isinstance(file_data, BytesIO | StringIO):
+        # argument is type 'stream'
+        file_data.seek(0)
+        result = file_data.read()
+        if isinstance(result, str):
+            result = result.encode(encoding="utf-8")
 
     elif isinstance(file_data, Path):
         # argument is a file path

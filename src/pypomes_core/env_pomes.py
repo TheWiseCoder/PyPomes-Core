@@ -185,7 +185,6 @@ def env_get_floats(key: str,
 
 def env_get_enum(key: str,
                  enum_class: type[IntEnum | StrEnum],
-                 use_names: bool = False,
                  values: list[IntEnum | StrEnum] = None,
                  def_value: IntEnum | StrEnum = None) -> Any:
     """
@@ -193,22 +192,22 @@ def env_get_enum(key: str,
 
     If provided, this value must be a name or a value corresponding to an instance of a subclass of *enum_class*.
     The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*.
-    The parameter *use_names* determines whether the names of the elements in the *enum_class* should be used,
-    ignoring capitalization. If not specified, the values of the elements are used (the default).
     If *values* is specified, the value obtained is checked for occurrence therein.
     On failure, *None* is returned.
 
     :param key: the key which the value is associated with
     :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
-    :param use_names: specifies whether *enum*'s names should be used (defaults to using *enum*'s values)
     :param values: optional list of allowed values (defaults to all elements of *enum_class*)
     :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the value associated with the key, or *def_value* if error
     """
+    from .obj_pomes import IntEnumUseName, StrEnumUseName
+
     # initialize the return variable
     result: Any = None
 
-    if use_names:
+    if issubclass(enum_class, IntEnumUseName | StrEnumUseName):
+        # noinspection PyUnresolvedReferences
         name: str = env_get_str(key=key,
                                 values=[e.name for e in (values or enum_class)],
                                 ignore_case=True,
@@ -236,22 +235,20 @@ def env_get_enum(key: str,
 
 
 def env_get_enums(key: str,
-                  enum_class: type[IntEnum | StrEnum],
-                  use_names: bool = False) -> list:
+                  enum_class: type[IntEnum | StrEnum]) -> list:
     """
     Retrieve the enum values defined for *key* in the current operating environment.
 
     If provided, these value must be names or values corresponding to an instance of a subclass of *enum_class*.
-    The only accepted values for *enum_class* are subclasses of *StrEnum* or *IntEnum*.
-    The parameter *use_names* determines whether the names of the elements in the *enum_class* should be used,
-    ignoring capitalization. It must be possible to convert all names associated with *key* to enum instances.
-    On failure, *None* is returned.
+    The only accepted values for *enum_class* are subclasses of *StrEnum* or *IntEnum*. It must be possible
+    to convert all names associated with *key* to enum instances. On failure, *None* is returned.
 
     :param key: the key which the values are associated with
     :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
-    :param use_names: specifies whether *enum*'s names should be used (defaults to using *enum*'s values)
     :return: the values associated with the key, or *def_value* if error
     """
+    from .obj_pomes import IntEnumUseName, StrEnumUseName
+
     # initialize the return variable
     result: list | None = None
 
@@ -262,7 +259,7 @@ def env_get_enums(key: str,
         names: list[str] = values.split(",")
         for name in names:
             found = False
-            if use_names:
+            if issubclass(enum_class, IntEnumUseName | StrEnumUseName):
                 for e in enum_class:
                     if e.name.lower() == name.lower():
                         enums.append(e)
@@ -274,6 +271,7 @@ def env_get_enums(key: str,
                 else:
                     value: str = name
                 if value in enum_class:
+                    # noinspection PyCallingNonCallable
                     enums.append(enum_class(value))
                     found = True
             # break on the first failure
@@ -380,7 +378,7 @@ def env_get_path(key: str,
     """
     result: Path
     try:
-        result = Path(os.environ[key])
+        result = Path(os.environ[key]).resolve()
     except (AttributeError, KeyError, TypeError):
         result = def_value
 

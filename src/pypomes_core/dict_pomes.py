@@ -63,6 +63,28 @@ def dict_has_key(source: dict,
     return result
 
 
+def dict_has_value(source: dict,
+                   value: Any) -> Any:
+    """
+    Indicate the existence in *source*, of a key/value pair with *value* as its value.
+
+    No recursion is attempted; only the first-level attributes in *source* are inspected.
+
+    :param source: the reference *dict*
+    :param value: the reference value
+    :return: *True* if *value* exists in *source*, or *False* otherwise
+    """
+    # initialize the return variable
+    result: bool = False
+
+    for _, val in (source or {}).items():
+        if val == value:
+            result = True
+            break
+
+    return result
+
+
 def dict_get_value(source: dict,
                    key_chain: str | list[Any]) -> Any:
     """
@@ -356,14 +378,15 @@ def dict_get_key(source: dict,
     Return the key in *source*, mapping the first occurrence of *value* found.
 
     No recursion is attempted; only the first-level attributes in *source* are inspected.
-    Return *None*, if no key is found.
 
     :param source: dict to search
     :param value: the reference value
-    :return: first key mapping the reference value
+    :return: first key mapping the reference value, or *None* if a mapping is not found
     """
+    # initialize the return variable
     result: Any = None
-    for key, val in source.items():
+
+    for key, val in (source or {}).items():
         if val == value:
             result = key
             break
@@ -382,11 +405,12 @@ def dict_get_keys(source: dict,
 
     :param source: dict to search
     :param value: the reference value
-    :return: list containing all keys mapping the reference value
+    :return: list containing all keys mapping the reference value (might be empty)
     """
     # initialize the return variable
     result: list[str] = []
-    for item_key, item_value in source.items():
+
+    for item_key, item_value in (source or {}).items():
         if item_value == value:
             result.append(item_key)
         elif isinstance(item_value, dict):
@@ -413,7 +437,7 @@ def dict_merge(target: dict,
     :return: the modified target *dict*
     """
     # traverse the dictionary with the new elements
-    for skey, svalue in source.items():
+    for skey, svalue in (source or {}).items():
 
         # is the item in target ?
         if skey in target:

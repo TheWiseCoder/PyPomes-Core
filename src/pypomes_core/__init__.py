@@ -5,9 +5,9 @@ from .datetime_pomes import (
     timestamp_interval, timestamp_duration
 )
 from .dict_pomes import (
-    dict_has_key, dict_get_value, dict_set_value, dict_reduce,
-    dict_listify, dict_transform, dict_merge, dict_coalesce, dict_clone,
-    dict_get_key, dict_get_keys, dict_from_object, dict_from_list,
+    dict_has_key, dict_has_value, dict_get_value, dict_set_value,
+    dict_reduce, dict_listify, dict_transform, dict_merge, dict_coalesce,
+    dict_clone, dict_get_key, dict_get_keys, dict_from_object, dict_from_list,
     dict_replace_value, dict_pop, dict_pop_all, dict_unique_values,
     dict_jsonify, dict_hexify, dict_stringify
 )
@@ -43,6 +43,7 @@ from .list_pomes import (
     list_jsonify, list_hexify, list_hierarchize, list_stringify
 )
 from .obj_pomes import (
+    IntEnumUseName, StrEnumUseName,
     obj_is_serializable, obj_to_dict, exc_format
 )
 from .str_pomes import (
@@ -77,9 +78,9 @@ __all__ = [
     "date_parse", "datetime_parse",
     "timestamp_interval", "timestamp_duration",
     # dict_pomes
-    "dict_has_key", "dict_get_value", "dict_set_value", "dict_reduce",
-    "dict_listify", "dict_transform", "dict_merge", "dict_coalesce", "dict_clone",
-    "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
+    "dict_has_key", "dict_has_value", "dict_get_value", "dict_set_value",
+    "dict_reduce", "dict_listify", "dict_transform", "dict_merge", "dict_coalesce",
+    "dict_clone", "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
     "dict_replace_value", "dict_pop", "dict_pop_all", "dict_unique_values",
     "dict_jsonify", "dict_hexify", "dict_stringify",
     # email_pomes
@@ -108,6 +109,7 @@ __all__ = [
     "list_prune_duplicates", "list_prune_in", "list_prune_not_in",
     "list_jsonify", "list_hexify", "list_hierarchize", "list_stringify",
     # obj_pomes
+    "IntEnumUseName", "StrEnumUseName",
     "obj_is_serializable", "obj_to_dict", "exc_format",
     # str_pomes
     "str_to_hex", "str_from_hex", "str_to_lower", "str_to_upper",

@@ -40,7 +40,9 @@ def encode_ascii_hex(source: bytes) -> bytes:
                     lower_char: int = int_char % 16             # \xNN
                     upper_char: int = round((int_char - lower_char) / 16)
                     byte_str = "\\x" + hex(upper_char)[2:] + hex(lower_char)[2:]
-            result += byte_str.encode()
+
+            result += byte_str.encode(encoding="utf-8")
+
         pos += 1
 
     return result
@@ -92,10 +94,12 @@ def decode_ascii_hex(source: bytes) -> bytes:
                 byte_val = b"\x08"                  # BS, \b  - backspace
             case _:
                 byte_val = source[pos2+1:pos2+2]    # byte following '\'
+
         pos1 = pos2 + shift
         result += byte_val
         # locate the next '\'
         pos2 = source.find(b"\\", pos1)
+
     result += source[pos1:]
 
     return result

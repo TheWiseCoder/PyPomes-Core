@@ -56,17 +56,17 @@ lint.select = [
     "PL",    # Pylint - Python classic static code analyser
     "TRY",   # tryceratops - prevent exception handling antipatterns
     "UP",    # pyupgrade - upgrade syntax for newer versions of the language
-#   unused
-#   "AIR",   # Airflow - check workflows
-#   "BLE",   # flake8-blind-except - check for except clauses that catch all exceptions
-#   "CPY",   # flake8-copyright - check for copyright notices in all python files
-#   "DJ",    # flake8-django - detect bad practices on Django projects
-#   "ERA",   # eradicate - check for commented-out code
-#   "EXE",   # flake8-executable - ensure the executable permissions and shebangs of Python files are correctly set
-#   "FBT",   # flake8-boolean-trap - check for boolean traps
-#   "I",     # isort - organize imports
-#   "T10",   # flake8-debugger - check for 'pdb;idbp' imports and set traces
-#   "T20",   # flake8-print - check for 'print' and 'pprint' statements in python files
+	# unused
+	# "AIR", # Airflow - check workflows
+	# "BLE", # flake8-blind-except - check for except clauses that catch all exceptions
+	# "CPY", # flake8-copyright - check for copyright notices in all python files
+	# "DJ",  # flake8-django - detect bad practices on Django projects
+	# "ERA", # eradicate - check for commented-out code
+	# "EXE", # flake8-executable - ensure the executable permissions and shebangs of Python files are correctly set
+	# "FBT", # flake8-boolean-trap - check for boolean traps
+	# "I",   # isort - organize imports
+	# "T10", # flake8-debugger - check for 'pdb;idbp' imports and set traces
+	# "T20", # flake8-print - check for 'print' and 'pprint' statements in python files
 ]
 lint.ignore = [
     "ANN002",   # missing type annotation for *kargs
@@ -82,6 +82,7 @@ lint.ignore = [
     "D212",     # multi-line docstring summary to start at the second line
     "DTZ005",   # the use of datetime.datetime.now() without tz argument is not allowed
     "DTZ006",   # usage of 'datetime.datetime.fromtimestamp()' that do not specify a timezone
+    "E402",     # checks for imports that are not at the top of the file
     "FA102",    # use PEP 585- and PEP 604-style type annotations (not applicable for Python versions >= 3.10)
     "G004",     # logging statement uses 'f-string'
     "N815",     # variable in class scope should not be mixedCase
@@ -95,7 +96,8 @@ lint.ignore = [
     "RUF013",   # implicit Optional in type annotations when the default parameter value is None
     "RUF022",   # __all__ is not sorted
     "S104",     # possible binding to all interfaces
-    "S105",     # hardcoded-password-string
+    "S105",     # Checks for potential uses of hardcoded passwords in strings
+    "S106",     # possible hardcoded password assigned to argument
     "S108",     # probable insecure usage of temporary file or directory
     "S113",     # probable use of requests call without timeout
     "S301",     # 'pickle' and modules that wrap it can be unsafe when used to deserialize untrusted data

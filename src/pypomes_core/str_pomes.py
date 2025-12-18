@@ -17,7 +17,7 @@ def str_to_hex(s: str, /) -> str:
     :raises AttributeError: *s* is not a string
     :raises UnicodeEncodeError:  a UTF-8 encoding error occurred
     """
-    return s.encode().hex()
+    return s.encode(encoding="utf-8").hex()
 
 
 def str_from_hex(s: str, /) -> str:
@@ -32,7 +32,7 @@ def str_from_hex(s: str, /) -> str:
     :raises TypeError: *s* is not a string
     :raises UnicodeDecodeError: a UTF-8 decoding error occurred
     """
-    return bytes.fromhex(s).decode()
+    return bytes.fromhex(s).decode(encoding="utf-8")
 
 
 def str_as_list(s: str,

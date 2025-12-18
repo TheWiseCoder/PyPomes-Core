@@ -25,7 +25,6 @@ class MsgLang(StrEnum):
 
 VALIDATION_MSG_LANGUAGE: Final[MsgLang] = env_get_enum(key=f"{APP_PREFIX}_VALIDATION_MSG_LANGUAGE",
                                                        enum_class=MsgLang,
-                                                       use_names=False,
                                                        def_value=MsgLang.EN)
 VALIDATION_MSG_PREFIX: Final[str] = env_get_str(key=f"{APP_PREFIX}_VALIDATION_MSG_PREFIX",
                                                 def_value=APP_PREFIX)
@@ -95,7 +94,13 @@ def validate_value(attr: str,
         length: int = len(value)
         if min_value is not None and max_value == min_value and length != min_value:
             # 146: Invalid value {}: length must be {}
-            result = validate_format_error(156,
+            result = validate_format_error(146,
+                                           value,
+                                           min_value,
+                                           f"@{attr}")
+        elif min_value is not None and length < min_value:
+            # 147: Invalid value {}: length shorter than {}
+            result = validate_format_error(147,
                                            value,
                                            min_value,
                                            f"@{attr}")
@@ -104,12 +109,6 @@ def validate_value(attr: str,
             result = validate_format_error(148,
                                            value,
                                            max_value,
-                                           f"@{attr}")
-        elif min_value is not None and length < min_value:
-            # 147: Invalid value {}: length shorter than {}
-            result = validate_format_error(147,
-                                           value,
-                                           min_value,
                                            f"@{attr}")
     elif ((min_value is not None and value < min_value) or
           (max_value is not None and value > max_value)):
@@ -558,7 +557,6 @@ def validate_datetime(source: dict[str, Any],
 def validate_enum(source: dict[str, Any],
                   attr: str,
                   enum_class: type[IntEnum | StrEnum],
-                  use_names: bool = False,
                   values: list[IntEnum | StrEnum | str | int | Decimal] = None,
                   default: IntEnum | StrEnum | str | int | Decimal = None,
                   required: bool = False,
@@ -569,14 +567,11 @@ def validate_enum(source: dict[str, Any],
 
     If provided, this value must be a name or a value corresponding to an instance of a subclass of *enum_class*.
     The only accepted values for *enum_class* are subclasses of  *StrEnum* or *IntEnum*.
-    The parameter *use_names* determines whether the names of the elements in the *enum_class* should be used,
-    ignoring capitalization. If not specified, the values of the elements are used (the default).
     If *values* is specified, the value obtained is checked for occurrence therein.
 
     :param source: *dict* containing the value to be validated
     :param attr: the attribute associated with the value to be validated
     :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
-    :param use_names: specifies whether *enum*'s names should be used (defaults to using *enum*'s values)
     :param default: optional default value, overrides *required*
     :param values: optional list of allowed values (defaults to all elements of *enum_class*)
     :param required: specifies whether a value must be provided
@@ -584,10 +579,11 @@ def validate_enum(source: dict[str, Any],
     :param logger: optional logger
     :return: the validated value as an instance of *enum_class*, or *None* if validation failed
     """
+    from .obj_pomes import StrEnumUseName
     # initialize the return variable
     result: IntEnum | StrEnum | None = None
 
-    if use_names:
+    if issubclass(enum_class, StrEnumUseName):
         pos: int = attr.rfind(".") + 1
         suffix: str = attr[pos:]
         value: Any = source.get(suffix)

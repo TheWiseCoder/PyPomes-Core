@@ -1,8 +1,23 @@
 import json
 import os
-from contextlib import suppress
+from enum import IntEnum, StrEnum
 from types import TracebackType
 from typing import Any
+
+
+class IntEnumUseName(IntEnum):
+    """
+    A marker indicating that the attribute *name* should, in some circumstances, be used in lieu of
+    *value*, as when it becomes necessary to locate an instance of this class by looking for a *str*
+    having its name, rather then for an *int* having its value (examples in the *env_pomes* module).
+    """
+
+
+class StrEnumUseName(StrEnum):
+    """
+    A marker indicating that the attribute *name* should be used in lieu of *value*, as the latter
+    is intended to be a description of the *StrEnum* instance.
+    """
 
 
 def obj_is_serializable(obj: Any) -> bool:
@@ -49,11 +64,12 @@ def obj_to_dict(obj: Any,
         result = {}
         for attr in dir(obj):
             if not (omit_private and attr.startswith("_")):
-                with suppress(Exception):
-                    value: Any = getattr(obj, attr)
-                    if not callable(value):
-                        result[attr] = obj_to_dict(obj=value,
-                                                   omit_private=omit_private)
+                value: Any = getattr(obj,
+                                     attr,
+                                     None)
+                if value is not None and not callable(value):
+                    result[attr] = obj_to_dict(obj=value,
+                                               omit_private=omit_private)
     else:
         result = obj
 
