@@ -198,12 +198,13 @@ def file_get_mimetype(file_data: Path | str | bytes) -> Mimetype | str:
             mimetype = kind.mime
 
     if not mimetype:
-        if isinstance(file_data, Path):
-            mimetype = puremagic.from_file(filename=file_data,
-                                           mime=True)
-        else:
-            mimetype = puremagic.from_string(string=file_data,
-                                             mime=True)
+        with suppress(puremagic.PureError):
+            if isinstance(file_data, Path):
+                mimetype = puremagic.from_file(filename=file_data,
+                                               mime=True)
+            else:
+                mimetype = puremagic.from_string(string=file_data,
+                                                 mime=True)
     result: Mimetype | str
     if mimetype:
         # for unknown mimetypes, return its identifying string

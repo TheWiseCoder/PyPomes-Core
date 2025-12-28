@@ -1004,7 +1004,7 @@ def validate_format_error(error_id: int,
     if error_id != 100:
         if msg_prefix:
             result += msg_prefix + str(error_id) + ": "
-        result += err_msgs.get(error_id) or ""
+        result += err_msgs.get(error_id, "")
 
     # apply the provided arguments
     for arg in args:
