@@ -7,9 +7,9 @@ from typing import Any
 
 class IntEnumUseName(IntEnum):
     """
-    A marker indicating that the attribute *name* should, in some circumstances, be used in lieu of
-    *value*, as when it becomes necessary to locate an instance of this class by looking for a *str*
-    having its name, rather then for an *int* having its value (examples in the *env_pomes* module).
+    A marker indicating that the attribute *name* should be used in lieu of *value*, when locating an
+    instance of this class by looking for a *str* having its name, rather then for an *int* having its value
+    (examples in the *env_pomes* module). Note that this is the only situation justifying the use of this marker.
     """
 
 

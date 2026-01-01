@@ -908,7 +908,7 @@ def dict_jsonify(source: dict,
     :return: the modified input *dict*
     """
     # needed imports
-    from .obj_pomes import IntEnumUseName, StrEnumUseName
+    from .obj_pomes import StrEnumUseName
 
     # traverse the input 'dict'
     keys: list[Any] = []
@@ -918,11 +918,6 @@ def dict_jsonify(source: dict,
         if jsonify_values:
             if isinstance(value, StrEnumUseName):
                 source[key] = value.name
-            elif isinstance(value, IntEnumUseName):
-                if value.name.isdigit():
-                    source[key] = int(value.name)
-                else:
-                    source[key] = value.name
             elif isinstance(value, Enum):
                 source[key] = value.value
             elif isinstance(value, bytes | bytearray):
@@ -947,11 +942,6 @@ def dict_jsonify(source: dict,
     for key in keys:
         if isinstance(key, StrEnumUseName):
             source[key.name] = source.pop(key)
-        elif isinstance(key, IntEnumUseName):
-            if key.name.isdigit():
-                source[int(key.name)] = source.pop(key)
-            else:
-                source[key.name] = source.pop(key)
         elif isinstance(key, Enum):
             source[key.value] = source.pop(key)
         elif isinstance(key, bytes | bytearray):
@@ -995,7 +985,7 @@ def dict_hexify(source: dict,
     """
     # needed imports
     from .list_pomes import list_hexify
-    from obj_pomes import IntEnumUseName, StrEnumUseName
+    from obj_pomes import StrEnumUseName
 
     # traverse the input 'dict'
     keys: list[Any] = []
@@ -1014,11 +1004,6 @@ def dict_hexify(source: dict,
             # enums
             if isinstance(value, StrEnumUseName):
                 value = value.name
-            elif isinstance(value, IntEnumUseName):
-                if value.name.isdigit():
-                    value = int(value.name)
-                else:
-                    value = value.name
             elif isinstance(value, Enum):
                 value = value.value
 
@@ -1044,11 +1029,6 @@ def dict_hexify(source: dict,
         # enums
         if isinstance(key, StrEnumUseName):
             key = key.name
-        elif isinstance(key, IntEnumUseName):
-            if key.name.isdigit():
-                key = int(key.name)
-            else:
-                key = key.name
         elif isinstance(key, Enum):
             key = key.value
 

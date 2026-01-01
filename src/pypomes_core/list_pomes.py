@@ -455,7 +455,7 @@ def list_jsonify(source: list) -> list:
     :return: a new *jsonified* list
     """
     # needed imports
-    from .obj_pomes import IntEnumUseName, StrEnumUseName
+    from .obj_pomes import StrEnumUseName
 
     # initialize the return variable
     result: list = []
@@ -472,11 +472,6 @@ def list_jsonify(source: list) -> list:
         # enums
         elif isinstance(value, StrEnumUseName):
             result.append(value.name)
-        elif isinstance(value, IntEnumUseName):
-            if value.name.isdigit():
-                result.append(int(value.name))
-            else:
-                result.append(value.name)
         elif isinstance(value, Enum):
             result.append(value.value)
 
@@ -517,7 +512,7 @@ def list_hexify(source: list) -> list:
     """
     # needed imports
     from .dict_pomes import dict_hexify
-    from obj_pomes import IntEnumUseName, StrEnumUseName
+    from obj_pomes import StrEnumUseName
 
     # initialize the return variable
     result: list = []
@@ -536,11 +531,6 @@ def list_hexify(source: list) -> list:
         # enums
         elif isinstance(value, StrEnumUseName):
             value = value.name
-        elif isinstance(value, IntEnumUseName):
-            if value.name.isdigit():
-                value = int(value.name)
-            else:
-                value = value.name
         elif isinstance(value, Enum):
             value = value.value
 
