@@ -3,7 +3,7 @@ from collections import defaultdict
 from datetime import date
 from enum import Enum
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 
 def list_compare(list1: list,
@@ -431,17 +431,16 @@ def list_prune_not_in(target: list,
     return result
 
 
-def list_jsonify(source: list,
-                 jsonify_enums: Literal["names", "values"] | None = "values") -> list:
+def list_jsonify(source: list) -> list:
     """
     Return a new *list* containing the values in *source*, made serializable if necessary.
 
     Possible transformations:
-      - *Enum* is changed to its value or name, as per *jsonify_enums* (defaults to value)
+      - *Enum* is changed to its value or name (as per its class)
       - *bytes* and *bytearray* are changed with *str()*
       - *date* and *datetime* are changed to their *ISO* representations
       - *Path* is changed to its *POSIX* representation
-      - *dict* is recursively *jsonified* with *dict_jsonify()*, unless *jsonify_enums* is *None*
+      - *dict* is recursively *jsonified* with *dict_jsonify()* (using the function's defaults for keys and values)
       - *list* is recursively *jsonified* with *list_jsonify()*
       - all other types are left unchanged
 
@@ -452,32 +451,42 @@ def list_jsonify(source: list,
     *HAZARD*: depending on the type of object contained in *source*, the final result may still
     not be fully serializable.
 
-    :param source: the *dict* to be *jsonified*
-    :param jsonify_enums: whether to *jsonify* enums, using their values (the default) or names
+    :param source: the list to be *jsonified*
     :return: a new *jsonified* list
     """
+    # needed imports
+    from .obj_pomes import IntEnumUseName, StrEnumUseName
+
     # initialize the return variable
     result: list = []
 
     # traverse the input list
     for value in source:
-        if isinstance(value, Enum):
-            result.append(value.value if jsonify_enums == "values" else value.name)
+        # recursions
+        if isinstance(value, dict):
+            from .dict_pomes import dict_jsonify
+            result.append(dict_jsonify(source=value))
+        elif isinstance(value, list):
+            result.append(list_jsonify(source=value))
+
+        # enums
+        elif isinstance(value, StrEnumUseName):
+            result.append(value.name)
+        elif isinstance(value, IntEnumUseName):
+            if value.name.isdigit():
+                result.append(int(value.name))
+            else:
+                result.append(value.name)
+        elif isinstance(value, Enum):
+            result.append(value.value)
+
+        # scalars
         elif isinstance(value, bytes | bytearray):
             result.append(str(value))
         elif isinstance(value, date):
             result.append(value.isoformat())
         elif isinstance(value, Path):
             result.append(value.as_posix())
-        elif isinstance(value, dict):
-            if jsonify_enums:
-                from .dict_pomes import dict_jsonify
-                result.append(dict_jsonify(source=value,
-                                           jsonify_keys=jsonify_enums == "names",
-                                           jsonify_values=jsonify_enums == "values"))
-        elif isinstance(value, list):
-            result.append(list_jsonify(source=value,
-                                       jsonify_enums=jsonify_enums))
         else:
             result.append(value)
 
@@ -492,9 +501,10 @@ def list_hexify(source: list) -> list:
       - *str* is changed with *<value>.encode().hex()*
       - *int* is changed with *float(<value>).hex()*
       - *float*, *bytes*, and *bytearray* are changed using their built-in *hex()* method
+      - *Enum* has its value and/or name changed (as per its class)
       - *date* and *datetime* are changed using their ISO representations
       - *Path* is changed using its POSIX representation
-      - *dict* is recursively *hexified* with *dict_hexify()*
+      - *dict* is recursively *hexified* with *dict_hexify()* (using the function's defaults for key and values)
       - *list* is recursively *hexified* with *list_hexify()*
       - all other types are left unchanged
 
@@ -505,13 +515,16 @@ def list_hexify(source: list) -> list:
     :param source: the list to be *hexified*
     :return: a list with *hexified* values
     """
+    # needed imports
     from .dict_pomes import dict_hexify
+    from obj_pomes import IntEnumUseName, StrEnumUseName
 
     # initialize the return variable
     result: list = []
 
     # traverse the input list
     for value in source:
+        # recursions
         if isinstance(value, dict):
             dict_hexify(source=value,
                         hexify_keys=False,
@@ -519,7 +532,20 @@ def list_hexify(source: list) -> list:
             result.append(value)
         elif isinstance(value, list):
             result.append(list_hexify(source=value))
-        elif isinstance(value, str):
+
+        # enums
+        elif isinstance(value, StrEnumUseName):
+            value = value.name
+        elif isinstance(value, IntEnumUseName):
+            if value.name.isdigit():
+                value = int(value.name)
+            else:
+                value = value.name
+        elif isinstance(value, Enum):
+            value = value.value
+
+        # scalars
+        if isinstance(value, str):
             result.append(value.encode().hex())
         elif isinstance(value, int):
             result.append(float(value).hex())

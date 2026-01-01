@@ -3,7 +3,7 @@ import types
 from datetime import date
 from enum import Enum
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 
 def dict_has_key(source: dict,
@@ -879,21 +879,15 @@ def dict_listify(target: dict,
 
 def dict_jsonify(source: dict,
                  jsonify_keys: bool = True,
-                 jsonify_values: bool = True,
-                 jsonify_enums: Literal["names", "values"] | None = "values") -> dict:
+                 jsonify_values: bool = True) -> dict:
     """
     Convert the *(key, value)* pairs in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
 
     The parameters *jsonify_keys* and *jsonify_values* specify whether keys and values in *source* should be
     *jsonified*, respectively. No action is taken if both *jsonify_keys* and *jsonify_values* are set to *None*.
 
-    The parameter *jsonify_enums* specify how *enums* are to be *jsonified*:
-      - *None*: do not jsonify *enums*
-      - *names*: use names
-      - *value*: use values (the default)
-
     Possible transformations of keys and values:
-      - *Enums* are changed to their values or names, or left unchanged (as per *jsonify_enums*)
+      - *Enum* has its value and/or name changed (as per its class)
       - *bytes* and *bytearray* values are changed with *str()*
       - *date* and *datetime* are changed to their *ISO* representations
       - *Path* is changed to its *POSIX* representation
@@ -911,20 +905,26 @@ def dict_jsonify(source: dict,
     :param source: the dict to be made serializable
     :param jsonify_keys: whether the keys in *source* should be *jsonified* (defaults to *True*)
     :param jsonify_values: whether the values in *source* should be *jsonified* (defaults to *True*)
-    :param jsonify_enums: whether to *jsonify* enums, using their values (the default) or names
     :return: the modified input *dict*
     """
+    # needed imports
+    from .obj_pomes import IntEnumUseName, StrEnumUseName
+
     # traverse the input 'dict'
     keys: list[Any] = []
     for key, value in source.items():
 
         # values transformations
         if jsonify_values:
-            if isinstance(value, Enum):
-                if jsonify_enums == "values":
-                    source[key] = value.value
-                elif jsonify_enums == "names":
+            if isinstance(value, StrEnumUseName):
+                source[key] = value.name
+            elif isinstance(value, IntEnumUseName):
+                if value.name.isdigit():
+                    source[key] = int(value.name)
+                else:
                     source[key] = value.name
+            elif isinstance(value, Enum):
+                source[key] = value.value
             elif isinstance(value, bytes | bytearray):
                 source[key] = str(value)
             elif isinstance(value, date):
@@ -937,8 +937,7 @@ def dict_jsonify(source: dict,
                              jsonify_values=jsonify_values)
             elif isinstance(value, list):
                 from .list_pomes import list_jsonify
-                source[key] = list_jsonify(source=value,
-                                           jsonify_enums=jsonify_enums)
+                source[key] = list_jsonify(source=value)
         # mark for key transformation
         if jsonify_keys and \
                 isinstance(key, Enum | Path | bytes | bytearray | date):
@@ -946,11 +945,15 @@ def dict_jsonify(source: dict,
 
     # transform the keys
     for key in keys:
-        if isinstance(key, Enum):
-            if jsonify_enums == "values":
-                source[key.value] = source.pop(key)
-            elif jsonify_enums == "names":
+        if isinstance(key, StrEnumUseName):
+            source[key.name] = source.pop(key)
+        elif isinstance(key, IntEnumUseName):
+            if key.name.isdigit():
+                source[int(key.name)] = source.pop(key)
+            else:
                 source[key.name] = source.pop(key)
+        elif isinstance(key, Enum):
+            source[key.value] = source.pop(key)
         elif isinstance(key, bytes | bytearray):
             source[str(key)] = source.pop(key)
         elif isinstance(key, date):
@@ -974,6 +977,7 @@ def dict_hexify(source: dict,
       - *str* is changed with *<value>.encode().hex()*
       - *int* is changed with *float(<value>).hex()*
       - *float*, *bytes*, and *bytearray* are changed using their built-in *hex()* method
+      - *Enum* has its value and/or name changed (as per its class)
       - *date* and *datetime* are changed using their ISO representations
       - *Path* is changed using its POSIX representation
       - *dict* is recursively *hexified* with *dict_hexify()*
@@ -991,6 +995,7 @@ def dict_hexify(source: dict,
     """
     # needed imports
     from .list_pomes import list_hexify
+    from obj_pomes import IntEnumUseName, StrEnumUseName
 
     # traverse the input 'dict'
     keys: list[Any] = []
@@ -998,13 +1003,27 @@ def dict_hexify(source: dict,
 
         # values transformations
         if hexify_values:
+            # recursions
             if isinstance(value, dict):
                 dict_hexify(source=value,
                             hexify_keys=hexify_keys,
                             hexify_values=hexify_values)
             elif isinstance(value, list):
                 source[key] = list_hexify(source=value)
-            elif isinstance(value, str):
+
+            # enums
+            if isinstance(value, StrEnumUseName):
+                value = value.name
+            elif isinstance(value, IntEnumUseName):
+                if value.name.isdigit():
+                    value = int(value.name)
+                else:
+                    value = value.name
+            elif isinstance(value, Enum):
+                value = value.value
+
+            # scalars
+            if isinstance(value, str):
                 source[key] = value.encode().hex()
             elif isinstance(value, int):
                 source[key] = float(value).hex()
@@ -1017,11 +1036,23 @@ def dict_hexify(source: dict,
 
         # key transformations
         if hexify_keys and \
-                isinstance(key, dict | list | int | float | str | Path | bytes | bytearray | date):
+                isinstance(key, dict | list | int | float | str | Enum | Path | bytes | bytearray | date):
             keys.append(key)
 
     # transform the keys
     for key in keys:
+        # enums
+        if isinstance(key, StrEnumUseName):
+            key = key.name
+        elif isinstance(key, IntEnumUseName):
+            if key.name.isdigit():
+                key = int(key.name)
+            else:
+                key = key.name
+        elif isinstance(key, Enum):
+            key = key.value
+
+        # scalars
         if isinstance(key, str):
             source[key.encode().hex()] = source.pop(key)
         elif isinstance(key, int):
