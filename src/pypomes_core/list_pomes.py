@@ -21,15 +21,13 @@ def list_compare(list1: list,
     # initialize the return variable
     result: bool = True
 
-    # are the input parameters lists containing the same number of elements ?
     if isinstance(list1, list) and \
        isinstance(list2, list) and \
        len(list1) == len(list2):
-        # yes, verify whether all elements in 'list1' are also in 'list2', in the same quantity
+        # verify whether all elements in 'list1' are also in 'list2', in the same quantity
         for elem in list1:
-            # is 'elem' in both lists, in the same quantity ?
             if list1.count(elem) != list2.count(elem):
-                # no, the lists are not equal
+                # different quantities, the lists are not equal
                 result = False
                 break
     else:
@@ -157,10 +155,10 @@ def list_flatten(source: list[str]) -> str:
     Build and return a *str* by concatenating with "." the elements in *source*.
 
     Examples:
-        - ['1', '2', '']     -> '1.2.'
-        - ['', 'a', 'b']     -> '.a.b'
-        - ['x', '', '', 'y'] -> 'x...y'
-        - ['z']              -> 'z'
+      - ['1', '2', '']     -> '1.2.'
+      - ['', 'a', 'b']     -> '.a.b'
+      - ['x', '', '', 'y'] -> 'x...y'
+      - ['z']              -> 'z'
 
     :param source: the source list
     :return: the concatenated elements of the source list
@@ -176,10 +174,10 @@ def list_unflatten(source: str) -> list[str]:
     Build and return a *list*, by splitting *source* into its components separated by ".".
 
     This *list* will contain the extracted components. Examples:
-        - '1.2.'  -> ['1', '2', '']
-        - '.a.b'  -> ['', 'a', 'b']
-        - 'x...y' -> ['x', '', '', 'y']
-        - 'z'     -> ['z']
+      - '1.2.'  -> ['1', '2', '']
+      - '.a.b'  -> ['', 'a', 'b']
+      - 'x...y' -> ['x', '', '', 'y']
+      - 'z'     -> ['z']
 
     :param source: string with components concatenated by "."
     :return: the list of strings containing the concatenated components
@@ -223,9 +221,8 @@ def list_get_coupled(coupled_elements: list[tuple[str, Any]],
     # traverse the list of coupled elements
     is_coupled: bool = False
     for coupled_element in coupled_elements:
-        # has the primary element been found ?
-        if coupled_element[0] == primary_element:
-            # yes, return the corresponding coupled element
+        if isinstance(coupled_element, list | tuple) and coupled_element[0] == primary_element:
+            # primary element found, return the corresponding coupled element
             result = coupled_element[1]
             is_coupled = True
             break
@@ -431,6 +428,48 @@ def list_prune_not_in(target: list,
     return result
 
 
+def list_is_slice(list_ref: list,
+                  list_slice: list) -> bool:
+    """
+    Determine whether *list_slice* is a slice of *list_ref*.
+
+    A list is said to be a slice of another list if the former can be obtained by extracting a contiguous
+    portion of the latter. The order, cardinality, and contiguity of the elements are thus relevant.
+
+    :param list_ref: the reference list
+    :param list_slice: the candidate slice
+    :result: *True* if *list_sub* is a slice of *list_ref*, *False* otherwise
+    """
+    # initialize the return variable
+    result: bool = False
+
+    len_ref: int = len(list_ref)
+    len_slice: int = len(list_slice)
+    if len_ref >= len_slice:
+        for i in range(len_ref - len_slice + 1):
+            # compare a slice of 'list_ref' with the entire 'list_slice'
+            if list_ref[i:i+len_slice] == list_slice:
+                result = True
+                break
+
+    return result
+
+
+def list_is_sub(list_ref: list,
+                list_sub: list) -> bool:
+    """
+    Determine whether *list_sub* is a sublist of *list_ref*.
+
+    A list is said to be a sublist of another list if all elements contained in the former are also
+    contained in the latter. The order and cardinality of the elements are not relevant.
+
+    :param list_ref: the reference list
+    :param list_sub: the candidate sublist
+    :result: *True* if *list_sub* is a sublist of *list_ref*, *False* otherwise
+    """
+    return all(item in list_ref for item in list_sub)
+
+
 def list_jsonify(source: list) -> list:
     """
     Return a new *list* containing the values in *source*, made serializable if necessary.
@@ -454,9 +493,6 @@ def list_jsonify(source: list) -> list:
     :param source: the list to be *jsonified*
     :return: a new *jsonified* list
     """
-    # needed imports
-    from .obj_pomes import StrEnumUseName
-
     # initialize the return variable
     result: list = []
 
@@ -470,8 +506,6 @@ def list_jsonify(source: list) -> list:
             result.append(list_jsonify(source=value))
 
         # enums
-        elif isinstance(value, StrEnumUseName):
-            result.append(value.name)
         elif isinstance(value, Enum):
             result.append(value.value)
 
@@ -512,7 +546,6 @@ def list_hexify(source: list) -> list:
     """
     # needed imports
     from .dict_pomes import dict_hexify
-    from obj_pomes import StrEnumUseName
 
     # initialize the return variable
     result: list = []
@@ -529,8 +562,6 @@ def list_hexify(source: list) -> list:
             result.append(list_hexify(source=value))
 
         # enums
-        elif isinstance(value, StrEnumUseName):
-            value = value.name
         elif isinstance(value, Enum):
             value = value.value
 

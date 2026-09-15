@@ -16,18 +16,20 @@ class DateFormat(StrEnum):
     """
     Some useful date formats.
     """
-    STD = "%m/%d/%Y"
     COMPACT = "%Y%m%d"
     INV = "%Y-%m-%d"
+    LATIN = "%d/%m/%Y"
+    STD = "%m/%d/%Y"
 
 
 class DatetimeFormat(StrEnum):
     """
     Some useful datetime formats.
     """
-    STD = "%m/%d/%Y %H:%M:%S"
     COMPACT = "%Y%m%d%H%M%S"
     INV = "%Y-%m-%d %H:%M:%S"
+    LATIN = "%d/%m/%Y %H:%M:%S"
+    STD = "%m/%d/%Y %H:%M:%S"
 
 
 def date_reformat(dt_str: str,

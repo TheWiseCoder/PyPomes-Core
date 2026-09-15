@@ -1,23 +1,8 @@
 import json
 import os
-from enum import IntEnum, StrEnum
+from contextlib import suppress
 from types import TracebackType
 from typing import Any
-
-
-class IntEnumUseName(IntEnum):
-    """
-    A marker indicating that the attribute *name* should be used in lieu of *value*, when locating an
-    instance of this class by looking for a *str* having its name, rather then for an *int* having its value
-    (examples in the *env_pomes* module). Note that this is the only situation justifying the use of this marker.
-    """
-
-
-class StrEnumUseName(StrEnum):
-    """
-    A marker indicating that the attribute *name* should be used in lieu of *value*, as the latter
-    is intended to be a description of the *StrEnum* instance.
-    """
 
 
 def obj_is_serializable(obj: Any) -> bool:
@@ -72,6 +57,30 @@ def obj_to_dict(obj: Any,
                                                omit_private=omit_private)
     else:
         result = obj
+
+    return result
+
+
+def obj_positional(o: Any,
+                   /,
+                   keys: tuple[Any, ...],
+                   values: tuple[Any, ...],
+                   def_value: Any = None) -> Any:
+    """
+    Locate the position of *o* within *keys*, and return the element in the same position in *values*.
+
+    :param o: the source object
+    :param keys: the tuple holding the keys to be inspected
+    :param values: the tuple holding the positionally corresponding values
+    :param def_value: the value to return, if not found (defaults to *None*)
+    :return: the value positionally corresponding to the source object, or *def_value* if not found
+    """
+    # initialize the return variable
+    result: Any = def_value
+
+    with suppress(Exception):
+        pos: int = keys.index(o)
+        result = values[pos]
 
     return result
 

@@ -1,8 +1,8 @@
 # environment
 cache-dir = "~/.cache/ruff"
 force-exclude = true
-required-version = ">=0.14"
-target-version = "py312"
+required-version = ">=0.16"
+target-version = "py314"
 respect-gitignore = true
 lint.task-tags = ["TODO", "FIXME", "HACK", "HAZARD"]
 lint.select = [

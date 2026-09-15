@@ -5,6 +5,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+# dict-related types
+dict_keys = type({}.keys())
+dict_values = type({}.values())
+dict_items = type({}.items())
+
 
 def dict_has_key(source: dict,
                  key_chain: str | list[Any]) -> bool:
@@ -153,7 +158,7 @@ def dict_set_value(target: dict,
     Any non-existing intermediate elements are created with the value of an empty *dict*.
     A key might indicate the position of the element within a list, using the format *<key>[<pos>]*.
     In such a case, that element must exist.
-    For convenience, the possibly modified *target* itself is returned.
+    For convenience, the modified *target* itself is returned.
 
     :param target: the reference *dict*
     :param key_chain: the key chain
@@ -291,7 +296,7 @@ def dict_pop_all(target: dict,
 
     :param target: the reference *dict*
     :param key: the key chain
-    :return: the possibly modified input *dict*
+    :return: the modified input *dict*
     """
     # traverse the input dictionary
     for k, v in target.copy().items():
@@ -310,7 +315,7 @@ def dict_replace_value(target: dict,
     """
     Replace, in *target*, all occurrences of *old_value* with *new_value*.
 
-    For convenience, the possibly modified *target* itself is returned.
+    For convenience, the modified *target* itself is returned.
 
     :param target: the reference *dict*
     :param old_value: the value to be replaced
@@ -430,7 +435,7 @@ def dict_merge(target: dict,
         - recursively process both elements, if both are type *dict*
         - add the missing items, if both are type *list*
         - replace the element in *target* if it is a different type, ou if both elements are not of the same type
-    For convenience, the possibly modified *target* itself is returned.
+    For convenience, the modified *target* itself is returned.
 
     :param target: the dictionary to be updated
     :param source: the dictionary with the new elements
@@ -466,6 +471,30 @@ def dict_merge(target: dict,
     return target
 
 
+def dict_move(target: dict,
+              from_key_chain: str | list[Any],
+              to_key_chain: str | list[Any]) -> dict:
+    """
+    Move the subtree pointed to by *from_key_chain* to the location specified in *to_key_chain*.
+
+    Both key chains may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
+    For convenience, the modified *target* itself is returned.
+
+    :param target: the *dict* to be modified
+    :param from_key_chain: the origin chain of nested keys
+    :param to_key_chain: the destination chain of nested keys
+    :return: the modified input *dict*
+    """
+    if dict_has_key(source=target,
+                    key_chain=from_key_chain):
+        value: Any = dict_pop(target=target,
+                              key_chain=from_key_chain)
+        dict_set_value(target=target,
+                       key_chain=to_key_chain,
+                       value=value)
+    return target
+
+
 def dict_coalesce(target: dict,
                   key_chain: str | list[Any]) -> dict:
     """
@@ -474,7 +503,7 @@ def dict_coalesce(target: dict,
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
     This element is pointed to by the key chain *[keys[0]: ... :keys[n]*, and is processed as a sequence
     of multiple elements. The two last keys in *key_chain* must be associated with values of type *list*.
-    For convenience, the possibly modified *target* itself is returned.
+    For convenience, the modified *target* itself is returned.
 
     :param target: the *dict* to be coalesced
     :param key_chain: the chain of nested keys
@@ -576,8 +605,7 @@ def dict_reduce(target: dict,
 
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
     These elements are pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
-    The element at level *n* is removed at the end.
-    For convenience, the possibly modified *target* itself is returned.
+    The element at level *n* is removed at the end. For convenience, the modified *target* itself is returned.
 
     :param target: the *dict* to be reduced
     :param key_chain: the key chain
@@ -826,7 +854,7 @@ def dict_listify(target: dict,
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
     This insertion will happen only if such a value is not itself a list.
     All lists eventually found, up to the penultimate key in the chain, will be processed recursively.
-    For convenience, the possibly modified *target* itself is returned.
+    For convenience, the modified *target* itself is returned.
 
     :param target: the dictionary to be modified
     :param key_chain: the chain of nested keys pointing to the item in question
@@ -897,7 +925,7 @@ def dict_jsonify(source: dict,
 
     Note that retrieving the original values through a reversal of this process is not deterministic.
     The transformation is recursively carried out, that is, any *dict* or *list* set as value will be
-    *jsonified* accordingly. For convenience, the possibly modified *source* itself is returned.
+    *jsonified* accordingly. For convenience, the modified *source* itself is returned.
 
     *HAZARD*: depending on the type of object contained in *source*, the final result may still
     not be fully serializable.
@@ -907,18 +935,13 @@ def dict_jsonify(source: dict,
     :param jsonify_values: whether the values in *source* should be *jsonified* (defaults to *True*)
     :return: the modified input *dict*
     """
-    # needed imports
-    from .obj_pomes import StrEnumUseName
-
     # traverse the input 'dict'
     keys: list[Any] = []
     for key, value in source.items():
 
         # values transformations
         if jsonify_values:
-            if isinstance(value, StrEnumUseName):
-                source[key] = value.name
-            elif isinstance(value, Enum):
+            if isinstance(value, Enum):
                 source[key] = value.value
             elif isinstance(value, bytes | bytearray):
                 source[key] = str(value)
@@ -940,9 +963,7 @@ def dict_jsonify(source: dict,
 
     # transform the keys
     for key in keys:
-        if isinstance(key, StrEnumUseName):
-            source[key.name] = source.pop(key)
-        elif isinstance(key, Enum):
+        if isinstance(key, Enum):
             source[key.value] = source.pop(key)
         elif isinstance(key, bytes | bytearray):
             source[str(key)] = source.pop(key)
@@ -976,7 +997,7 @@ def dict_hexify(source: dict,
 
     Note that retrieving the original values through a reversal of this process is not deterministic.
     The transformation is recursively carried out, that is, any *dict* or *list* set as value will be
-    *hexified* accordingly. For convenience, the possibly modified *source* itself is returned.
+    *hexified* accordingly. For convenience, the modified *source* itself is returned.
 
     :param source: the dict to be made serializable
     :param hexify_keys: whether the keys in *source* should be *hexified* (defaults to *False*)
@@ -985,7 +1006,6 @@ def dict_hexify(source: dict,
     """
     # needed imports
     from .list_pomes import list_hexify
-    from obj_pomes import StrEnumUseName
 
     # traverse the input 'dict'
     keys: list[Any] = []
@@ -1002,9 +1022,7 @@ def dict_hexify(source: dict,
                 source[key] = list_hexify(source=value)
 
             # enums
-            if isinstance(value, StrEnumUseName):
-                value = value.name
-            elif isinstance(value, Enum):
+            if isinstance(value, Enum):
                 value = value.value
 
             # scalars
@@ -1027,9 +1045,7 @@ def dict_hexify(source: dict,
     # transform the keys
     for key in keys:
         # enums
-        if isinstance(key, StrEnumUseName):
-            key = key.name
-        elif isinstance(key, Enum):
+        if isinstance(key, Enum):
             key = key.value
 
         # scalars

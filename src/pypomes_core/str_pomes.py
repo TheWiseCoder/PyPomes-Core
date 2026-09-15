@@ -1,9 +1,20 @@
 import random
+import re
 import string
 from contextlib import suppress
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, Final
+
+DIACRITICS_LOWER: Final[tuple[str, str]] = (
+    "áàâãäéèêëíìïóòôõöúùûüç",
+    "aaaaaeeeeiiiooooouuuuc"
+)
+DIACRITICS_UPPER: Final[tuple[str, str]] = (
+    "ÁÀÂÃÄÉÈÊËÍÌÏÓÒÔÕÖÚÙÛÜÇ",
+    "AAAAAEEEEIIIOOOOOUUUUC"
+)
+REGEX_METACHARS: Final[str] = ".^$*+?[]()|\\{}"
 
 
 def str_to_hex(s: str, /) -> str:
@@ -67,10 +78,10 @@ def str_sanitize(s: str, /) -> str:
     Clean the given *s* string.
 
     The sanitization is carried out by:
-        - removing backslashes
-        - replacing double quotes with single quotes
-        - replacing newlines and tabs with whitespace
-        - replacing multiple consecutive spaces with a single space
+      - removing backslashes
+      - replacing double quotes with single quotes
+      - replacing newlines and tabs with whitespace
+      - replacing multiple consecutive spaces with a single space
 
     :param s: the string to be cleaned
     :return: the cleaned string
@@ -178,27 +189,6 @@ def str_between(s: str,
     return result
 
 
-def str_positional(s: str,
-                   /,
-                   keys: tuple[str, ...],
-                   values: tuple[str, ...]) -> Any:
-    """
-    Locate the position of *s* within *keys*, and return the element in the same position in *values*.
-
-    :param s: the source string
-    :param keys: the tuple holding the keys to be inspected
-    :param values: the tuple holding the positionally corresponding values
-    :return: the value positionally corresponding to the source string, or *None* if not found
-    """
-    # noinspection PyUnusedLocal
-    result: Any = None
-    with suppress(Exception):
-        pos: int = keys.index(s)
-        result = values[pos]
-
-    return result
-
-
 def str_random(size: int,
                chars: str | list[str] = None) -> str:
     """
@@ -293,6 +283,32 @@ def str_splice(s: str,
     return result
 
 
+def str_purge_leading_chars(s: str,
+                            /,
+                            ch: str) -> str:
+    """
+    Remove leading occurrences of *ch* from *s*, and return the result.
+
+    If *s* is not a *str*, or *ch* is not a leading character therein, then *s* is itself returned.
+
+    :param s: the string to remove leading characters from
+    :param ch: leading character to remove
+    :return: *s* with leading *chr*s removed
+    """
+    # declare the return variable
+    result: str
+
+    if isinstance(s, str) and len(s) > 0:
+        result = ""
+        for c in s:
+            if len(result) > 0 or c != ch:
+                result += c
+    else:
+        result = s
+
+    return result
+
+
 def str_to_lower(s: str, /) -> str:
     """
     Safely convert *s* to lower-case.
@@ -322,13 +338,13 @@ def str_from_any(s: Any, /) -> str:
     Convert *s* to its string representation.
 
     These are the string representations returned:
-        - *None*: the string 'None'
-        - *bool*: the string 'True' of 'False'
-        - *str* : the source string itself
-        - *bytes*: its hex representation
-        - *date*: the date in ISO format (*datetime* is a *date* subtype)
-        - *Path*: its POSIX form
-        - all other types: their *str()* representation
+      - *None*: the string 'None'
+      - *bool*: the string 'True' of 'False'
+      - *str* : the source string itself
+      - *bytes*: its hex representation
+      - *date*: the date in ISO format (*datetime* is a *date* subtype)
+      - *Path*: its POSIX form
+      - all other types: their *str()* representation
 
     :param s: the data to be converted to string.
     :return: the string representation of the source data
@@ -354,10 +370,10 @@ def str_to_bool(s: str, /) -> bool | None:
     Obtain and return the *bool* value encoded in *s*.
 
     These are the criteria:
-        - case is disregarded
-        - the string values accepted to stand for *True* are *1*, *t*, or *true*
-        - the string values accepted to stand for *False* are *0*, *f*, or *false*
-        - all other values causes *None* to be returned
+      - case is disregarded
+      - the string values accepted to stand for *True* are *1*, *t*, or *true*
+      - the string values accepted to stand for *False* are *0*, *f*, or *false*
+      - all other values causes *None* to be returned
 
     :param s: the encoded bool value
     :return: the decoded bool value, or *None* if *s* fails the encoding criteria
@@ -384,6 +400,29 @@ def str_to_int(s: str, /) -> int | None:
     result: int | None = None
     with suppress(Exception):
         result = int(s)
+
+    return result
+
+
+def str_in_regex(s: str,
+                 /,
+                 regexs: list[str]) -> bool:
+    """
+    Determine whether *s* matches any of the regular expressions in *regexs*.
+
+    :param s: the value to match
+    :param regexs: list of regular expressions to match
+    :return: *True* if a match has been found, *False* otherwise
+    """
+    # initialize the return variable
+    result: bool = False
+
+    if s and regexs:
+        for exp in regexs:
+            if re.search(pattern=exp,
+                         string=s):
+                result = True
+                break
 
     return result
 

@@ -228,7 +228,7 @@ def file_is_binary(file_data: Path | str | bytes) -> bool:
 
     The heuristics used, as heuristics go, provide an educated guess, not an accurate result.
     In the present case, the first 4 KBytes of the file data is inspected for the occurrence
-    of characters normally absent in text files. Thus the presence of characters other than
+    of characters normally absent in text files. Thus, the presence of characters other than
     *bell*, *backspace*, *horizontal tab*, *newline*, *form feed*, *carriage return*, *escape*,
     and those in ASCII range [32 - 255] (except 127), would flag the file as binary.
     Empty or null content is considered to be non-binary.

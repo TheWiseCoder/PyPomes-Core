@@ -137,7 +137,7 @@ def email_send(email_to: str,
 
 def email_codify(email: str) -> str:
     """
-    Codify *email* so as to provide a hint at its content, whilst preventing its usage.
+    Codify *email* to provide a hint at its content, whilst preventing its usage.
 
     The codification process changes my_mail@my_server.com into m*****l@m********.com.
 

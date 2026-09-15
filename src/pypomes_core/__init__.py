@@ -5,10 +5,12 @@ from .datetime_pomes import (
     timestamp_interval, timestamp_duration
 )
 from .dict_pomes import (
+    dict_keys, dict_values, dict_items,
     dict_has_key, dict_has_value, dict_get_value, dict_set_value,
-    dict_reduce, dict_listify, dict_transform, dict_merge, dict_coalesce,
-    dict_clone, dict_get_key, dict_get_keys, dict_from_object, dict_from_list,
-    dict_replace_value, dict_pop, dict_pop_all, dict_unique_values,
+    dict_reduce, dict_listify, dict_transform, dict_merge, dict_move,
+    dict_coalesce, dict_clone, dict_get_key, dict_get_keys,
+    dict_from_object, dict_from_list, dict_replace_value,
+    dict_pop, dict_pop_all, dict_unique_values,
     dict_jsonify, dict_hexify, dict_stringify
 )
 from .email_pomes import (
@@ -16,6 +18,11 @@ from .email_pomes import (
 )
 from .encoding_pomes import (
     encode_ascii_hex, decode_ascii_hex
+)
+from .enum_pomes import (
+    IntStrEnum, EnumUseName, EnumUseAny, EnumAny,
+    IntEnumDesc, IntEnumAny, IntEnumDescAny,
+    StrEnumDesc, StrEnumAny, StrEnumDescAny
 )
 from .env_pomes import (
     APP_PREFIX,
@@ -36,32 +43,33 @@ from .func_pomes import (
     func_capture_params, func_defaulted_params, func_specified_params
 )
 from .list_pomes import (
-    list_compare, list_correlate, list_bin_search,
-    list_flatten, list_unflatten, list_get_coupled,
+    list_compare, list_correlate, list_is_slice, list_is_sub,
+    list_bin_search, list_flatten, list_unflatten, list_get_coupled,
     list_elem_starting_with, list_elem_with_attr, list_transform,
     list_prune_duplicates, list_prune_in, list_prune_not_in,
     list_jsonify, list_hexify, list_hierarchize, list_stringify
 )
 from .obj_pomes import (
-    IntEnumUseName, StrEnumUseName,
-    obj_is_serializable, obj_to_dict, exc_format
+    obj_is_serializable, obj_to_dict, obj_positional, exc_format
 )
 from .str_pomes import (
+    DIACRITICS_LOWER, DIACRITICS_UPPER, REGEX_METACHARS,
     str_to_hex, str_from_hex, str_to_lower, str_to_upper,
     str_as_list, str_sanitize, str_split_on_mark,
-    str_between, str_positional, str_random, str_splice,
+    str_between, str_random, str_splice, str_purge_leading_chars,
     str_find_char, str_find_whitespace, str_rreplace,
     str_from_any, str_to_bool, str_to_int, str_to_float,
-    str_is_int, str_is_float, str_is_hex
+    str_in_regex, str_is_int, str_is_float, str_is_hex
 )
 from .validation_msgs import (
     validate_set_msgs, validate_update_msgs
 )
 from .validation_pomes import (
-    VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX, MsgLang, IntStrEnum,
-    validate_value, validate_bool, validate_int, validate_decimal,
-    validate_str, validate_date, validate_datetime, validate_enum,
-    validate_email, validate_pwd, validate_cron, validate_ints, validate_strs,
+    VALIDATION_MSG_LANGUAGE, VALIDATION_MSG_PREFIX, MsgLang,
+    validate_value, validate_bool, validate_decimal,
+    validate_int, validate_ints, validate_str, validate_strs,
+    validate_enum, validate_enums, validate_date, validate_datetime,
+    validate_email, validate_pwd, validate_cron,
     validate_format_error, validate_format_errors, validate_unformat_errors
 )
 from .xml_pomes import (
@@ -78,15 +86,21 @@ __all__ = [
     "date_parse", "datetime_parse",
     "timestamp_interval", "timestamp_duration",
     # dict_pomes
+    "dict_keys", "dict_values", "dict_items",
     "dict_has_key", "dict_has_value", "dict_get_value", "dict_set_value",
-    "dict_reduce", "dict_listify", "dict_transform", "dict_merge", "dict_coalesce",
-    "dict_clone", "dict_get_key", "dict_get_keys", "dict_from_object", "dict_from_list",
-    "dict_replace_value", "dict_pop", "dict_pop_all", "dict_unique_values",
+    "dict_reduce", "dict_listify", "dict_transform", "dict_merge", "dict_move",
+    "dict_coalesce", "dict_clone", "dict_get_key", "dict_get_keys",
+    "dict_from_object", "dict_from_list", "dict_replace_value",
+    "dict_pop", "dict_pop_all", "dict_unique_values",
     "dict_jsonify", "dict_hexify", "dict_stringify",
     # email_pomes
     "EmailParam", "email_setup", "email_send", "email_codify",
     # encoding_pomes
     "encode_ascii_hex", "decode_ascii_hex",
+    # enum_pomes
+    "IntStrEnum", "EnumUseName", "EnumUseAny", "EnumAny",
+    "IntEnumAny", "IntEnumDesc", "IntEnumDescAny",
+    "StrEnumAny", "StrEnumDesc", "StrEnumDescAny",
     # env_pomes
     "APP_PREFIX",
     "env_get_str", "env_get_strs",
@@ -103,28 +117,30 @@ __all__ = [
     "func_capture_args", "func_defaulted_args", "func_specified_args",
     "func_capture_params", "func_defaulted_params", "func_specified_params",
     # list_pomes
-    "list_compare", "list_correlate", "list_bin_search",
-    "list_flatten", "list_unflatten", "list_get_coupled",
+    "list_compare", "list_correlate", "list_is_slice", "list_is_sub",
+    "list_bin_search", "list_flatten", "list_unflatten", "list_get_coupled",
     "list_elem_starting_with", "list_elem_with_attr", "list_transform",
     "list_prune_duplicates", "list_prune_in", "list_prune_not_in",
     "list_jsonify", "list_hexify", "list_hierarchize", "list_stringify",
     # obj_pomes
-    "IntEnumUseName", "StrEnumUseName",
-    "obj_is_serializable", "obj_to_dict", "exc_format",
+    "EnumUseName", "IntEnumDesc", "StrEnumDesc",
+    "obj_is_serializable", "obj_to_dict", "obj_positional", "exc_format",
     # str_pomes
+    "DIACRITICS_LOWER", "DIACRITICS_UPPER", "REGEX_METACHARS",
     "str_to_hex", "str_from_hex", "str_to_lower", "str_to_upper",
     "str_as_list", "str_sanitize", "str_split_on_mark",
-    "str_between", "str_positional", "str_random", "str_splice",
+    "str_between", "str_random", "str_splice", "str_purge_leading_chars",
     "str_find_char", "str_find_whitespace", "str_rreplace",
     "str_from_any", "str_to_bool", "str_to_int", "str_to_float",
-    "str_is_int", "str_is_float", "str_is_hex",
+    "str_in_regex", "str_is_int", "str_is_float", "str_is_hex",
     # validation_msgs
     "validate_set_msgs", "validate_update_msgs",
     # validation_pomes
-    "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX", "MsgLang", "IntStrEnum",
+    "VALIDATION_MSG_LANGUAGE", "VALIDATION_MSG_PREFIX", "MsgLang",
     "validate_value", "validate_bool", "validate_int", "validate_decimal",
     "validate_str", "validate_date", "validate_datetime", "validate_enum",
-    "validate_email", "validate_pwd", "validate_cron", "validate_ints", "validate_strs",
+    "validate_email", "validate_pwd", "validate_cron",
+    "validate_ints", "validate_strs", "validate_enums",
     "validate_format_error", "validate_format_errors", "validate_unformat_errors",
     # xml_pomes
     "XML_FILE_HEADER",

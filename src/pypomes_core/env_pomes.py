@@ -62,7 +62,7 @@ def env_get_strs(key: str,
     :param key: the key the values ares associated with
     :param values: optional list of valid values
     :param ignore_case: specifies whether to ignore capitalization when checking with *values*
-    :return: the string values associated with the key, or *def_value* if error
+    :return: the string values associated with the key, or *None* if error or no values found
     """
     # initialize the return variable
     result: list[str] | None = None
@@ -116,7 +116,7 @@ def env_get_ints(key: str,
 
     :param key: the key the values ares associated with
     :param values: optional list of valid values
-    :return: the integer values associated with the key, or *def_value* if error
+    :return: the integer values associated with the key, or *None* if error or no values found
     """
     result: list[int] | None = None
     # noinspection PyUnusedLocal
@@ -167,7 +167,7 @@ def env_get_floats(key: str,
 
     :param key: the key the values ares associated with
     :param values: optional list of valid values
-    :return: the float values associated with the key, or *def_value* if error
+    :return: the float values associated with the key, or *None* if error or no values found
     """
     result: list[float] | None = None
     # noinspection PyUnusedLocal
@@ -201,12 +201,12 @@ def env_get_enum(key: str,
     :param def_value: the value to return, if obtaining the value for *key* fails (defaults to *None*)
     :return: the value associated with the key, or *def_value* if error
     """
-    from .obj_pomes import IntEnumUseName, StrEnumUseName
+    from .enum_pomes import EnumUseName
 
     # initialize the return variable
     result: Any = None
 
-    if issubclass(enum_class, IntEnumUseName | StrEnumUseName):
+    if issubclass(enum_class, EnumUseName):
         # noinspection PyUnresolvedReferences
         name: str = env_get_str(key=key,
                                 values=[e.name for e in (values or enum_class)],
@@ -245,9 +245,9 @@ def env_get_enums(key: str,
 
     :param key: the key which the values are associated with
     :param enum_class: the *enum* class to consider (must be a subclass of *IntEnum* or *StrEnum*)
-    :return: the values associated with the key, or *def_value* if error
+    :return: the values associated with the key, or *None* if error or no values found
     """
-    from .obj_pomes import IntEnumUseName, StrEnumUseName
+    from .enum_pomes import EnumUseName
 
     # initialize the return variable
     result: list | None = None
@@ -259,7 +259,7 @@ def env_get_enums(key: str,
         names: list[str] = values.split(",")
         for name in names:
             found = False
-            if issubclass(enum_class, IntEnumUseName | StrEnumUseName):
+            if issubclass(enum_class, EnumUseName):
                 for e in enum_class:
                     if e.name.lower() == name.lower():
                         enums.append(e)
@@ -417,12 +417,19 @@ def env_is_docker() -> bool:
 
     Note that a reasonable, but not infallible, heuristics is used.
 
-    :return: 'True' if this could be determined, 'False' otherwise
+    :return: *True* if this could be determined, *False* otherwise
     """
+    # upon container creation, Docker automatically creates this hidden file in its root directory
     result: bool = Path("/.dockerenv").exists()
-    if not result:
-        with (suppress(Exception),
-              Path("/proc/1/cgroup", "rt").open() as f):
-            result = "docker" in f.read()
 
+    if not result:
+        # Linux systems track processes using control groups (cgroups):
+        #   inside a container, this file explicitly lists docker or kubepods
+        #   (if running under Kubernetes) in its path entries
+        with (suppress(Exception),
+              Path("/proc/self/cgroup").open("rt") as f):
+            for line in f:
+                if "docker" in line or "kubepods" in line:
+                    result = True
+                    break
     return result
