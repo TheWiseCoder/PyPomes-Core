@@ -86,10 +86,12 @@ def str_sanitize(s: str, /) -> str:
     :param s: the string to be cleaned
     :return: the cleaned string
     """
-    cleaned: str = s.replace("\\", "") \
-                    .replace('"', "'") \
-                    .replace("\n", " ") \
-                    .replace("\t", " ")
+    cleaned: str = (s.replace("\\n", "")    # newline representation
+                     .replace("\\t", "")    # tab representation
+                     .replace("\\", "")
+                     .replace('"', "'")
+                     .replace("\n", " ")    # actual newline
+                     .replace("\t", " "))   # actual tab
     return " ".join(cleaned.split())
 
 

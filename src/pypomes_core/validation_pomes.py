@@ -1008,7 +1008,7 @@ def validate_format_error(__error_id: int,
                           msg_lang: MsgLang = VALIDATION_MSG_LANGUAGE,
                           msg_prefix: str = VALIDATION_MSG_PREFIX) -> str:
     """
-    Format and return the error message identified by *err_id* in the standard messages list.
+    Format and return the error message identified by *__error_id* in the standard messages list.
 
     The message is built from the message element in the standard messages list, identified by *error_id*.
     The occurrences of *{}* in the element are sequentially replaced by the given *args*.
@@ -1074,7 +1074,7 @@ def validate_format_errors(__errors: list[str],
                            msg_lang: MsgLang = VALIDATION_MSG_LANGUAGE,
                            msg_prefix: str = VALIDATION_MSG_PREFIX) -> list[dict[str, str]]:
     """
-    Build and return a list of *dicts* from the list of errors in *errors*.
+    Build and return a list of *dicts* from the list of errors in *__errors*.
 
     Each element in *errors* is encoded as a *dict*.
     This list is typically used in a returning *JSON* string.
