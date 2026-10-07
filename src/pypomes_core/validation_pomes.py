@@ -609,19 +609,25 @@ def validate_enum(source: dict[str, Any],
             vals.append(v.value)
         else:
             vals.append(v)
-    if issubclass(enum_class, StrEnum):
+    if issubclass(enum_class, StrEnum | EnumUseName):
+        if isinstance(default, EnumUseName):
+            default = default.name.lower()
+        elif isinstance(default, Enum):
+            default = default.value.lower()
         value: str = validate_str(source=source,
                                   attr=attr,
                                   values=vals,
-                                  default=default.value if isinstance(default, Enum) else default,
+                                  default=default,
                                   required=required,
                                   errors=errors,
                                   logger=logger)
     elif issubclass(enum_class, IntEnum):
+        if isinstance(default, Enum):
+            default = default.value
         value: int = validate_int(source=source,
                                   attr=attr,
                                   values=vals,
-                                  default=default.value if isinstance(default, Enum) else default,
+                                  default=default,
                                   required=required,
                                   errors=errors,
                                   logger=logger)
@@ -630,7 +636,7 @@ def validate_enum(source: dict[str, Any],
             # noinspection PyUnresolvedReferences
             result = enum_class.from_anyval(value)
         elif issubclass(enum_class, EnumUseName):
-            result = enum_class[value]
+            result = enum_class[value.upper()]
         else:
             result = enum_class(value)
 

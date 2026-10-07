@@ -1,6 +1,7 @@
 import contextlib
 from collections import defaultdict
 from datetime import date
+from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -514,6 +515,8 @@ def list_jsonify(source: list) -> list:
             result.append(str(value))
         elif isinstance(value, date):
             result.append(value.isoformat())
+        elif isinstance(value, Decimal):
+            result.append(float(value))
         elif isinstance(value, Path):
             result.append(value.as_posix())
         else:

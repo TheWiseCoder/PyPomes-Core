@@ -1,6 +1,7 @@
 import inspect
 import types
 from datetime import date
+from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -947,6 +948,8 @@ def dict_jsonify(source: dict,
                 source[key] = str(value)
             elif isinstance(value, date):
                 source[key] = value.isoformat()
+            elif isinstance(value, Decimal):
+                source[key] = float(value)
             elif isinstance(value, Path):
                 source[key] = value.as_posix()
             elif isinstance(value, dict):

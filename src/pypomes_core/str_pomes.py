@@ -457,7 +457,7 @@ def str_is_int(s: str, /) -> bool:
     try:
         int(s)
         result = True
-    except ValueError:
+    except (TypeError, ValueError):
         result = False
 
     return result
@@ -476,7 +476,7 @@ def str_is_float(s: str, /) -> bool:
     try:
         float(s)
         result = True
-    except ValueError:
+    except (TypeError, ValueError):
         result = False
 
     return result
@@ -498,7 +498,7 @@ def str_is_hex(s: str, /) -> bool:
     try:
         int(s)
         result = True
-    except ValueError:
+    except (TypeError, ValueError):
         result = False
 
     return result
