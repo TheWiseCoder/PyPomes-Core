@@ -1,4 +1,5 @@
 import contextlib
+import re
 from collections import defaultdict
 from datetime import date
 from decimal import Decimal
@@ -7,27 +8,28 @@ from pathlib import Path
 from typing import Any
 
 
-def list_compare(list1: list,
-                 list2: list) -> bool:
+def list_compare(_list1: list,
+                 _list2: list,
+                 /) -> bool:
     """
-    Compare the contents of the two lists *list1* e *list2*.
+    Compare the contents of the two input lists.
 
-    Return *True* if all the elements in *list1* are also in *list2*, and vice versa, with the same cardinality.
-    The input list need not be sorted.
+    Return *True* if all the elements in the first list are also in the second one,
+    and vice versa, with the same cardinality. The input list need not be sorted.
 
-    :param list1: the first list
-    :param list2: the second list
+    :param _list1: the first list
+    :param _list2: the second list
     :return: True if the two lists contain the same elements, in the same quantity, in any order
     """
     # initialize the return variable
     result: bool = True
 
-    if isinstance(list1, list) and \
-       isinstance(list2, list) and \
-       len(list1) == len(list2):
+    if isinstance(_list1, list) and \
+       isinstance(_list2, list) and \
+       len(_list1) == len(_list2):
         # verify whether all elements in 'list1' are also in 'list2', in the same quantity
-        for elem in list1:
-            if list1.count(elem) != list2.count(elem):
+        for elem in _list1:
+            if _list1.count(elem) != _list2.count(elem):
                 # different quantities, the lists are not equal
                 result = False
                 break
@@ -38,14 +40,15 @@ def list_compare(list1: list,
     return result
 
 
-def list_correlate(list_first: list,
-                   list_second: list,
+def list_correlate(_list_first: list,
+                   _list_second: list,
+                   /,
                    only_in_first: bool = False,
                    only_in_second: bool = False,
                    in_both: bool = False,
                    is_sorted: bool = False) -> tuple:
     """
-    Correlate *list_first* and *list_second* by computing their differences.
+    Correlate the two input lists by computing their differences.
 
     A tuple containing up to three lists is returned, with contents based on the parameters:
       - *only_in_first*: items existing in *list_first* but not in *list_second*
@@ -59,8 +62,8 @@ def list_correlate(list_first: list,
     Note that, depending on the context, a returning list might be the same object as *list_first*
     or *list_second*. The input lists need not be sorted.
 
-    :param list_first: the first list to consider
-    :param list_second: the second list to consider
+    :param _list_first: the first list to consider
+    :param _list_second: the second list to consider
     :param only_in_first: include list of items existing in *list_first* but not in *list_second*
     :param only_in_second: include list of items existing in *list_second* but not in *list_first*
     :param in_both: include list of items existing in both lists
@@ -75,33 +78,33 @@ def list_correlate(list_first: list,
         result_second: list = []
         result_both: list = []
 
-        if list_first and list_second:
+        if _list_first and _list_second:
             if is_sorted:
                 if in_both or only_in_first:
-                    for item in list_first:
-                        if list_bin_search(source=list_second,
+                    for item in _list_first:
+                        if list_bin_search(_list_second,
                                            item=item) < 0:
                             if only_in_first:
                                 result_first.append(item)
                         elif in_both:
                             result_both.append(item)
                 if only_in_second:
-                    result_second = [item for item in list_second if list_bin_search(source=list_first,
-                                                                                     item=item) < 0]
+                    result_second = [item for item in _list_second if list_bin_search(_list_first,
+                                                                                      item=item) < 0]
             else:
                 if in_both or only_in_first:
-                    for item in list_first:
-                        if item in list_second:
+                    for item in _list_first:
+                        if item in _list_second:
                             if in_both:
                                 result_both.append(item)
                         elif only_in_first:
                             result_first.append(item)
                 if only_in_second:
-                    result_second = [item for item in list_second if item not in list_first]
-        elif list_first and only_in_first:
-            result_first = list_first
-        elif list_second and only_in_second:
-            result_second = list_second
+                    result_second = [item for item in _list_second if item not in _list_first]
+        elif _list_first and only_in_first:
+            result_first = _list_first
+        elif _list_second and only_in_second:
+            result_second = _list_second
 
         # assemble the return tuple
         correlations: list[list] = []
@@ -116,34 +119,35 @@ def list_correlate(list_first: list,
     return result
 
 
-def list_bin_search(source: list,
+def list_bin_search(_list: list,
+                    /,
                     item: Any) -> int:
     """
-    Find the index of *item* in the sorted list *source*, using binary search.
+    Find the index of *item* in the sorted input list, using binary search.
 
-    If *source* is not ascendingly or descendingly sorted, the return value is not valid.
+    If the input list is not ascendingly or descendingly sorted, the return value is not valid.
 
-    :param source: the sorted list to inspect
+    :param _list: the sorted list to inspect
     :param item: the item to find
-    :return: the position of *item* in *source*, or "-1" if not found
+    :return: the position of *item* in the input list, or *-1* if not found
     """
     # initialize the return variable
     result: int = -1
 
     low: int = 0
-    high: int = len(source) - 1
-    is_ascending: bool = source[low] < source[high]
+    high: int = len(_list) - 1
+    is_ascending: bool = _list[low] < _list[high]
 
     while result < 0 and low <= high:
         mid: int = (low + high) // 2
-        if source[mid] == item:
+        if _list[mid] == item:
             result = mid
         elif is_ascending:
-            if item < source[mid]:
+            if item < _list[mid]:
                 high = mid - 1
             else:
                 low = mid + 1
-        elif item > source[mid]:
+        elif item > _list[mid]:
             high = mid - 1
         else:
             low = mid + 1
@@ -151,9 +155,46 @@ def list_bin_search(source: list,
     return result
 
 
-def list_flatten(source: list[str]) -> str:
+def list_find(_list: list[tuple],
+              /,
+              values: tuple,
+              regex: bool = False) -> int:
     """
-    Build and return a *str* by concatenating with "." the elements in *source*.
+    Locate the first element in the input list having values as specified in *values*.
+
+    The elements in the source list are sequentially compared with items in *values*, up to its last item.
+    Elements in the input list with less number of elements are skipped.
+    If *regex* is specified, values in *values* are taken to be regular expressions.
+
+    :param _list: the list of tuples to inspect
+    :param values: the tuple containing values to compare
+    :param regex: if *True*, use *REGEX* in comparisons (defaults to *False*)
+    :return: the index of the first element found, or -1 if not element in the input list matches *values*
+    """
+    # initialize the return variable
+    result: int = -1
+
+    vlen: int = len(values)
+    for inx, elem in enumerate(_list):
+        if len(elem) >= vlen:
+            found: bool = True
+            for i in range(0, vlen):
+                if ((not regex and elem[i] != values[i]) or
+                    (regex and not re.search(pattern=values[i],
+                                             string=elem[i]))):
+                    found = False
+                    break
+            if found:
+                result = inx
+                break
+
+    return result
+
+
+def list_flatten(_list: list[str],
+                 /) -> str:
+    """
+    Build and return a *str* by concatenating with "." the elements in the input list.
 
     Examples:
       - ['1', '2', '']     -> '1.2.'
@@ -161,18 +202,19 @@ def list_flatten(source: list[str]) -> str:
       - ['x', '', '', 'y'] -> 'x...y'
       - ['z']              -> 'z'
 
-    :param source: the source list
+    :param _list: the source list
     :return: the concatenated elements of the source list
     """
     result: str = ""
-    for item in source:
+    for item in _list:
         result += "." + item
     return result[1:]
 
 
-def list_unflatten(source: str) -> list[str]:
+def list_unflatten(_list: str,
+                   /) -> list[str]:
     """
-    Build and return a *list*, by splitting *source* into its components separated by ".".
+    Build and return a *list*, by splitting the input list into its components separated by ".".
 
     This *list* will contain the extracted components. Examples:
       - '1.2.'  -> ['1', '2', '']
@@ -180,12 +222,12 @@ def list_unflatten(source: str) -> list[str]:
       - 'x...y' -> ['x', '', '', 'y']
       - 'z'     -> ['z']
 
-    :param source: string with components concatenated by "."
+    :param _list: string with components concatenated by "."
     :return: the list of strings containing the concatenated components
     """
     from .str_pomes import str_split_on_mark
 
-    return str_split_on_mark(source, ".")
+    return str_split_on_mark(_list, ".")
 
 
 def list_get_coupled(coupled_elements: list[tuple[str, Any]],
@@ -233,27 +275,28 @@ def list_get_coupled(coupled_elements: list[tuple[str, Any]],
     return result
 
 
-def list_transform(source: list,
+def list_transform(_list: list,
+                   /,
                    from_to_keys: list[tuple[str, Any]],
                    prefix_from: str = None,
                    prefix_to: str = None,
                    add_missing: bool = False) -> list:
     """
-    Construct a new *list*, recursively transforming elements of type *list* and *dict* found in *source*.
+    Construct a new *list*, recursively transforming elements of type *list* and *dict* found in the input list.
 
     The conversion of *dict* type elements is documented in the *dict_transform* function.
 
     The prefixes for the source and destination keys, if defined, have different treatments.
-    They are added when searching for values in *Source*, and removed when assigning values
+    They are added when searching for values in the input list, and removed when assigning values
     to the return *dict*.
-    If *add_missing* is *True*, the entries in *source* whose keys are missing in *from_to_keys*
+    If *add_missing* is *True*, the entries in the input list whose keys are missing in *from_to_keys*
     are added to the new *list*.
 
-    :param source: the source *dict* of the values
+    :param _list: the source list of the values
     :param from_to_keys: the list of tuples containing the source and destination key sequences
     :param prefix_from: prefix to be added to the source keys
     :param prefix_to: prefix to be removed from the target keys
-    :param add_missing: whether to add entries in *source* missing in *from_to_keys* (defaults to *False*)
+    :param add_missing: whether to add entries in the input list missing in *from_to_keys* (defaults to *False*)
     :return: the new list
     """
     from .dict_pomes import dict_transform
@@ -262,20 +305,20 @@ def list_transform(source: list,
     result: list = []
 
     # traverse the source list
-    for inx, value in enumerate(source):
+    for inx, value in enumerate(_list):
         from_keys: str | None = None
         if prefix_from:
             from_keys: str = f"{prefix_from}[{inx}]"
 
         # obtain the target value
         if isinstance(value, dict):
-            to_value: dict = dict_transform(source=value,
+            to_value: dict = dict_transform(value,
                                             from_to_keys=from_to_keys,
                                             prefix_from=from_keys,
                                             prefix_to=prefix_to,
                                             add_missing=add_missing)
         elif isinstance(value, list):
-            to_value: list = list_transform(source=value,
+            to_value: list = list_transform(value,
                                             from_to_keys=from_to_keys,
                                             prefix_from=from_keys,
                                             prefix_to=prefix_to,
@@ -289,24 +332,25 @@ def list_transform(source: list,
     return result
 
 
-def list_elem_with_attr(source: list,
+def list_elem_with_attr(_list: list,
+                        /,
                         attr: str,
                         value: Any) -> Any:
     """
-    Locate and return the first element in *source* having an attribute named *attr* with value *value*.
+    Locate and return the first element in the input list having an attribute named *attr* with value *value*.
 
     Values obtained by invoking *get* on the element are also considered. *None* is a valid value for *value*.
 
-    :param source: The list to search for the element
+    :param _list: The list to search for the element
     :param attr: the name of the reference attribute
     :param value: the reference value
-    :return: The element in *source* having an attribute *attr* with *value*, or *None*
+    :return: The element in the input list having an attribute *attr* with *value*, or *None*
     """
     # initialize the return variable
     result: Any = None
 
     # traverse the source list
-    for element in source:
+    for element in _list:
         if hasattr(element, attr) and getattr(element, attr) == value:
             result = element
             break
@@ -318,15 +362,16 @@ def list_elem_with_attr(source: list,
     return result
 
 
-def list_elem_starting_with(source: list[str | bytes],
+def list_elem_starting_with(_list: list[str | bytes],
+                            /,
                             prefix: str | bytes,
                             keep_prefix: bool = True) -> str | bytes | None:
     """
-    Locate and return the first element in *source* prefixed by *prefix*.
+    Locate and return the first element in the input list prefixed by *prefix*.
 
     Retorn *None* if this element is not found.
 
-    :param source: the list to be inspected
+    :param _list: the list to be inspected
     :param prefix: the data prefixing the element to be returned
     :param keep_prefix: defines whether the found element should be returned with the prefix
     :return: the prefixed element, with or without the prefix, or *None* if not found
@@ -335,7 +380,7 @@ def list_elem_starting_with(source: list[str | bytes],
     result: str | bytes | None = None
 
     # traverse the source list
-    for elem in source:
+    for elem in _list:
         if elem.startswith(prefix):
             if keep_prefix:
                 result = elem
@@ -346,16 +391,17 @@ def list_elem_starting_with(source: list[str | bytes],
     return result
 
 
-def list_prune_duplicates(target: list,
+def list_prune_duplicates(_list: list,
+                          /,
                           is_sorted: bool = False) -> list:
     """
-    Remove duplicate elements from *target*.
+    Remove duplicate elements from the input list.
 
     The parameter *is_sorted* indicates that *target* is ascendingly or descendingly sorted.
     In both cases, the original order of the elements in *target* is maintained.
     For convenience, the pruned input list is returned.
 
-    :param target: the target list
+    :param _list: the target list
     :param is_sorted: *target* is ascendingly or descendingly sorted
     :return: *target* with its duplicate elements removed
     """
@@ -365,41 +411,42 @@ def list_prune_duplicates(target: list,
     # traverse the list
     if is_sorted:
         # remove duplicates by comparing each element with the last unique one
-        for read_index in range(1, len(target)):
-            if target[read_index] != target[write_index - 1]:
+        for read_index in range(1, len(_list)):
+            if _list[read_index] != _list[write_index - 1]:
                 # add this element to the unique segment in the list
                 if write_index != read_index:
-                    target[write_index] = target[read_index]
+                    _list[write_index] = _list[read_index]
                 write_index += 1
     else:
         # remove duplicates by verifying if each element is in the unique segment in the list
-        for read_index in range(1, len(target)):
-            if target[read_index] not in target[:write_index]:
+        for read_index in range(1, len(_list)):
+            if _list[read_index] not in _list[:write_index]:
                 # add this element to the unique segment in the list
                 if write_index != read_index:
-                    target[write_index] = target[read_index]
+                    _list[write_index] = _list[read_index]
                 write_index += 1
 
     # delete the remaining tail of the list
-    del target[write_index:]
+    del _list[write_index:]
 
     # return the input list for convenience
-    return target
+    return _list
 
 
-def list_prune_in(target: list,
+def list_prune_in(_list: list,
+                  /,
                   ref: list) -> list:
     """
-    Remove from *target* all its elements that are also in *ref*.
+    Remove from the input list all its elements that are also in *ref*.
 
     The pruned input list is returned, for convenience.
 
-    :param target: the target list
+    :param _list: the target list
     :param ref: the reference list
     :return: the target list without the elements also in the reference list
     """
     # initialize the return variable
-    result: list = target
+    result: list = _list
 
     removals: list = [item for item in result if item in ref]
     for item in removals:
@@ -408,19 +455,20 @@ def list_prune_in(target: list,
     return result
 
 
-def list_prune_not_in(target: list,
+def list_prune_not_in(_list: list,
+                      /,
                       ref: list) -> list:
     """
-    Remove from *target* all of its elements that are not also in *ref*.
+    Remove from the input list all of its elements that are not also in *ref*.
 
     The pruned input list is returned, for convenience.
 
-    :param target: the target list
+    :param _list: the input list
     :param ref: the reference list
     :return: the target list without the elements not in the reference list
     """
     # initialize the return variable
-    result: list = target
+    result: list = _list
 
     removals: list = [item for item in result if item not in ref]
     for item in removals:
@@ -429,51 +477,54 @@ def list_prune_not_in(target: list,
     return result
 
 
-def list_is_slice(list_ref: list,
+def list_is_slice(_list: list,
+                  /,
                   list_slice: list) -> bool:
     """
-    Determine whether *list_slice* is a slice of *list_ref*.
+    Determine whether *list_slice* is a slice of the input list.
 
     A list is said to be a slice of another list if the former can be obtained by extracting a contiguous
     portion of the latter. The order, cardinality, and contiguity of the elements are thus relevant.
 
-    :param list_ref: the reference list
+    :param _list: the input list
     :param list_slice: the candidate slice
-    :result: *True* if *list_sub* is a slice of *list_ref*, *False* otherwise
+    :result: *True* if *list_slice* is a slice of the input list, *False* otherwise
     """
     # initialize the return variable
     result: bool = False
 
-    len_ref: int = len(list_ref)
+    len_ref: int = len(_list)
     len_slice: int = len(list_slice)
     if len_ref >= len_slice:
         for i in range(len_ref - len_slice + 1):
             # compare a slice of 'list_ref' with the entire 'list_slice'
-            if list_ref[i:i+len_slice] == list_slice:
+            if _list[i:i + len_slice] == list_slice:
                 result = True
                 break
 
     return result
 
 
-def list_is_sub(list_ref: list,
+def list_is_sub(_list: list,
+                /,
                 list_sub: list) -> bool:
     """
-    Determine whether *list_sub* is a sublist of *list_ref*.
+    Determine whether *list_sub* is a sublist of the input list.
 
     A list is said to be a sublist of another list if all elements contained in the former are also
     contained in the latter. The order and cardinality of the elements are not relevant.
 
-    :param list_ref: the reference list
+    :param _list: the reference list
     :param list_sub: the candidate sublist
-    :result: *True* if *list_sub* is a sublist of *list_ref*, *False* otherwise
+    :result: *True* if *list_sub* is a sublist of the input list, *False* otherwise
     """
-    return all(item in list_ref for item in list_sub)
+    return all(item in _list for item in list_sub)
 
 
-def list_jsonify(source: list) -> list:
+def list_jsonify(_list: list,
+                 /) -> list:
     """
-    Return a new *list* containing the values in *source*, made serializable if necessary.
+    Return a new *list* containing the values in the input list, made serializable if necessary.
 
     Possible transformations:
       - *Enum* is changed to its value or name (as per its class)
@@ -488,23 +539,23 @@ def list_jsonify(source: list) -> list:
     The transformation is recursively carried out, that is, any *dict* or *list* set as a list item
     will be *jsonified* accordingly.
 
-    *HAZARD*: depending on the type of object contained in *source*, the final result may still
+    *HAZARD*: depending on the type of object contained in the input list, the final result may still
     not be fully serializable.
 
-    :param source: the list to be *jsonified*
+    :param _list: the list to be *jsonified*
     :return: a new *jsonified* list
     """
     # initialize the return variable
     result: list = []
 
     # traverse the input list
-    for value in source:
+    for value in _list:
         # recursions
         if isinstance(value, dict):
             from .dict_pomes import dict_jsonify
-            result.append(dict_jsonify(source=value))
+            result.append(dict_jsonify(value))
         elif isinstance(value, list):
-            result.append(list_jsonify(source=value))
+            result.append(list_jsonify(value))
 
         # enums
         elif isinstance(value, Enum):
@@ -525,9 +576,10 @@ def list_jsonify(source: list) -> list:
     return result
 
 
-def list_hexify(source: list) -> list:
+def list_hexify(_list: list,
+                /) -> list:
     """
-    Return a new *list* containing the values in *source* changed to their hexadecimal representations.
+    Return a new *list* containing the values in the input list changed to their hexadecimal representations.
 
     Possible transformations:
       - *str* is changed with *<value>.encode().hex()*
@@ -544,7 +596,7 @@ def list_hexify(source: list) -> list:
     The transformation is recursively carried out, that is, any *dict* or *list* set as a list item
     will be *hexified* accordingly.
 
-    :param source: the list to be *hexified*
+    :param _list: the list to be *hexified*
     :return: a list with *hexified* values
     """
     # needed imports
@@ -554,15 +606,15 @@ def list_hexify(source: list) -> list:
     result: list = []
 
     # traverse the input list
-    for value in source:
+    for value in _list:
         # recursions
         if isinstance(value, dict):
-            dict_hexify(source=value,
+            dict_hexify(value,
                         hexify_keys=False,
                         hexify_values=True)
             result.append(value)
         elif isinstance(value, list):
-            result.append(list_hexify(source=value))
+            result.append(list_hexify(value))
 
         # enums
         elif isinstance(value, Enum):
@@ -585,11 +637,12 @@ def list_hexify(source: list) -> list:
     return result
 
 
-def list_hierarchize(source: list[list | tuple]) -> list:
+def list_hierarchize(_list: list[list | tuple],
+                     /) -> list:
     """
     Hierarchize a fully sorted list of tuples or list of lists by aggregating common values at all levels.
 
-    To illustrate, let us assume *source* is the input list:
+    To illustrate, let us assume the input list is:
     ::
       [
         ('John', 'parent Fred', 'old age', 'indifferent'),
@@ -622,7 +675,7 @@ def list_hierarchize(source: list[list | tuple]) -> list:
       ]
 
     Notes:
-      - the elements in *source* must not contain embedded lists or tuples
+      - the elements in the input list must not contain embedded lists or tuples
       - once an aggregation has been given a value, another aggregation cannot be added to it, such as:
 
         ('John', 'parent Fred', 'poor health', 'dependent'),
@@ -631,7 +684,7 @@ def list_hierarchize(source: list[list | tuple]) -> list:
 
         ('John', 'parent Fred', 'poor health', 'constrained', 'complex'),
 
-    :param source: the fully sorted list of tuples or list of lists to be hierarchized
+    :param _list: the fully sorted list of tuples or list of lists to be hierarchized
     :return: the hierarchized list
 
     """
@@ -659,7 +712,7 @@ def list_hierarchize(source: list[list | tuple]) -> list:
         return result
 
     l_hierarchy: dict = defaultdict(dict)
-    for l_item in source:
+    for l_item in _list:
         add_to_hierarchy(hierarchy=l_hierarchy,
                          keys=l_item[:-1],
                          value=l_item[-1])
@@ -667,27 +720,28 @@ def list_hierarchize(source: list[list | tuple]) -> list:
     return convert_to_list(item=l_hierarchy)
 
 
-def list_stringify(source: list) -> str:
+def list_stringify(_list: list,
+                   /) -> str:
     """
-    Return a string with the items from *source* listed as *[<i1>, ..., <in>]*.
+    Return a string with the items from the input list listed as *[<i1>, ..., <in>]*.
 
     The *stringification* is done recursively, with *dict* and *list* as values handled accordingly.
 
-    :param source: the source *list*
-    :return: the string listing the items in *source*
+    :param _list: the source *list*
+    :return: the string listing the items in the input list
     """
     from .dict_pomes import dict_stringify
 
     # initialize the return variable
     result: str = "["
 
-    if source:
+    if _list:
         # traverse the source 'list'
-        for item in source:
+        for item in _list:
             if isinstance(item, dict):
-                result += f"{dict_stringify(source=item)}"
+                result += f"{dict_stringify(_dict=item)}"
             elif isinstance(item, list):
-                result += f"{list_stringify(source=item)}"
+                result += f"{list_stringify(item)}"
             elif isinstance(item, str):
                 result += f"'{item}'"
             else:

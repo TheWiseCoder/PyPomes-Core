@@ -12,16 +12,17 @@ dict_values = type({}.values())
 dict_items = type({}.items())
 
 
-def dict_has_key(source: dict,
+def dict_has_key(_dict: dict,
+                 /,
                  key_chain: str | list[Any]) -> bool:
     """
-    Indicate the existence of an element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
+    Indicate the existence of an element in the input dict, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
     The path up to he last key in the chain must point to an existing element.
     A given key may indicate the element's position within a *list*, using the format *<key>[<pos>]*.
 
-    :param source: the reference *dict*
+    :param _dict: the reference dict
     :param key_chain: the nested key chain
     :return: whether the element exists
     """
@@ -31,7 +32,7 @@ def dict_has_key(source: dict,
     # unflatten the key chain
     if isinstance(key_chain, str):
         from .list_pomes import list_unflatten
-        key_chain = list_unflatten(source=key_chain)
+        key_chain = list_unflatten(key_chain)
 
     # define the parent element
     parent: dict | None = None
@@ -39,12 +40,12 @@ def dict_has_key(source: dict,
     # does the key chain contain just 1 element ?
     if len(key_chain) == 1:
         # yes, use the provided dict
-        parent = source
+        parent = _dict
 
     # does the key chain contain more than 1 element ?
     elif len(key_chain) > 1:
         # yes, obtain the parent element of the last key in the chain
-        parent = dict_get_value(source=source,
+        parent = dict_get_value(_dict,
                                 key_chain=key_chain[:-1])
 
     # is the parent element a dict ?
@@ -69,21 +70,22 @@ def dict_has_key(source: dict,
     return result
 
 
-def dict_has_value(source: dict,
+def dict_has_value(_dict: dict,
+                   /,
                    value: Any) -> Any:
     """
-    Indicate the existence in *source*, of a key/value pair with *value* as its value.
+    Indicate the existence in the input dict, of a key/value pair with *value* as its value.
 
     No recursion is attempted; only the first-level attributes in *source* are inspected.
 
-    :param source: the reference *dict*
+    :param _dict: the reference dict
     :param value: the reference value
     :return: *True* if *value* exists in *source*, or *False* otherwise
     """
     # initialize the return variable
     result: bool = False
 
-    for _, val in (source or {}).items():
+    for _, val in (_dict or {}).items():
         if val == value:
             result = True
             break
@@ -91,10 +93,11 @@ def dict_has_value(source: dict,
     return result
 
 
-def dict_get_value(source: dict,
+def dict_get_value(_dict: dict,
+                   /,
                    key_chain: str | list[Any]) -> Any:
     """
-    Obtain the value of the element in *source*, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
+    Obtain the value of the element in the input dict, pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
 
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
     The path up to the last key in the chain must point to an existing element.
@@ -104,17 +107,17 @@ def dict_get_value(source: dict,
     since that element might exist therein with the value *None*. To determine whether this is the case,
     use the operation *dict_has_key()*.
 
-    :param source: the reference *dict*
+    :param _dict: the reference dict
     :param key_chain: the key chain
     :return: the value obtained
     """
     # initialize the return variable
-    result: Any = source
+    result: Any = _dict
 
     # unflatten the key chain
     if isinstance(key_chain, str):
         from .list_pomes import list_unflatten
-        key_chain = list_unflatten(source=key_chain)
+        key_chain = list_unflatten(key_chain)
 
     # traverse the keys in the chain
     for key in key_chain:
@@ -147,7 +150,8 @@ def dict_get_value(source: dict,
     return result
 
 
-def dict_set_value(target: dict,
+def dict_set_value(_dict: dict,
+                   /,
                    key_chain: str | list[Any],
                    value: Any) -> dict:
     """
@@ -159,9 +163,9 @@ def dict_set_value(target: dict,
     Any non-existing intermediate elements are created with the value of an empty *dict*.
     A key might indicate the position of the element within a list, using the format *<key>[<pos>]*.
     In such a case, that element must exist.
-    For convenience, the modified *target* itself is returned.
+    For convenience, the modified input dict itself is returned.
 
-    :param target: the reference *dict*
+    :param _dict: the reference dict
     :param key_chain: the key chain
     :param value: the value to be assigned
     :return: the modified input *dict*
@@ -169,9 +173,9 @@ def dict_set_value(target: dict,
     # unflatten the key chain
     if isinstance(key_chain, str):
         from .list_pomes import list_unflatten
-        key_chain = list_unflatten(source=key_chain)
+        key_chain = list_unflatten(key_chain)
 
-    dict_item: Any = target
+    dict_item: Any = _dict
     # traverse the chain, up to end including its penultimate element
     for key in (key_chain[:-1] or []):
 
@@ -218,13 +222,14 @@ def dict_set_value(target: dict,
             # no, assign 'value' to the element 'key' in the dictionary
             dict_item[key] = value
 
-    return target
+    return _dict
 
 
-def dict_pop(target: dict,
+def dict_pop(_dict: dict,
+             /,
              key_chain: str | list[Any]) -> Any:
     """
-    Remove the element in *source* pointed to by *key_chain*, and return its value.
+    Remove the element in the input dict pointed to by *key_chain*, and return its value.
 
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
     The path up to the last key in the chain must point to an existing element.
@@ -235,7 +240,7 @@ def dict_pop(target: dict,
     since that element might exist therein with the value *None*. To determine whether this is the case,
     use the operation *dict_has_key()*.
 
-    :param target: the reference *dict*
+    :param _dict: the reference dict
     :param key_chain: the key chain
     :return: the value removed, or *None* if not found
     """
@@ -245,7 +250,7 @@ def dict_pop(target: dict,
     # unflatten the key chain
     if isinstance(key_chain, str):
         from .list_pomes import list_unflatten
-        key_chain = list_unflatten(source=key_chain)
+        key_chain = list_unflatten(key_chain)
 
     # obtain the element pointed to by the las key in the chain
     parent: dict | None = None
@@ -253,12 +258,12 @@ def dict_pop(target: dict,
     # does the key chain contain just 1 element ?
     if len(key_chain) == 1:
         # yes, use the provided dict
-        parent = target
+        parent = _dict
 
     # does the key chain contain more than 1 element ?
     elif len(key_chain) > 1:
         # yes, retrieve the parent element of the last key in the chain
-        parent = dict_get_value(source=target,
+        parent = dict_get_value(_dict,
                                 key_chain=key_chain[:-1])
 
     # is the parent element a dict ?
@@ -287,38 +292,40 @@ def dict_pop(target: dict,
     return result
 
 
-def dict_pop_all(target: dict,
+def dict_pop_all(_dict: dict,
+                 /,
                  key: Any) -> dict:
     """
-    Remove all elements in *source* associated with *key*, at all levels.
+    Remove all elements in the input dict associated with *key*, at all levels.
 
-    Values of type *dict* found while traversing *target* are recursively processed for removal.
-    For convenience the, possibly modified, input dict *target* is returned.
+    Values of type *dict* found while traversing the input dict are recursively processed for removal.
+    For convenience the, possibly modified, input dict is returned.
 
-    :param target: the reference *dict*
+    :param _dict: the reference dict
     :param key: the key chain
     :return: the modified input *dict*
     """
     # traverse the input dictionary
-    for k, v in target.copy().items():
+    for k, v in _dict.copy().items():
         if k == key:
-            target.pop(k)
+            _dict.pop(k)
         elif v and isinstance(v, dict):
             # 'v' is a nonempty 'dict'
-            target[k] = dict_pop_all(target=v,
-                                     key=key)
-    return target
+            _dict[k] = dict_pop_all(v,
+                                    key=key)
+    return _dict
 
 
-def dict_replace_value(target: dict,
+def dict_replace_value(_dict: dict,
+                       /,
                        old_value: Any,
                        new_value: Any) -> dict:
     """
-    Replace, in *target*, all occurrences of *old_value* with *new_value*.
+    Replace, in the input dict, all occurrences of *old_value* with *new_value*.
 
-    For convenience, the modified *target* itself is returned.
+    For convenience, the modified input dict itself is returned.
 
-    :param target: the reference *dict*
+    :param _dict: the reference dict
     :param old_value: the value to be replaced
     :param new_value: the new value
     :return: the modified input *dict*
@@ -331,7 +338,7 @@ def dict_replace_value(target: dict,
             # is 'item' a dict ?
             if isinstance(item, dict):
                 # yes, process it recursively
-                dict_replace_value(target=item,
+                dict_replace_value(item,
                                    old_value=old_val,
                                    new_value=new_val)
             # is 'item' a list ?
@@ -341,17 +348,17 @@ def dict_replace_value(target: dict,
                                    old_val=old_val,
                                    new_val=new_val)
     # traverse the dict
-    for curr_key, curr_value in target.items():
+    for curr_key, curr_value in _dict.items():
 
         # is 'curr_value' the value to be replaced ?
         if curr_value == old_value:
             # yes, replace it
-            target[curr_key] = new_value
+            _dict[curr_key] = new_value
 
         # is 'curr_value' a dict ?
         elif isinstance(curr_value, dict):
             # yes, process it recursively
-            dict_replace_value(target=curr_value,
+            dict_replace_value(curr_value,
                                old_value=old_value,
                                new_value=new_value)
 
@@ -361,38 +368,40 @@ def dict_replace_value(target: dict,
             list_replace_value(items=curr_value,
                                old_val=old_value,
                                new_val=new_value)
-    return target
+    return _dict
 
 
-def dict_unique_values(source: dict) -> list:
+def dict_unique_values(_dict: dict,
+                       /) -> list:
     """
-    Return a list with the values in *source*, pruned of duplicates.
+    Return a list with the values in the input dict, pruned of duplicates.
 
-    The elements in the returned list maintain the original insertion order in *source*.
+    The elements in the returned list maintain the original insertion order in the input string.
 
-    :param source: the dict to retrieve the values from
-    :return: list the values in the source *dict*, pruned of duplicated
+    :param _dict: the dict to retrieve the values from
+    :return: list the values in the source input dict, pruned of duplicated
     """
     # a 'dict' maintains the insertion order of its elements
-    uniques: dict[Any, None] = dict.fromkeys(source.values())
+    uniques: dict[Any, None] = dict.fromkeys(_dict.values())
     return list(uniques.keys())
 
 
-def dict_get_key(source: dict,
+def dict_get_key(_dict: dict,
+                 /,
                  value: Any) -> Any:
     """
-    Return the key in *source*, mapping the first occurrence of *value* found.
+    Return the key in the input dict, mapping the first occurrence of *value* found.
 
-    No recursion is attempted; only the first-level attributes in *source* are inspected.
+    No recursion is attempted; only the first-level attributes in the input dict are inspected.
 
-    :param source: dict to search
+    :param _dict: dict to search
     :param value: the reference value
     :return: first key mapping the reference value, or *None* if a mapping is not found
     """
     # initialize the return variable
     result: Any = None
 
-    for key, val in (source or {}).items():
+    for key, val in (_dict or {}).items():
         if val == value:
             result = key
             break
@@ -400,60 +409,62 @@ def dict_get_key(source: dict,
     return result
 
 
-def dict_get_keys(source: dict,
+def dict_get_keys(_dict: dict,
+                  /,
                   value: Any) -> list[Any]:
     """
-    Return all keys in *source*, mapping the value *value*.
+    Return all keys in the input dict, mapping the value *value*.
 
     The search is done recursively. Note that *dict*s in *list*s are not searched.
     The order of the keys returned should not be taken as relevant.
     Return *[]* if no key is found.
 
-    :param source: dict to search
+    :param _dict: dict to search
     :param value: the reference value
     :return: list containing all keys mapping the reference value (might be empty)
     """
     # initialize the return variable
     result: list[str] = []
 
-    for item_key, item_value in (source or {}).items():
+    for item_key, item_value in (_dict or {}).items():
         if item_value == value:
             result.append(item_key)
         elif isinstance(item_value, dict):
-            result.extend(dict_get_keys(source=item_value,
+            result.extend(dict_get_keys(item_value,
                                         value=value))
     return result
 
 
-def dict_merge(target: dict,
+def dict_merge(_dict: dict,
+               /,
                source: dict) -> dict:
     """
-    Traverse the elements in *source* to update *target*, according to the criteria presented herein.
+    Traverse the elements in the input dict to update the input dict, according to the criteria presented herein.
 
     The criteria to be followed are:
-      - add the element to *target*, if it does not exist
-      - if the element exists in *target*:
+      - add the element to the input dict, if it does not exist
+      - if the element exists in the input dict:
         - recursively process both elements, if both are type *dict*
         - add the missing items, if both are type *list*
-        - replace the element in *target* if it is a different type, ou if both elements are not of the same type
-    For convenience, the modified *target* itself is returned.
+        - replace the element in the input dict if it is a different type, ou if both elements are not of the same type
+    For convenience, the modified input dict itself is returned.
 
-    :param target: the dictionary to be updated
+    :param _dict: the dictionary to be updated
     :param source: the dictionary with the new elements
-    :return: the modified target *dict*
+    :return: the modified input dict
     """
     # traverse the dictionary with the new elements
     for skey, svalue in (source or {}).items():
 
         # is the item in target ?
-        if skey in target:
+        if skey in _dict:
             # yes, proceed
-            tvalue: Any = target.get(skey)
+            tvalue: Any = _dict.get(skey)
 
             # are both elements dictionaries  ?
             if isinstance(svalue, dict) and isinstance(tvalue, dict):
                 # yes, recursively process them
-                dict_merge(target=tvalue,
+                dict_merge(tvalue,
                            source=svalue)
 
             # are both elements lists ?
@@ -464,59 +475,61 @@ def dict_merge(target: dict,
                         tvalue.append(item)
             else:
                 # both elements are not lists or dictionaries, replace the value in target
-                target[skey] = svalue
+                _dict[skey] = svalue
         else:
             # the item is not in target, add it
-            target[skey] = svalue
+            _dict[skey] = svalue
 
-    return target
+    return _dict
 
 
-def dict_move(target: dict,
+def dict_move(_dict: dict,
+              /,
               from_key_chain: str | list[Any],
               to_key_chain: str | list[Any]) -> dict:
     """
     Move the subtree pointed to by *from_key_chain* to the location specified in *to_key_chain*.
 
     Both key chains may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
-    For convenience, the modified *target* itself is returned.
+    For convenience, the modified input string itself is returned.
 
-    :param target: the *dict* to be modified
+    :param _dict: the *dict* to be modified
     :param from_key_chain: the origin chain of nested keys
     :param to_key_chain: the destination chain of nested keys
-    :return: the modified input *dict*
+    :return: the modified input dict
     """
-    if dict_has_key(source=target,
+    if dict_has_key(_dict,
                     key_chain=from_key_chain):
-        value: Any = dict_pop(target=target,
+        value: Any = dict_pop(_dict,
                               key_chain=from_key_chain)
-        dict_set_value(target=target,
+        dict_set_value(_dict,
                        key_chain=to_key_chain,
                        value=value)
-    return target
+    return _dict
 
 
-def dict_coalesce(target: dict,
+def dict_coalesce(_dict: dict,
+                  /,
                   key_chain: str | list[Any]) -> dict:
     """
-    Coalesce the element of type *list* in *target* at the level *n* with the list at the level immediately above.
+    Coalesce the element of type *list* in the input dict at the level *n* with the list at the level immediately above.
 
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
     This element is pointed to by the key chain *[keys[0]: ... :keys[n]*, and is processed as a sequence
     of multiple elements. The two last keys in *key_chain* must be associated with values of type *list*.
-    For convenience, the modified *target* itself is returned.
+    For convenience, the modified input string itself is returned.
 
-    :param target: the *dict* to be coalesced
+    :param _dict: the *dict* to be coalesced
     :param key_chain: the chain of nested keys
-    :return: the modified input *dict*
+    :return: the modified input dict
     """
     # unflatten the key chain
     if isinstance(key_chain, str):
         from .list_pomes import list_unflatten
-        key_chain = list_unflatten(source=key_chain)
+        key_chain = list_unflatten(key_chain)
 
     # traverse the kay chain up to its penultimate element
-    curr_dict: dict | None = target
+    curr_dict: dict | None = _dict
     # 'key_chain[:-2]' returns an empy list if it has less the 3 elements
     for inx, key in enumerate(key_chain[:-2]):
 
@@ -533,7 +546,7 @@ def dict_coalesce(target: dict,
                 # is 'in_dict' a dictionary ?
                 if isinstance(in_dict, dict):
                     # yes, recursively coalesce it
-                    dict_coalesce(target=in_dict,
+                    dict_coalesce(in_dict,
                                   key_chain=key_chain[inx + 1:])
             # finalize the operation
             curr_dict = None
@@ -596,28 +609,29 @@ def dict_coalesce(target: dict,
         # replace the original list with the coalesced new list
         curr_dict[key_chain[-2]] = penultimate_list
 
-    return target
+    return _dict
 
 
-def dict_reduce(target: dict,
+def dict_reduce(_dict: dict,
+                /,
                 key_chain: str | list[Any]) -> dict:
     """
-    Relocate the elements from *target* at level *n*, to the level immediately above.
+    Relocate the elements from the input dict at level *n*, to the level immediately above.
 
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
     These elements are pointed to by the nested key chain *[keys[0]: ... :keys[n]*.
-    The element at level *n* is removed at the end. For convenience, the modified *target* itself is returned.
+    The element at level *n* is removed at the end. For convenience, the modified input string itself is returned.
 
-    :param target: the *dict* to be reduced
+    :param _dict: the *dict* to be reduced
     :param key_chain: the key chain
-    :return: the modified input *dict*
+    :return: the modified input dict
     """
     # unflatten the key chain
     if isinstance(key_chain, str):
         from .list_pomes import list_unflatten
-        key_chain = list_unflatten(source=key_chain)
+        key_chain = list_unflatten(key_chain)
 
-    curr_dict: dict | None = target
+    curr_dict: dict | None = _dict
     # traverse the chain up to its penultimate key
     for inx, key in enumerate(key_chain[:-1]):
 
@@ -634,7 +648,7 @@ def dict_reduce(target: dict,
                 # Is the list item a dictionary ?
                 if isinstance(in_dict, dict):
                     # sim, recursively reduce it
-                    dict_reduce(target=in_dict,
+                    dict_reduce(in_dict,
                                 key_chain=key_chain[inx + 1:])
             # terminate the operation
             curr_dict = None
@@ -652,18 +666,19 @@ def dict_reduce(target: dict,
         for key, value in last.items():
             curr_dict[key] = value
 
-    return target
+    return _dict
 
 
-def dict_from_list(source: list[dict],
+def dict_from_list(_indata: list[dict],
+                   /,
                    key_chain: str | list[Any],
                    value: Any) -> dict | None:
     """
-    Locate in *source*, and return, the element of type *dict* having the attribute *key_chain* with value *value*.
+    Locate in the input data the element of type *dict* having the attribute *key_chain* with value *value*.
 
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
 
-    :param source: the list to be inspected
+    :param _indata: the list to be inspected
     :param key_chain: the key chain used in the search process
     :param value: the value of the element pointed to by the key chain
     :return: the *dict* wanted, or *None* if not found
@@ -671,9 +686,9 @@ def dict_from_list(source: list[dict],
     # initialize the return variable
     result: dict | None = None
 
-    for item in source:
+    for item in _indata:
         if isinstance(item, dict) and \
-           value == dict_get_value(source=item,
+           value == dict_get_value(item,
                                    key_chain=key_chain):
             result = item
             break
@@ -681,22 +696,23 @@ def dict_from_list(source: list[dict],
     return result
 
 
-def dict_from_object(source: object) -> dict:
+def dict_from_object(_indata: object,
+                     /) -> dict:
     """
-    Create a *dict* and populate it with the attributes in *source* containing non-None values.
+    Create a *dict* and populate it with the attributes in the input data containing non-None values.
 
-    The input *source* might be any *object*, specially those decorated with *@dataclass*.
+    The input data might be any *object*, specially those decorated with *@dataclass*.
 
-    :param source: the reference object
+    :param _indata: the reference object
     :return: *dict* structurally similar to the reference object
     """
     # initialize the return variable
     result: dict = {}
 
     # obtain the object's source module
-    source_module: types.ModuleType = inspect.getmodule(object=source)
+    source_module: types.ModuleType = inspect.getmodule(object=_indata)
     # obtain the source module's dictionary
-    source_dict: dict = source.__dict__
+    source_dict: dict = _indata.__dict__
     # traverse it
     for key, value in source_dict.items():
         # is 'value' None or an empty list ?
@@ -712,7 +728,7 @@ def dict_from_object(source: object) -> dict:
                     # is 'list_item' an object of the same module ?
                     if source_module == inspect.getmodule(object=list_item):
                         # yes, proceed recursively
-                        result[name].append(dict_from_object(source=list_item))
+                        result[name].append(dict_from_object(list_item))
                     else:
                         # no, proceed linearly
                         result[name].append(list_item)
@@ -720,7 +736,7 @@ def dict_from_object(source: object) -> dict:
             # is 'value' an object of the same module ?
             elif source_module == inspect.getmodule(object=value):
                 # yes, proceed recursively
-                result[name] = dict_from_object(source=value)
+                result[name] = dict_from_object(value)
             else:
                 # no, proceed linearly
                 result[name] = value
@@ -728,7 +744,8 @@ def dict_from_object(source: object) -> dict:
     return result
 
 
-def dict_transform(source: dict,
+def dict_transform(_dict: dict,
+                   /,
                    from_to_keys: list[tuple[str, Any]],
                    prefix_from: str = None,
                    prefix_to: str = None,
@@ -738,7 +755,7 @@ def dict_transform(source: dict,
 
     This dictionary is constructed by creating, for each element of the list of tuples in
     *from_to_keys*, the element indicated by the second term of the tuple, assigning to it
-    the value of the *source* element indicated by the first term of the tuple. Both terms
+    the value of the the input dict element indicated by the first term of the tuple. Both terms
     of the tuples are represented by a chain of nested keys.
 
     For existing *dict* values, *dict_transform()* is recursively invoked. Fo existing *list* values,
@@ -746,15 +763,15 @@ def dict_transform(source: dict,
 
     If defined, the prefixes *prefix_from* and *prefix_to*, respectively for the source and
     destination keys, have different treatments: *prefix-from* is added when searching
-    for values in *source*, and *prefix-to* is removed when assigning values to the return *dict*.
-    If *add_missing* is *True*, the entries in *source* whose keys are missing in *from_to_keys*
+    for values in the input dict, and *prefix-to* is removed when assigning values to the return *dict*.
+    If *add_missing* is *True*, the entries in the input dict whose keys are missing in *from_to_keys*
     are added to the new *dict*.
 
-    :param source: the source *dict* for the transformation
+    :param _dict: the source *dict* for the transformation
     :param from_to_keys: the list of tuples containing the source and destination key sequences
     :param prefix_from: prefix to be added to source keys
     :param prefix_to: prefix to be removed from target keys
-    :param add_missing: whether to add entries in *source* missing in *from_to_keys* (defaults to *False*)
+    :param add_missing: whether to add entries in the input dict missing in *from_to_keys* (defaults to *False*)
     :return: the new *dict*
     """
     # import the needed functions
@@ -764,7 +781,7 @@ def dict_transform(source: dict,
     result: dict = {}
 
     # traverse the source dictionary
-    for key, value in source.items():
+    for key, value in _dict.items():
 
         # define the source key chain
         if prefix_from:
@@ -782,14 +799,14 @@ def dict_transform(source: dict,
             # yes, get the target value
             if isinstance(value, dict):
                 # 'value' is a dictionary, transform it
-                to_value: dict = dict_transform(source=value,
+                to_value: dict = dict_transform(value,
                                                 from_to_keys=from_to_keys,
                                                 prefix_from=from_keys,
                                                 prefix_to=to_keys,
                                                 add_missing=add_missing)
             elif isinstance(value, list):
                 # 'value' is a list, transform it
-                to_value: list = list_transform(source=value,
+                to_value: list = list_transform(value,
                                                 from_to_keys=from_to_keys,
                                                 prefix_from=from_keys,
                                                 prefix_to=to_keys,
@@ -802,16 +819,17 @@ def dict_transform(source: dict,
             if prefix_to and to_keys.startswith(prefix_to):
                 # yes, remove the prefix
                 to_keys = to_keys[len(prefix_to)+1:]
-            to_keys_deep: list[str] = list_unflatten(source=to_keys)
+            to_keys_deep: list[str] = list_unflatten(to_keys)
 
             # assign the transformed value to the result
-            dict_set_value(target=result,
+            dict_set_value(result,
                            key_chain=to_keys_deep,
                            value=to_value)
     return result
 
 
-def dict_clone(source: dict,
+def dict_clone(_dict: dict,
+               /,
                from_to_keys: list[tuple[Any, Any] | Any],
                omit_missing: bool = True) -> dict:
     """
@@ -819,13 +837,13 @@ def dict_clone(source: dict,
 
     This dictionary is constructed by creating a new element for each element in the list
     *from_to_keys*. When the element of this list is a tuple, the name indicated by its
-    second term is used, and the value of the *source* element indicated by the tuple's
+    second term is used, and the value of the the input dict element indicated by the tuple's
     first term is assigned. This first term can be represented by a chain of  nested keys.
     The name of the element to be created can be omitted, in which case the name of the term
     indicative of the value to be assigned is used. If the corresponding value is not found
-    in *source*, *None* is assigned.
+    in the input dict, *None* is assigned.
 
-    :param source: the source *dict*
+    :param _dict: the source *dict*
     :param from_to_keys: list of elements indicative of the source and target keys
     :param omit_missing: omit the elements not found in the source *dict* (defaults to *True*)
     :return: the new *dict*
@@ -837,27 +855,28 @@ def dict_clone(source: dict,
     for elem in from_to_keys:
         from_key: str = elem[0] if isinstance(elem, tuple) else elem
         to_key: str = (elem[1] if isinstance(elem, tuple) and len(elem) > 1 else None) or from_key
-        has_key: bool = dict_has_key(source=source,
+        has_key: bool = dict_has_key(_dict,
                                      key_chain=from_key)
         if has_key or not omit_missing:
-            value: Any = dict_get_value(source=source,
+            value: Any = dict_get_value(_dict,
                                         key_chain=from_key)
             result[to_key] = value
 
     return result
 
 
-def dict_listify(target: dict,
+def dict_listify(_dict: dict,
+                 /,
                  key_chain: str | list[Any]) -> dict:
     """
-    Insert the value of the item pointed to by the key chain *[keys[0]: ... :keys[n]* in a list.
+    Insert the value of the item in the input dict pointed to by the key chain *[keys[0]: ... :keys[n]* in a list.
 
     The key chain may be provided in flat (*key1.key2...keyN*) or list (*[key1, key2, ..., keyN]*) format.
     This insertion will happen only if such a value is not itself a list.
     All lists eventually found, up to the penultimate key in the chain, will be processed recursively.
-    For convenience, the modified *target* itself is returned.
+    For convenience, the modified input string itself is returned.
 
-    :param target: the dictionary to be modified
+    :param _dict: the dictionary to be modified
     :param key_chain: the chain of nested keys pointing to the item in question
     :return: the modified input *dict*
     """
@@ -868,7 +887,7 @@ def dict_listify(target: dict,
             # is the element a dictionary ?
             if isinstance(in_target, dict):
                 # yes, process it
-                dict_listify(target=in_target,
+                dict_listify(in_target,
                              key_chain=in_keys)
             # is the element a list ?
             elif isinstance(in_target, list):
@@ -880,10 +899,10 @@ def dict_listify(target: dict,
     # unflatten the key chain
     if isinstance(key_chain, str):
         from .list_pomes import list_unflatten
-        key_chain = list_unflatten(source=key_chain)
+        key_chain = list_unflatten(key_chain)
 
     # traverse the chain up to its penultimate key
-    parent: Any = target
+    parent: Any = _dict
     for inx, key in enumerate(key_chain[:-1]):
         parent = parent.get(key)
         if isinstance(parent, list):
@@ -903,16 +922,17 @@ def dict_listify(target: dict,
             item: Any = parent.pop(key)
             parent[key] = [item]
 
-    return target
+    return _dict
 
 
-def dict_jsonify(source: dict,
+def dict_jsonify(_dict: dict,
+                 /,
                  jsonify_keys: bool = True,
                  jsonify_values: bool = True) -> dict:
     """
-    Convert the *(key, value)* pairs in *source* into values that can be serialized to JSON, thus avoiding *TypeError*.
+    Convert the *(key, value)* pairs in the input dict into values that can be serialized to JSON.
 
-    The parameters *jsonify_keys* and *jsonify_values* specify whether keys and values in *source* should be
+    The parameters *jsonify_keys* and *jsonify_values* specify whether keys and values in the input dict should be
     *jsonified*, respectively. No action is taken if both *jsonify_keys* and *jsonify_values* are set to *None*.
 
     Possible transformations of keys and values:
@@ -926,39 +946,39 @@ def dict_jsonify(source: dict,
 
     Note that retrieving the original values through a reversal of this process is not deterministic.
     The transformation is recursively carried out, that is, any *dict* or *list* set as value will be
-    *jsonified* accordingly. For convenience, the modified *source* itself is returned.
+    *jsonified* accordingly. For convenience, the modified input dict itself is returned.
 
-    *HAZARD*: depending on the type of object contained in *source*, the final result may still
+    *HAZARD*: depending on the type of object contained in the input dict, the final result may still
     not be fully serializable.
 
-    :param source: the dict to be made serializable
-    :param jsonify_keys: whether the keys in *source* should be *jsonified* (defaults to *True*)
-    :param jsonify_values: whether the values in *source* should be *jsonified* (defaults to *True*)
+    :param _dict: the dict to be made serializable
+    :param jsonify_keys: whether the keys in the input dict should be *jsonified* (defaults to *True*)
+    :param jsonify_values: whether the values in the input dict should be *jsonified* (defaults to *True*)
     :return: the modified input *dict*
     """
     # traverse the input 'dict'
     keys: list[Any] = []
-    for key, value in source.items():
+    for key, value in _dict.items():
 
         # values transformations
         if jsonify_values:
             if isinstance(value, Enum):
-                source[key] = value.value
+                _dict[key] = value.value
             elif isinstance(value, bytes | bytearray):
-                source[key] = str(value)
+                _dict[key] = str(value)
             elif isinstance(value, date):
-                source[key] = value.isoformat()
+                _dict[key] = value.isoformat()
             elif isinstance(value, Decimal):
-                source[key] = float(value)
+                _dict[key] = float(value)
             elif isinstance(value, Path):
-                source[key] = value.as_posix()
+                _dict[key] = value.as_posix()
             elif isinstance(value, dict):
-                dict_jsonify(source=value,
+                dict_jsonify(value,
                              jsonify_keys=jsonify_keys,
                              jsonify_values=jsonify_values)
             elif isinstance(value, list):
                 from .list_pomes import list_jsonify
-                source[key] = list_jsonify(source=value)
+                _dict[key] = list_jsonify(value)
         # mark for key transformation
         if jsonify_keys and \
                 isinstance(key, Enum | Path | bytes | bytearray | date):
@@ -967,22 +987,23 @@ def dict_jsonify(source: dict,
     # transform the keys
     for key in keys:
         if isinstance(key, Enum):
-            source[key.value] = source.pop(key)
+            _dict[key.value] = _dict.pop(key)
         elif isinstance(key, bytes | bytearray):
-            source[str(key)] = source.pop(key)
+            _dict[str(key)] = _dict.pop(key)
         elif isinstance(key, date):
-            source[key.isoformat()] = source.pop(key)
+            _dict[key.isoformat()] = _dict.pop(key)
         elif isinstance(key, Path):
-            source[key.as_posix()] = source.pop(key)
+            _dict[key.as_posix()] = _dict.pop(key)
 
-    return source
+    return _dict
 
 
-def dict_hexify(source: dict,
+def dict_hexify(_dict: dict,
+                /,
                 hexify_keys: bool = False,
                 hexify_values: bool = True) -> dict:
     """
-    Convert the *[key, value]* pairs in *source* to their hexadecimal representantions.
+    Convert the *[key, value]* pairs in the input dict to their hexadecimal representantions.
 
     The parameters *hexify_keys* and *hexify_values* specify whether keys and values are to be *hexified*,
     respectively. It is expected that either *hexify_keys* or *hexify_values*, or both, is set to *True*.
@@ -1000,11 +1021,11 @@ def dict_hexify(source: dict,
 
     Note that retrieving the original values through a reversal of this process is not deterministic.
     The transformation is recursively carried out, that is, any *dict* or *list* set as value will be
-    *hexified* accordingly. For convenience, the modified *source* itself is returned.
+    *hexified* accordingly. For convenience, the modified input dict itself is returned.
 
-    :param source: the dict to be made serializable
-    :param hexify_keys: whether the keys in *source* should be *hexified* (defaults to *False*)
-    :param hexify_values: whether the values in *source* should be *hexified* (defaults to *True*)
+    :param _dict: the dict to be made serializable
+    :param hexify_keys: whether the keys in the input dict should be *hexified* (defaults to *False*)
+    :param hexify_values: whether the values in the input dict should be *hexified* (defaults to *True*)
     :return: the modified input *dict*
     """
     # needed imports
@@ -1012,17 +1033,17 @@ def dict_hexify(source: dict,
 
     # traverse the input 'dict'
     keys: list[Any] = []
-    for key, value in source.items():
+    for key, value in _dict.items():
 
         # values transformations
         if hexify_values:
             # recursions
             if isinstance(value, dict):
-                dict_hexify(source=value,
+                dict_hexify(value,
                             hexify_keys=hexify_keys,
                             hexify_values=hexify_values)
             elif isinstance(value, list):
-                source[key] = list_hexify(source=value)
+                _dict[key] = list_hexify(value)
 
             # enums
             if isinstance(value, Enum):
@@ -1030,15 +1051,15 @@ def dict_hexify(source: dict,
 
             # scalars
             if isinstance(value, str):
-                source[key] = value.encode().hex()
+                _dict[key] = value.encode().hex()
             elif isinstance(value, int):
-                source[key] = float(value).hex()
+                _dict[key] = float(value).hex()
             elif isinstance(value, float | bytes | bytearray):
-                source[key] = value.hex()
+                _dict[key] = value.hex()
             elif isinstance(value, Path):
-                source[key] = value.as_posix().encode().hex()
+                _dict[key] = value.as_posix().encode().hex()
             elif isinstance(value, date):
-                source[key] = value.isoformat().encode().hex()
+                _dict[key] = value.isoformat().encode().hex()
 
         # key transformations
         if hexify_keys and \
@@ -1053,40 +1074,40 @@ def dict_hexify(source: dict,
 
         # scalars
         if isinstance(key, str):
-            source[key.encode().hex()] = source.pop(key)
+            _dict[key.encode().hex()] = _dict.pop(key)
         elif isinstance(key, int):
-            source[float(key).hex()] = source.pop(key)
+            _dict[float(key).hex()] = _dict.pop(key)
         elif isinstance(key, float | bytes | bytearray):
-            source[key.hex()] = source.pop(key)
+            _dict[key.hex()] = _dict.pop(key)
         elif isinstance(key, Path):
-            source[key.as_posix().encode().hex()] = source.pop(key)
+            _dict[key.as_posix().encode().hex()] = _dict.pop(key)
         elif isinstance(key, date):
-            source[key.isoformat().encode().hex()] = source.pop(key)
+            _dict[key.isoformat().encode().hex()] = _dict.pop(key)
 
-    return source
+    return _dict
 
 
-def dict_stringify(source: dict) -> str:
+def dict_stringify(_dict: dict) -> str:
     """
-    Return a string with the key-value pairs from *source* listed as *{<k1> = <v1>, ..., <kn> = <vn>}*.
+    Return a string with the key-value pairs from the input dict listed as *{<k1> = <v1>, ..., <kn> = <vn>}*.
 
     The *stringification* is done recursively, with *dict* and *list* as values handled accordingly.
 
-    :param source: the source *dict*
-    :return: the string listing the *key-value* pairs in *source*
+    :param _dict: the source *dict*
+    :return: the string listing the *key-value* pairs in the input dict
     """
     from .list_pomes import list_stringify
     # initialize the return variable
     result: str = "{"
 
-    if source:
+    if _dict:
         # traverse the source 'dict'
-        for key, value in source.items():
+        for key, value in _dict.items():
             result += f"{key} = "
             if isinstance(value, dict):
-                result += f"{dict_stringify(source=value)}"
+                result += f"{dict_stringify(_dict=value)}"
             elif isinstance(value, list):
-                result += f"{list_stringify(source=value)}"
+                result += f"{list_stringify(value)}"
             elif isinstance(value, str):
                 result += f"'{value}'"
             else:

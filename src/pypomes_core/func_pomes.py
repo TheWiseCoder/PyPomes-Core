@@ -13,7 +13,8 @@ func_defaulted_params: ContextVar[list[str]] = ContextVar("defaulted_params")
 func_specified_params: ContextVar[list[str]] = ContextVar("specified_params")
 
 
-def func_capture_args(func: Callable) -> Callable:
+def func_capture_args(_func: Callable,
+                      /) -> Callable:
     """
     Create a decorator to identify arguments in a function which were defaulted, and which were explicitly passed.
 
@@ -27,14 +28,14 @@ def func_capture_args(func: Callable) -> Callable:
     of the caller. This is why constructs like *frame.f_locals*, *args_info*, and even *Signature.bind_partial()*
     all fall short.
 
-    :param func: the function being decorated
+    :param _func: the function being decorated
     :return: the return from the call to *func*
     """
-    @wraps(func)
+    @wraps(_func)
     # ruff: noqa: ANN003 - Missing type annotation for *{name}
     def wrapper(*args, **kwargs) -> Any:
 
-        sig = inspect.signature(func)
+        sig = inspect.signature(_func)
 
         # bind only explicitly passed arguments
         bound_explicit = sig.bind(*args, **kwargs)
@@ -65,15 +66,16 @@ def func_capture_args(func: Callable) -> Callable:
         func_defaulted_args.set(used_defaults)
 
         # proceed executing the decorated function
-        return func(*args, **kwargs)
+        return _func(*args, **kwargs)
 
     # prevent a rogue error ("View function mapping is overwriting an existing endpoint function")
-    wrapper.__name__ = func.__name__
+    wrapper.__name__ = _func.__name__
 
     return wrapper
 
 
-def func_capture_params(func: Callable) -> Callable:
+def func_capture_params(_func: Callable,
+                        /) -> Callable:
     """
     Create a decorator to identify parameters in a function which were defaulted, and which were explicitly passed.
 
@@ -87,14 +89,14 @@ def func_capture_params(func: Callable) -> Callable:
     of the caller. This is why constructs like *frame.f_locals*, *args_info*, and even *Signature.bind_partial()*
     all fall short.
 
-    :param func: the function being decorated
+    :param _func: the function being decorated
     :return: the return from the call to *func*
     """
-    @wraps(func)
+    @wraps(_func)
     # ruff: noqa: ANN003 - Missing type annotation for *{name}
     def wrapper(*args, **kwargs) -> Any:
 
-        sig = inspect.signature(func)
+        sig = inspect.signature(_func)
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
 
@@ -115,9 +117,9 @@ def func_capture_params(func: Callable) -> Callable:
         func_defaulted_params.set(list(used_defaults))
 
         # proceed executing the decorated function
-        return func(*args, **kwargs)
+        return _func(*args, **kwargs)
 
     # prevent a rogue error ("View function mapping is overwriting an existing endpoint function")
-    wrapper.__name__ = func.__name__
+    wrapper.__name__ = _func.__name__
 
     return wrapper

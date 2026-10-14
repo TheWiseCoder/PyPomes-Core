@@ -43,7 +43,7 @@ from .func_pomes import (
     func_capture_params, func_defaulted_params, func_specified_params
 )
 from .list_pomes import (
-    list_compare, list_correlate, list_is_slice, list_is_sub,
+    list_compare, list_correlate, list_is_slice, list_is_sub, list_find,
     list_bin_search, list_flatten, list_unflatten, list_get_coupled,
     list_elem_starting_with, list_elem_with_attr, list_transform,
     list_prune_duplicates, list_prune_in, list_prune_not_in,
@@ -117,7 +117,7 @@ __all__ = [
     "func_capture_args", "func_defaulted_args", "func_specified_args",
     "func_capture_params", "func_defaulted_params", "func_specified_params",
     # list_pomes
-    "list_compare", "list_correlate", "list_is_slice", "list_is_sub",
+    "list_compare", "list_correlate", "list_is_slice", "list_is_sub", "list_find",
     "list_bin_search", "list_flatten", "list_unflatten", "list_get_coupled",
     "list_elem_starting_with", "list_elem_with_attr", "list_transform",
     "list_prune_duplicates", "list_prune_in", "list_prune_not_in",

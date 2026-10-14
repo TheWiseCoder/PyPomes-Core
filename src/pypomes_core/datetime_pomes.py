@@ -1,6 +1,6 @@
+from contextlib import suppress
 from datetime import date, datetime, timedelta
 from dateutil import parser
-from dateutil.parser import ParserError
 from enum import StrEnum
 from typing import Any, Final
 from zoneinfo import ZoneInfo
@@ -32,13 +32,14 @@ class DatetimeFormat(StrEnum):
     STD = "%m/%d/%Y %H:%M:%S"
 
 
-def date_reformat(dt_str: str,
+def date_reformat(_dt: str,
+                  /,
                   to_format: str,
                   **kwargs: Any) -> str | None:
     """
-    Convert the date in *dt_str* to the format specified in *to_format*.
+    Convert the date encoded in the input string to the format specified in *to_format*.
 
-    The argument *dt_str* must represent a valid date, with or without time-of-day information.
+    The argument input string must encode a valid date, with or without time-of-day information.
     The argument *to_format* must be a valid format for *date* ou *datetime*.
 
     In *kwargs*, it may optionally be specified:
@@ -51,24 +52,28 @@ def date_reformat(dt_str: str,
         -   *fmt=<format>*, to force use of a specific format
     Return *None* se *dt_str* does not contain a valid date.
 
-    :param dt_str: the date to convert
+    :param _dt: the date to convert
     :param to_format: the format for the conversion
     :param kwargs: optional arguments for the parser in python-dateutil
     :return: the converted date, or *None* if the convertion was not possible
     """
+    # initialize the return variable
     result: str | None = None
-    ts: datetime = parser.parse(timestr=dt_str,
-                                **kwargs)
-    if ts:
-        result = ts.strftime(to_format)
+
+    with suppress(Exception):
+        ts: datetime = parser.parse(timestr=_dt,
+                                    **kwargs)
+        if ts:
+            result = ts.strftime(to_format)
 
     return result
 
 
-def date_weekday(dt_base: str | date | datetime,
+def date_weekday(_dt: str | date | datetime,
+                 /,
                  weekdays: list[int]) -> date | datetime | None:
     """
-    Obtain and return the first date with day-of-week specified in *weekdays*, starting at *dt_base*.
+    Obtain and return the first date with day-of-week specified in *weekdays*, starting at the input date.
 
     The parameter *weekdays* lists the accepted days-of-week, indicated as:
       - 0: Monday
@@ -79,11 +84,13 @@ def date_weekday(dt_base: str | date | datetime,
       - 5: Saturday
       - 6: Sunday
 
-    :param dt_base: the base date, either as *date*, *datetime*, or as a valid string representation of a *date*
+    :param _dt: the base date, either as *date*, *datetime*, or as a valid string representation of a *date*
     :param weekdays: the list of accepted days-of-week, as 0 (Monday) through 6 (Sunday)
     :return: the first satisfying date starting at *dt_base*, or *None*  if it could not be obtained
     """
-    result: date | datetime = date_parse(dt_str=dt_base) if isinstance(dt_base, str) else dt_base
+    # initialize the return variable
+    result: date | datetime = date_parse(_dt) if isinstance(_dt, str) else _dt
+
     # 'datetime' is subclass of 'date'
     if isinstance(result, date):
         while result.weekday() not in weekdays:
@@ -92,10 +99,11 @@ def date_weekday(dt_base: str | date | datetime,
     return result
 
 
-def date_parse(dt_str: str,
+def date_parse(_date: str,
+               /,
                **kwargs: Any) -> date | None:
     """
-    Obtain and return the *date* object corresponding to *dt_str*.
+    Obtain and return the *date* object encoded in the input string.
 
     In *kwargs*, it may optionally be specified:
         -   *dayfirst=True*
@@ -107,23 +115,21 @@ def date_parse(dt_str: str,
         -   *fmt=<format>*, to force use of a specific format
     Return *None* se *dt_str* does not contain a valid date.
 
-    :param dt_str: the date, in a supported format
+    :param _date: the date, in a supported format
     :param kwargs: optional arguments for the parser in python-dateutil
     :return: the corresponding date object, or *None* if it could not be obtained
     """
-    # declare the return variable
-    result: date | None
+    # initialize the return variable
+    result: date | None = None
 
-    try:
-        result = parser.parse(timestr=dt_str,
+    with suppress(Exception):
+        result = parser.parse(timestr=_date,
                               **kwargs).date()
-    except (TypeError, ParserError, OverflowError):
-        result = None
-
     return result
 
 
-def datetime_parse(dt_str: str,
+def datetime_parse(_dt: str,
+                   /,
                    **kwargs: Any) -> datetime | None:
     """
     Obtain and return the *datetime* object corresponding to *dt_str*.
@@ -138,19 +144,16 @@ def datetime_parse(dt_str: str,
         -   *fmt=<format>*, to force use of a specific format
     Return *None* if *dt_str* does not contain a valid date.
 
-    :param dt_str: the date, in a supported format
+    :param _dt: the date, in a supported format
     :param kwargs: optional arguments for the parser in python-dateutil
     :return: the corresponding datetime object, or *None*
     """
-    # declare the return variable
-    result: datetime | None
+    # initialize the return variable
+    result: datetime | None = None
 
-    try:
-        result = parser.parse(timestr=dt_str,
+    with suppress(Exception):
+        result = parser.parse(timestr=_dt,
                               **kwargs)
-    except (TypeError, ParserError, OverflowError):
-        result = None
-
     return result
 
 

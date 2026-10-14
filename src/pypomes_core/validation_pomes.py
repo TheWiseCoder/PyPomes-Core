@@ -745,7 +745,7 @@ def validate_date(source: dict[str, Any],
         elif isinstance(value, int | float):
             result = datetime.fromtimestamp(value).date()
         else:
-            result = date_parse(dt_str=value,
+            result = date_parse(value,
                                 dayfirst=day_first)
         if not result:
             # 141: Invalid value {}
@@ -816,7 +816,7 @@ def validate_datetime(source: dict[str, Any],
         elif isinstance(value, int | float):
             result = datetime.fromtimestamp(value)
         else:
-            result = datetime_parse(dt_str=value,
+            result = datetime_parse(value,
                                     dayfirst=day_first)
         if not result:
             # 141: Invalid value {}

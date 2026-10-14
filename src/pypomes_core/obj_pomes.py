@@ -5,11 +5,12 @@ from types import TracebackType
 from typing import Any
 
 
-def obj_is_serializable(obj: Any) -> bool:
+def obj_is_serializable(_obj: Any,
+                        /) -> bool:
     """
-    Determine if *obj* is serializable.
+    Determine if the input object is serializable.
 
-    :param obj: the reference object
+    :param _obj: the reference object
     :return: *True* if serializable, *False* otherwise
     """
     # initialize the return variable
@@ -17,14 +18,15 @@ def obj_is_serializable(obj: Any) -> bool:
 
     # verify the object
     try:
-        json.dumps(obj)
+        json.dumps(_obj)
     except (TypeError, OverflowError):
         result = False
 
     return result
 
 
-def obj_to_dict(obj: Any,
+def obj_to_dict(_obj: Any,
+                /,
                 omit_private: bool = True) -> dict[str, Any] | list[Any] | Any:
     """
     Convert the generic object *obj* to a *dict*.
@@ -32,44 +34,44 @@ def obj_to_dict(obj: Any,
     The conversion is done recursively. Attributes for which exceptions are raised on attempt
     to access them are silently omitted.
 
-    :param obj: the object to be converted
+    :param _obj: the object to be converted
     :param omit_private: whether to omit private attributes (defaults to *True*)
     :return: the dict obtained from *obj*
     """
     # declare the return variable
     result: dict[str, Any] | list[Any] | Any
 
-    if isinstance(obj, dict):
-        result = {str(k): obj_to_dict(obj=v,
-                                      omit_private=omit_private) for k, v in obj.items()}
-    elif isinstance(obj, list | tuple | set):
-        result = [obj_to_dict(obj=item,
-                              omit_private=omit_private) for item in obj]
-    elif hasattr(obj, "__dict__") or not isinstance(obj, str | int | float | bool | type(None)):
+    if isinstance(_obj, dict):
+        result = {str(k): obj_to_dict(v,
+                                      omit_private=omit_private) for k, v in _obj.items()}
+    elif isinstance(_obj, list | tuple | set):
+        result = [obj_to_dict(item,
+                              omit_private=omit_private) for item in _obj]
+    elif hasattr(_obj, "__dict__") or not isinstance(_obj, str | int | float | bool | type(None)):
         result = {}
-        for attr in dir(obj):
+        for attr in dir(_obj):
             if not (omit_private and attr.startswith("_")):
-                value: Any = getattr(obj,
+                value: Any = getattr(_obj,
                                      attr,
                                      None)
                 if value is not None and not callable(value):
-                    result[attr] = obj_to_dict(obj=value,
+                    result[attr] = obj_to_dict(value,
                                                omit_private=omit_private)
     else:
-        result = obj
+        result = _obj
 
     return result
 
 
-def obj_positional(o: Any,
+def obj_positional(_obj: Any,
                    /,
                    keys: tuple[Any, ...],
                    values: tuple[Any, ...],
                    def_value: Any = None) -> Any:
     """
-    Locate the position of *o* within *keys*, and return the element in the same position in *values*.
+    Locate the position of the input object within *keys*, and return the element in the same position in *values*.
 
-    :param o: the source object
+    :param _obj: the source object
     :param keys: the tuple holding the keys to be inspected
     :param values: the tuple holding the positionally corresponding values
     :param def_value: the value to return, if not found (defaults to *None*)
@@ -79,7 +81,7 @@ def obj_positional(o: Any,
     result: Any = def_value
 
     with suppress(Exception):
-        pos: int = keys.index(o)
+        pos: int = keys.index(_obj)
         result = values[pos]
 
     return result

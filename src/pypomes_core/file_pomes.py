@@ -78,11 +78,12 @@ class Mimetype(StrEnum):
     ZIP = "application/zip"
 
 
-def file_get_data(file_data: BytesIO | StringIO | Path | str | bytes,
+def file_get_data(_data: BytesIO | StringIO | Path | str | bytes,
+                  /,
                   max_len: int = None,
                   chunk_size: int = None) -> bytes | None:
     """
-    Retrieve the data in *file_data*, as implicitly defined by its data type.
+    Retrieve the input data as implicitly defined by its data type.
 
     The distinction is made with the parameter's type:
         - type *BytesIO*: *file_data* is a stream of bytes (collect and returned as is)
@@ -91,7 +92,7 @@ def file_get_data(file_data: BytesIO | StringIO | Path | str | bytes,
         - type *str*: *file_data* holds the data (returned as utf8-encoded)
         - type *bytes*: *file_data* holds the data (returned as is)
 
-    :param file_data: the data as implicitly defined by its data type
+    :param _data: the data as implicitly defined by its data type
     :param max_len: optional maximum length of the data to return, defaults to all data
     :param chunk_size: optional chunk size to use in reading the data, defaults to 128 KB
     :return: the data, or *None* if the file data could not be obtained
@@ -110,25 +111,25 @@ def file_get_data(file_data: BytesIO | StringIO | Path | str | bytes,
         chunk_size = 128 * 1024
 
     # what is the argument type ?
-    if isinstance(file_data, bytes):
+    if isinstance(_data, bytes):
         # argument is type 'bytes'
-        result = file_data
+        result = _data
 
-    elif isinstance(file_data, str):
+    elif isinstance(_data, str):
         # argument is type 'str'
-        result = file_data.encode(encoding="utf-8")
+        result = _data.encode(encoding="utf-8")
 
-    elif isinstance(file_data, BytesIO | StringIO):
+    elif isinstance(_data, BytesIO | StringIO):
         # argument is type 'stream'
-        file_data.seek(0)
-        result = file_data.read()
+        _data.seek(0)
+        result = _data.read()
         if isinstance(result, str):
             result = result.encode(encoding="utf-8")
 
-    elif isinstance(file_data, Path):
+    elif isinstance(_data, Path):
         # argument is a file path
         file_bytes: bytearray = bytearray()
-        file_path: Path = Path(file_data)
+        file_path: Path = Path(_data)
         # get the data
         with file_path.open(mode="rb") as f:
             buf_size: int = min(max_len, chunk_size) if max_len else chunk_size
@@ -146,6 +147,96 @@ def file_get_data(file_data: BytesIO | StringIO | Path | str | bytes,
 
     if result and max_len and len(result) > max_len:
         result = result[:max_len]
+
+    return result
+
+
+def file_get_mimetype(_data: Path | str | bytes,
+                      /) -> Mimetype | str:
+    """
+    Heuristics to determine the mimetype for *file_data*.
+
+    The content is retrieved for analysis according to *file_data*'s type:
+        - type *bytes*: *file_data* holds the data
+        - type *str*: *file_data* holds the data as utf8-encoded
+        - type *Path*: *file_data* is a path to a file holding the data
+
+    The heuristics used, as heuristics go, provides an educated guess, not an accurate result.
+    If a mimetype is found, and it is not in *Mimetype* (which is a small subset of known mimetypes),
+    then its identifying string is returned.
+
+    :param _data: file data, or the path to locate the file
+    :return: the probable mimetype, as a *Mimetype* object or as a string
+    """
+    mimetype: str | None = None
+    if isinstance(_data, str):
+        _data = _data.encode()
+    with suppress(TypeError):
+        kind: filetype.Type = filetype.guess(obj=_data)
+        if kind:
+            mimetype = kind.mime
+
+    if not mimetype:
+        with suppress(puremagic.PureError):
+            if isinstance(_data, Path):
+                mimetype = puremagic.from_file(filename=_data,
+                                               mime=True)
+            else:
+                mimetype = puremagic.from_string(string=_data,
+                                                 mime=True)
+    result: Mimetype | str
+    if mimetype:
+        # for unknown mimetypes, return its identifying string
+        result = Mimetype(mimetype) if mimetype in Mimetype else mimetype
+    elif file_is_binary(_data):
+        result = Mimetype.BINARY
+    else:
+        result = Mimetype.TEXT
+
+    return result
+
+
+def file_is_binary(_data: Path | str | bytes,
+                   /) -> bool:
+    """
+    Heuristics to determine whether the content of the input data is binary.
+
+    The content is retrieved for analysis according to *file_data*'s type:
+        - type *bytes*: *file_data* holds the data
+        - type *str*: *file_data* holds the data as utf8-encoded
+        - type *Path*: *file_data* is a path to a file holding the data
+
+    The heuristics used, as heuristics go, provide an educated guess, not an accurate result.
+    In the present case, the first 4 KBytes of the file data is inspected for the occurrence
+    of characters normally absent in text files. Thus, the presence of characters other than
+    *bell*, *backspace*, *horizontal tab*, *newline*, *form feed*, *carriage return*, *escape*,
+    and those in ASCII range [32 - 255] (except 127), would flag the file as binary.
+    Empty or null content is considered to be non-binary.
+
+    :param _data: file data, or the path to locate the file
+    :return: *True* if the determination resulted positive, *False* otherwise
+    """
+    # obtain up to 1024 bytes of content for analysis
+    chunk: bytes = file_get_data(_data,
+                                 max_len=4096) or b""
+    # check for null byte
+    result: bool = b"\0" in chunk
+
+    # check for non-printable characters
+    if not result:
+        # remove the chars listed below - chars remaining indicates content is binary
+        #    7: \a (bell)
+        #    8: \b (backspace)
+        #    9: \t (horizontal tab)
+        #   10: \n (newline)
+        #   12: \f (form feed)
+        #   13: \r (carriage return)
+        #   27: \x1b (escape)
+        #   0x20 - 0x100, less 0x7f: 32-255 char range, less 127 (the DEL control char)
+        text_characters = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7f})
+        translation: bytes = chunk.translate(None,
+                                             delete=text_characters)
+        result = bool(translation)
 
     return result
 
@@ -169,93 +260,5 @@ def file_get_extension(mimetype: Mimetype | str) -> str | None:
         mimetype = Mimetype(mimetype)
         # noinspection PyProtectedMember
         result = f".{mimetype._name_.lower()}"
-
-    return result
-
-
-def file_get_mimetype(file_data: Path | str | bytes) -> Mimetype | str:
-    """
-    Heuristics to determine the mimetype for *file_data*.
-
-    The content is retrieved for analysis according to *file_data*'s type:
-        - type *bytes*: *file_data* holds the data
-        - type *str*: *file_data* holds the data as utf8-encoded
-        - type *Path*: *file_data* is a path to a file holding the data
-
-    The heuristics used, as heuristics go, provides an educated guess, not an accurate result.
-    If a mimetype is found, and it is not in *Mimetype* (which is a small subset of known mimetypes),
-    then its identifying string is returned.
-
-    :param file_data: file data, or the path to locate the file
-    :return: the probable mimetype, as a *Mimetype* object or as a string
-    """
-    mimetype: str | None = None
-    if isinstance(file_data, str):
-        file_data = file_data.encode()
-    with suppress(TypeError):
-        kind: filetype.Type = filetype.guess(obj=file_data)
-        if kind:
-            mimetype = kind.mime
-
-    if not mimetype:
-        with suppress(puremagic.PureError):
-            if isinstance(file_data, Path):
-                mimetype = puremagic.from_file(filename=file_data,
-                                               mime=True)
-            else:
-                mimetype = puremagic.from_string(string=file_data,
-                                                 mime=True)
-    result: Mimetype | str
-    if mimetype:
-        # for unknown mimetypes, return its identifying string
-        result = Mimetype(mimetype) if mimetype in Mimetype else mimetype
-    elif file_is_binary(file_data=file_data):
-        result = Mimetype.BINARY
-    else:
-        result = Mimetype.TEXT
-
-    return result
-
-
-def file_is_binary(file_data: Path | str | bytes) -> bool:
-    """
-    Heuristics to determine whether the content of *file_data* is binary.
-
-    The content is retrieved for analysis according to *file_data*'s type:
-        - type *bytes*: *file_data* holds the data
-        - type *str*: *file_data* holds the data as utf8-encoded
-        - type *Path*: *file_data* is a path to a file holding the data
-
-    The heuristics used, as heuristics go, provide an educated guess, not an accurate result.
-    In the present case, the first 4 KBytes of the file data is inspected for the occurrence
-    of characters normally absent in text files. Thus, the presence of characters other than
-    *bell*, *backspace*, *horizontal tab*, *newline*, *form feed*, *carriage return*, *escape*,
-    and those in ASCII range [32 - 255] (except 127), would flag the file as binary.
-    Empty or null content is considered to be non-binary.
-
-    :param file_data: file data, or the path to locate the file
-    :return: *True* if the determination resulted positive, *False* otherwise
-    """
-    # obtain up to 1024 bytes of content for analysis
-    chunk: bytes = file_get_data(file_data=file_data,
-                                 max_len=4096) or b""
-    # check for null byte
-    result: bool = b"\0" in chunk
-
-    # check for non-printable characters
-    if not result:
-        # remove the chars listed below - chars remaining indicates content is binary
-        #    7: \a (bell)
-        #    8: \b (backspace)
-        #    9: \t (horizontal tab)
-        #   10: \n (newline)
-        #   12: \f (form feed)
-        #   13: \r (carriage return)
-        #   27: \x1b (escape)
-        #   0x20 - 0x100, less 0x7f: 32-255 char range, less 127 (the DEL control char)
-        text_characters = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7f})
-        translation: bytes = chunk.translate(None,
-                                             delete=text_characters)
-        result = bool(translation)
 
     return result

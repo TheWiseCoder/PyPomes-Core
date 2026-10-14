@@ -7,20 +7,21 @@ from .file_pomes import file_get_data
 XML_FILE_HEADER: Final[str] = '<?xml version="1.0" encoding="UTF-8" ?>'
 
 
-def xml_normalize_keys(source: dict[str, Any]) -> dict[str, Any]:
+def xml_normalize_keys(_dict: dict[str, Any],
+                       /) -> dict[str, Any]:
     """
     Clone *source*, removing *namespaces* and the prefixes *'@'* e *'#'* from its key names.
 
     The key order is kept unchanged.
 
-    :param source: the reference *dict*
+    :param _dict: the reference *dict*
     :return: the new, normalized, *dict*
     """
     # initialize the return variable
     result: dict[str, Any] = {}
 
     # traverse the dictionary
-    for curr_key, curr_value in source.items():
+    for curr_key, curr_value in _dict.items():
 
         # is 'curr_value' a dictionary ?
         if isinstance(curr_value, dict):
@@ -51,18 +52,19 @@ def xml_normalize_keys(source: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def xml_to_dict(file_data: Path | str | bytes) -> dict[str, Any]:
+def xml_to_dict(_data: Path | str | bytes,
+                /) -> dict[str, Any]:
     """
     Convert the XML into a *dict*, by removing namespaces, and keys prefixed with "@" e "#".
 
    The input XML must be in *file_data* (type *bytes*),  or in a
    system file with the path specified by *file_data* (type *Path* or *str*).
 
-    :param file_data: XML to be converted
+    :param _data: XML to be converted
     :return: the normalized *dict*
     """
     # obtain the file data
-    file_bytes: bytes = file_get_data(file_data=file_data)
+    file_bytes: bytes = file_get_data(_data)
 
     # convert XML to dict
     xml_data = XmlTextToDict(xml_text=file_bytes.decode(),
@@ -70,4 +72,4 @@ def xml_to_dict(file_data: Path | str | bytes) -> dict[str, Any]:
     result: dict[str, Any] = xml_data.get_dict()
 
     # normalize the dict, removing namespaces and prefixes '@' e '#' from the key names
-    return xml_normalize_keys(source=result)
+    return xml_normalize_keys(result)
